@@ -13,9 +13,6 @@
 
     <img src="data:image/svg+xml;base64,{{ $qrSvg }}" width="300">
 
-    <div class="url">
-        <strong>QR URL:</strong><br>
-        {{ $url }}
-    </div>
+  
 </body>
 </html>

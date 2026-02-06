@@ -29,9 +29,13 @@ Route::get('counters/create', [CounterController::class, 'create'])->name('count
 
 Route::get('counters', [CounterController::class, 'index'])->name('counters.index');
 Route::post('counters/store', [CounterController::class, 'store'])->name('counters.store');
-Route::put('counters/update/{counter}', [CounterController::class, 'update'])->name('counters.update');
+Route::put('counters/update/{counter}', [CounterController::class, 'update'])
+     ->name('counters.update');
 Route::delete('counters/delete/{counter}', [CounterController::class, 'destroy'])->name('counters.destroy');
-
+Route::get('/admin/feedbacks', [CounterController::class, 'feedback_index'])
+    ->name('admin.feedback.index');
+Route::get('/admin/feedbacks/pdf', [CounterController::class, 'downloadPdf'])
+    ->name('admin.feedback.downloadPdf');    
     Route::get('ds-divisions', [DsDivisionController::class, 'index'])->name('ds-divisions.index');
   // Show QR page
     Route::get('/{counterId}/qr', [DsDivisionController::class, 'showQr'])->name('showQr');

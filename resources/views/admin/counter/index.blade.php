@@ -110,8 +110,9 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.editBtn').forEach(function(btn) {
         btn.addEventListener('click', function() {
             let id = btn.dataset.id;
-            form.action = '/counters/' + id;
-            document.getElementById('methodField').value = 'PUT';
+      form.action = '/counters/update/' + id;
+document.getElementById('methodField').value = 'PUT';
+
             document.getElementById('modalTitle').innerText = 'Edit Counter';
             document.getElementById('district').value = btn.dataset.district;
             document.getElementById('division_name').value = btn.dataset.division;

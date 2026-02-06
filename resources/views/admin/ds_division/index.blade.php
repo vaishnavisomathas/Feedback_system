@@ -56,11 +56,6 @@ Generate QR
     <img src="{{ session('generatedQr') }}" style="max-width:150px">
     <input class="form-control mt-2" readonly value="{{ session('generatedQrUrl') }}">
 
-
-
-    <!-- Show Generated QR Inline -->
-   
-
             {{-- DOWNLOAD --}}
            <a href="{{ route('ds-divisions.downloadQrPdf', $counter->id) }}" 
    class="btn btn-sm btn-primary mb-1">
