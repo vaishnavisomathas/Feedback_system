@@ -124,19 +124,70 @@
         </div>
     </a>
 </li>
-               
-           
 <li class="nav-small-cap">
               <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">Roles</span>
+              <span class="hide-menu">User</span>
             </li>
-            {{-- ROLES --}}
-            <li class="nav-item mt-3 {{ request()->routeIs('roles.*') ? 'active' : '' }}">
-                <a href="" class="nav-link">
-                    <i class="ti ti-shield me-2"></i>
-                    Roles & Permissions
-                </a>
-            </li>
+          
+<li class="sidebar-item">
+    <a class="sidebar-link justify-content-between"
+       href="{{ route('users.index') }}" aria-expanded="false">
+        <div class="d-flex align-items-center gap-3">
+            <span class="d-flex">
+                <i class="ti ti-user"></i>
+            </span>
+            <span class="hide-menu">User</span>
+        </div>
+    </a>
+</li>
+
+               
+           
+{{-- ROLES & PERMISSIONS --}}
+<li class="nav-small-cap mt-3">
+    <iconify-icon icon="solar:menu-dots-linear"
+        class="nav-small-cap-icon fs-4"></iconify-icon>
+    <span class="hide-menu">Roles & Permissions</span>
+</li>
+<li class="sidebar-item">
+    <a class="sidebar-link justify-content-between"
+        href="{{ route('permission.groups') }}" aria-expanded="false">
+        <div class="d-flex align-items-center gap-3">
+            <span class="d-flex">
+        <i class="ti ti-category me-2"></i>
+            </span>
+            <span class="hide-menu">Permission Groups</span>
+        </div>
+    </a>
+</li>
+<li class="sidebar-item">
+    <a class="sidebar-link justify-content-between"
+        href="{{ route('permissions.index') }}" aria-expanded="false">
+        <div class="d-flex align-items-center gap-3">
+            <span class="d-flex">
+        <i class="ti ti-lock me-2"></i>
+            </span>
+            <span class="hide-menu">Permissions</span>
+        </div>
+    </a>
+</li>
+
+<li class="sidebar-item">
+    <a class="sidebar-link justify-content-between"
+        href="{{ route('roles.index') }}" aria-expanded="false">
+        <div class="d-flex align-items-center gap-3">
+            <span class="d-flex">
+        <i class="ti ti-shield me-2"></i>
+            </span>
+            <span class="hide-menu">Roles</span>
+        </div>
+    </a>
+</li>
+
+
+
+
+
 
         </ul>
     </div>

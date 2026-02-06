@@ -1,9 +1,14 @@
 <?php
 
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CounterController;
 use App\Http\Controllers\DsDivisionController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\PermissionGroupController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,10 +25,15 @@ use Illuminate\Support\Facades\Route;
 // Route::get('/', function () {
 //     return view('welcome');
 // });
+Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [LoginController::class, 'login'])->name('login.post');
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+Route::get('/password/reset', [LoginController::class, 'showLinkRequestForm'])->name('password.request');
+
 
 Route::get('/feedback/{division}/{counter}', [FeedbackController::class, 'show'])
     ->name('feedback.show');
-Route::get('/', [HomeController::class, 'index'])
+Route::get('/dashboard', [HomeController::class, 'index'])
     ->name('dashboard');
 Route::get('counters/create', [CounterController::class, 'create'])->name('counters.create');
 
@@ -53,3 +63,30 @@ Route::get('ds-divisions/{counterId}/download-qr', [DsDivisionController::class,
     ->name('admin.ds-divisions.qr-pdf');
 
         Route::post('feedback/store', [FeedbackController::class, 'store']) ->name('feedback.store');
+
+        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+Route::post('/users/store', [UserController::class, 'store'])->name('users.store');
+Route::put('/users/update/{id}', [UserController::class, 'update'])->name('users.update');
+Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+
+// Route::prefix('admin')->group(function () {
+
+    // Permission Groups
+    Route::get('/permission-groups', [PermissionGroupController::class,'index'])->name('permission.groups');
+    Route::post('/permission-groups', [PermissionGroupController::class,'store'])->name('permission.groups.store');
+    Route::put('/admin/permission-groups/{id}', [PermissionGroupController::class,'update'])->name('permission.groups.update');
+    Route::delete('/permission-groups/{id}', [PermissionGroupController::class,'destroy'])->name('permission.groups.delete');
+
+    // Permissions
+    Route::get('/permissions', [PermissionController::class,'index'])->name('permissions.index');
+    Route::post('/permissions', [PermissionController::class,'store'])->name('permissions.store');
+    Route::put('/admin/permissions/{id}', [PermissionController::class,'update'])->name('permissions.update');
+    Route::delete('/permissions/{id}', [PermissionController::class,'destroy'])->name('permissions.delete');
+
+    // Roles
+    Route::get('/roles', [RoleController::class,'index'])->name('roles.index');
+    Route::post('/roles', [RoleController::class,'store'])->name('roles.store');
+    Route::put('/admin/roles/{id}', [RoleController::class,'update'])->name('roles.update');
+    Route::delete('/roles/{id}', [RoleController::class,'destroy'])->name('roles.delete');
+
+// });
