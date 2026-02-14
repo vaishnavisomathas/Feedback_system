@@ -19,7 +19,7 @@
       <div class="d-flex align-items-center justify-content-center gap-5 mb-2 mb-lg-0">
         <a class="d-flex justify-content-center" href="#">
 <img src="assets/images/logos/rural-clms-logo.png" 
-                 alt="Rural Area CLMS Sri Lanka" 
+                 alt="" 
                 height="40" width="100">        </a>
 
         
@@ -42,7 +42,7 @@
       <div>
         <div class="brand-logo d-flex align-items-center justify-content-between">
           <a href="./index.html" class="text-nowrap logo-img">
-<img src="{{ asset('assets/images/logos/Rural_Area_CLMS.png') }}" alt="Rural Area CLMS" width="250" height="110" />
+<img src="{{ asset('assets/images/logos/Rural_Area_CLMS.png') }}" alt="" width="250" height="110" />
           </a>
           <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
             <i class="ti ti-x fs-6"></i>
@@ -127,16 +127,64 @@
                
            
 <li class="nav-small-cap">
-              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">Roles</span>
-            </li>
-            {{-- ROLES --}}
-            <li class="nav-item mt-3 {{ request()->routeIs('roles.*') ? 'active' : '' }}">
-                <a href="" class="nav-link">
-                    <i class="ti ti-shield me-2"></i>
-                    Roles & Permissions
-                </a>
-            </li>
+    <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
+    <span class="hide-menu">User Management</span>
+</li>
+
+<li class="sidebar-item">
+    <a class="sidebar-link justify-content-between"  
+        href="{{ route('users.index') }}" aria-expanded="false">
+        <div class="d-flex align-items-center gap-3">
+            <span class="d-flex">
+                <i class="ti ti-users"></i>
+            </span>
+            <span class="hide-menu">Users</span>
+        </div>
+    </a>
+</li>
+
+<li class="nav-small-cap">
+    <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
+    <span class="hide-menu">Settings</span>
+</li>
+
+{{-- RBAC DROPDOWN --}}
+<li class="sidebar-item">
+
+
+
+        {{-- Roles --}}
+        <li class="sidebar-item {{ request()->routeIs('roles.*') ? 'active' : '' }}">
+            <a href="{{ route('roles.index') }}" class="sidebar-link">
+                <span class="d-flex">
+                    <i class="ti ti-category"></i>
+                </span>
+                <span class="hide-menu">Roles</span>
+            </a>
+        </li>
+
+        {{-- Permission Groups --}}
+        <li class="sidebar-item {{ request()->routeIs('permission-groups.*') ? 'active' : '' }}">
+            <a href="{{ route('permission-groups.index') }}" class="sidebar-link">
+                <span class="d-flex">
+                    <i class="ti ti-category"></i>
+                </span>
+                <span class="hide-menu">Permission Groups</span>
+            </a>
+        </li>
+
+        {{-- Permissions --}}
+        <li class="sidebar-item {{ request()->routeIs('permissions.*') ? 'active' : '' }}">
+            <a href="{{ route('permissions.index') }}" class="sidebar-link">
+                <span class="d-flex">
+                    <i class="ti ti-key"></i>
+                </span>
+                <span class="hide-menu">Permissions</span>
+            </a>
+        </li>
+
+</li>
+
 
         </ul>
     </div>
@@ -188,19 +236,14 @@
                       <i class="ti ti-user fs-6"></i>
                       <p class="mb-0 fs-3">My Profile</p>
                     </a>
-                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
-                      <i class="ti ti-mail fs-6"></i>
-                      <p class="mb-0 fs-3">My Account</p>
-                    </a>
-                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
-                      <i class="ti ti-list-check fs-6"></i>
-                      <p class="mb-0 fs-3">My Task</p>
-                    </a>
-<a href=""
-   class="btn btn-outline-primary mx-3 mt-2 d-block"
-   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-    Logout
-</a>
+                   
+<form method="POST" action="{{ route('logout') }}">
+    @csrf
+    <button class="btn btn-danger btn-sm w-100">
+        Logout
+    </button>
+</form>
+
 
 <form id="logout-form" action="" method="POST" class="d-none">
     @csrf

@@ -5,15 +5,21 @@ namespace App\Http\Controllers;
 use App\Models\Counter;
 use Illuminate\Http\Request;
 use App\Models\Feedback;
+use Illuminate\Support\Carbon;
 
 class FeedbackController extends Controller
 {
-     public function show($division, $counterName)
-    {
-        // Find the counter by division and name
-        $counter = Counter::where('division_name', $division)
-                          ->where('counter_name', $counterName)
-                          ->firstOrFail();
+   public function show($division, $counterName)
+{
+    $counter = Counter::where('division_name',$division)
+        ->where('counter_name',$counterName)
+        ->firstOrFail();
+
+     session([
+            'rating_access' => true,
+            'rating_counter' => $counter->id
+        ]);
+
 
         return view('feedback', [
             'counter' => $counter,
@@ -23,6 +29,9 @@ class FeedbackController extends Controller
     }
     public function store(Request $request)
     {
+           if(!session('rating_access')){
+            return redirect()->route('feedback.closed');
+        }
         $request->validate([
                   'counter_id'       => 'required|exists:counters,id',
             'rating'           => 'required|integer|min:1|max:5',
@@ -43,6 +52,8 @@ class FeedbackController extends Controller
             'note'            => $request->note,
         ]);
 
-        return back()->with('success', 'Thank you for your feedback!');
+              session()->forget(['rating_access','rating_counter']);
+
+    return redirect()->route('feedback.thankyou');
     }
 }

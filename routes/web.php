@@ -1,9 +1,14 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CounterController;
 use App\Http\Controllers\DsDivisionController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\PermissionGroupController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,10 +25,13 @@ use Illuminate\Support\Facades\Route;
 // Route::get('/', function () {
 //     return view('welcome');
 // });
-
+Route::get('/', [AuthController::class,'showLogin'])->name('login');
+Route::post('/login', [AuthController::class,'login'])->name('login.post');
+Route::post('/logout', [AuthController::class,'logout'])->name('logout');
+// Route::middleware('auth')->group(function () {
 Route::get('/feedback/{division}/{counter}', [FeedbackController::class, 'show'])
     ->name('feedback.show');
-Route::get('/', [HomeController::class, 'index'])
+Route::get('/dashboard', [HomeController::class, 'index'])
     ->name('dashboard');
 Route::get('counters/create', [CounterController::class, 'create'])->name('counters.create');
 
@@ -53,3 +61,12 @@ Route::get('ds-divisions/{counterId}/download-qr', [DsDivisionController::class,
     ->name('admin.ds-divisions.qr-pdf');
 
         Route::post('feedback/store', [FeedbackController::class, 'store']) ->name('feedback.store');
+        Route::view('/thank-you','thankyou')->name('feedback.thankyou');
+Route::view('/closed','closed')->name('feedback.closed');
+
+        Route::resource('users', UserController::class);
+        
+Route::resource('roles', RoleController::class);
+Route::resource('permissions', PermissionController::class);
+Route::resource('permission-groups', PermissionGroupController::class);
+// });

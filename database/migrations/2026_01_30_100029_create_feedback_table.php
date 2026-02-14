@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('phone', 10)->nullable();
             $table->string('vehicle_number', 20)->nullable();
             $table->text('note')->nullable();
+
             $table->timestamps();
 
             $table->foreign('counter_id')->references('id')->on('counters')->onDelete('set null');
