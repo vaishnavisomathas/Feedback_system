@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function () {
         btn.addEventListener('click', function () {
 
             let id = btn.dataset.id;
-            form.action = '/users/update/' + id;
+form.action = '/users/' + id;
             document.getElementById('methodField').value = 'PUT';
 
             document.getElementById('modalTitle').innerText = 'Edit User';

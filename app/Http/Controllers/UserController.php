@@ -16,7 +16,7 @@ class UserController extends Controller
     return view('admin.user.index', compact('users','roles'));
 }
 
-    public function store(Request $request)
+  public function store(Request $request)
 {
     $request->validate([
         'name' => 'required',
@@ -68,7 +68,4 @@ public function destroy($id)
     $user->delete();
 
     return back()->with('success', 'User deleted successfully');
-}
-
-
-}
+}}
