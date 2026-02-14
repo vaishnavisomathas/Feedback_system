@@ -21,38 +21,37 @@ class PermissionController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|unique:permissions,name',
+            'name' => 'required',
             'group_id' => 'required'
         ]);
 
         Permission::create([
             'name' => $request->name,
-            'group_id' => $request->group_id,
-            'guard_name' => 'web'
+            'guard_name' => 'web',
+            'group_id' => $request->group_id ?? null, 
         ]);
 
         return back()->with('success','Permission created');
     }
+public function update(Request $request, $id)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'group_id' => 'nullable|exists:permission_groups,id',
+    ]);
 
-    public function update(Request $request, $id)
-    {
-        $permission = Permission::findOrFail($id);
+    $permission = Permission::findOrFail($id);
+    $permission->update([
+        'name' => $request->name,
+'group_id' => $request->group_id ?? null,
+    'guard_name' => $permission->guard_name ?? 'web',    ]);
 
-        $request->validate([
-            'name' => 'required|unique:permissions,name,'.$id,
-            'group_id' => 'required'
-        ]);
-
-        $permission->update([
-            'name'=>$request->name,
-            'group_id'=>$request->group_id
-        ]);
-
-        return back()->with('success','Permission updated');
-    }
+    return back()->with('success', 'Permission updated successfully');
+}
 
     public function destroy($id)
     {
-        Permission::findOrFail($id)->delete();
+        Permission::findById($id)->delete();
         return back()->with('success','Permission deleted');
-    }}
+    }
+}

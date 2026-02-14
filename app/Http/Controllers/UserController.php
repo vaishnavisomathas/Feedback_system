@@ -5,91 +5,70 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
- public function index()
-    {
-        $users = User::latest()->get();
-        return view('users.index', compact('users'));
-    }
+    public function index()
+{
+    $users = User::latest()->get();
+       $roles = Role::all();
+    return view('admin.user.index', compact('users','roles'));
+}
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:4'
-        ]);
+{
+    $request->validate([
+        'name' => 'required',
+        'email' => 'required|email|unique:users',
+        'role' => 'required|string',
+          'password' => 'required|string|min:6',
+    ]);
 
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+    User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+'password' => Hash::make($request->password),
+        'dob' => $request->dob,
+        'nic_number' => $request->nic_number,
+        'role' => $request->role,
+        'phone' => $request->phone,
+    ]);
 
-        return redirect()->back()->with('success','User Created Successfully');
+    return back()->with('success', 'User created successfully');
+}
+public function update(Request $request, $id)
+{
+    $user = User::findOrFail($id);
+
+    $request->validate([
+        'name' => 'required',
+        'email' => 'required|email|unique:users,email,' . $id,
+        'role' => 'required|string',
+    ]);
+
+    $user->name = $request->name;
+    $user->email = $request->email;
+    $user->dob = $request->dob;
+    $user->nic_number = $request->nic_number;
+    $user->role = $request->role;
+    $user->phone = $request->phone;
+
+    if ($request->password) {
+        $user->password = Hash::make($request->password); 
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+    $user->save();
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+    return back()->with('success', 'User updated successfully');
+}
+public function destroy($id)
+{
+    $user = User::findOrFail($id);
+    $user->delete();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id)
-    {
-        $user = User::findOrFail($id);
+    return back()->with('success', 'User deleted successfully');
+}
 
-        $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:users,email,'.$id,
-        ]);
 
-        $data = [
-            'name' => $request->name,
-            'email' => $request->email,
-        ];
-
-        if($request->password){
-            $data['password'] = Hash::make($request->password);
-        }
-
-        $user->update($data);
-
-        return redirect()->back()->with('success','User Updated Successfully');
-    }
-
-    public function destroy($id)
-    {
-        User::findOrFail($id)->delete();
-        return redirect()->back()->with('success','User Deleted Successfully');
-    }
 }
