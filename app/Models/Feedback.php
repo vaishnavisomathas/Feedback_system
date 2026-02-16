@@ -17,10 +17,16 @@ class Feedback extends Model
         'phone',
         'vehicle_number',
         'note',
+        
+         'status',
     ];
     
     public function counter()
     {
         return $this->belongsTo(Counter::class);
+    }
+      public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

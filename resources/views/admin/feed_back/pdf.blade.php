@@ -21,7 +21,7 @@
             <th>Vehicle</th>
             <th>Phone</th>
             <th>Rating</th>
-            <th>Note</th>
+            <th>Complaint</th>
         </tr>
     </thead>
     <tbody>

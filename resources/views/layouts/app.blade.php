@@ -20,7 +20,7 @@
         <a class="d-flex justify-content-center" href="#">
 <img src="assets/images/logos/rural-clms-logo.png" 
                  alt="" 
-                height="40" width="100">        </a>
+                height="40" width="10">        </a>
 
         
       </div>
@@ -42,7 +42,7 @@
       <div>
         <div class="brand-logo d-flex align-items-center justify-content-between">
           <a href="./index.html" class="text-nowrap logo-img">
-<img src="{{ asset('assets/images/logos/Rural_Area_CLMS.png') }}" alt="" width="250" height="110" />
+<img src="{{ asset('assets/images/logos/Rural_Area_CLMS.png') }}" alt="" width="200" height="60" />
           </a>
           <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
             <i class="ti ti-x fs-6"></i>
@@ -68,7 +68,6 @@
 
         
 
-
                  <li>
               <span class="sidebar-divider lg"></span>
             </li>
@@ -89,9 +88,7 @@
                   </a>
                 </li> 
            
-                
               
-         
   <li class="nav-small-cap">
               <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
               <span class="hide-menu">Ds Divisions Qr</span>
@@ -108,7 +105,8 @@
         </div>
     </a>
 </li>
-<li class="nav-small-cap">
+ 
+ <li class="nav-small-cap">
               <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
               <span class="hide-menu">Feedback</span>
             </li>
@@ -140,7 +138,7 @@
         </div>
     </a>
 </li>
-
+    
 <li class="nav-small-cap">
     <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
     <span class="hide-menu">Settings</span>
@@ -180,9 +178,15 @@
                 <span class="hide-menu">Permissions</span>
             </a>
         </li>
-
+ 
+</li><li class="sidebar-item {{ request()->routeIs('admin.forwarded.*') ? 'active' : '' }}">
+    <a href="{{ route('admin.forwarded-complaints') }}" class="sidebar-link">
+        <span class="d-flex">
+            <i class="ti ti-send"></i>
+        </span>
+        <span class="hide-menu">Forwarded Complaints</span>
+    </a>
 </li>
-
 
         </ul>
     </div>
@@ -231,8 +235,13 @@
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2">
                   <div class="message-body">
                     <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
-                      <i class="ti ti-user fs-6"></i>
-                      <p class="mb-0 fs-3">My Profile</p>
+                     <a href="{{ route('users.show', auth()->user()->id) }}" 
+   class="d-flex align-items-center gap-2 dropdown-item text-decoration-none text-dark">
+    <i class="ti ti-user fs-6"></i>
+    <p class="mb-0 fs-3">{{ auth()->user()->name }}</p>
+</a>
+
+
                     </a>
                    
 <form method="POST" action="{{ route('logout') }}">

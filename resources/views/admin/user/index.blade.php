@@ -104,29 +104,37 @@
                             <td>{{ ucfirst($user->role) }}</td>
                             <td>{{ $user->email }}</td>
                             <td>{{ $user->phone }}</td>
-                            <td>
-                                <button class="btn btn-sm btn-primary editBtn"
-                                    data-id="{{ $user->id }}"
-                                    data-name="{{ $user->name }}"
-                                    data-dob="{{ $user->dob }}"
-                                    data-nic="{{ $user->nic_number }}"
-                                    data-role="{{ $user->role }}"
-                                    data-email="{{ $user->email }}"
-                                    data-phone="{{ $user->phone }}">
-                                    Edit
-                                </button>
+                        <td>
+    <a href="{{ route('users.show', $user->id) }}" 
+       class="btn btn-sm btn-info">
+       <i class="bi bi-eye"></i>
+    </a>
 
-                                <form action="{{ route('users.destroy', $user->id) }}"
-                                      method="POST" class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit"
-                                            class="btn btn-sm btn-danger"
-                                            onclick="return confirm('Are you sure?')">
-                                        Delete
-                                    </button>
-                                </form>
-                            </td>
+    <button class="btn btn-sm btn-primary editBtn"
+        data-id="{{ $user->id }}"
+        data-name="{{ $user->name }}"
+        data-dob="{{ $user->dob }}"
+        data-nic="{{ $user->nic_number }}"
+        data-role="{{ $user->role }}"
+        data-email="{{ $user->email }}"
+        data-phone="{{ $user->phone }}"
+        >
+        <i class="bi bi-pencil-square"></i>
+    </button>
+
+    <form action="{{ route('users.destroy', $user->id) }}"
+          method="POST" class="d-inline">
+        @csrf
+        @method('DELETE')
+        <button type="submit"
+                class="btn btn-sm btn-danger"
+                onclick="return confirm('Are you sure?')"
+                >
+            <i class="bi bi-trash"></i>
+        </button>
+    </form>
+</td>
+
                         </tr>
                     @endforeach
                 </tbody>
@@ -139,6 +147,8 @@
 @endsection
 
 @section('script')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 

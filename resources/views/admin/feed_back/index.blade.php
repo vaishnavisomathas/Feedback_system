@@ -42,10 +42,19 @@
                    value="{{ request('end_date') }}"
                    class="form-control">
         </div>
+<div class="col-md-1 d-grid">
+    <button class="btn btn-primary"> <i class="bi bi-funnel-fill me-1"></i></button>
+</div>
 
-        <div class="col-md-1 d-grid">
-            <button class="btn btn-primary">Filter</button>
-        </div>
+@if(request()->hasAny(['search','counter','start_date','end_date']))
+<div class="col-md-1 d-grid">
+    <a href="{{ route('admin.feedback.index') }}" 
+       class="btn btn-danger">
+           <i class="bi bi-arrow-clockwise me-1"></i>
+    </a>
+</div>
+@endif
+
     </form>
 
     {{-- ACTIONS --}}
@@ -69,8 +78,10 @@
                 <th>Phone</th>
                 <th>Rating</th>
                 <th>Service Quality</th>
-                <th>Note</th>
+                <th>Complaint</th>
                 <th>Submitted</th>
+                                <th>Action</th> {{-- New column for Forward --}}
+
             </tr>
         </thead>
         <tbody>
@@ -85,6 +96,16 @@
                     <td>{{ ucfirst(str_replace('_',' ', $rating->service_quality)) }}</td>
                     <td>{{ $rating->note }}</td>
                     <td>{{ $rating->created_at->format('d M Y, H:i') }}</td>
+                       <td>
+                        @if($rating->note && $rating->status == 'pending')
+                            <form method="POST" action="{{ route('admin.feedback.forward', $rating->id) }}">
+                                @csrf
+                                <button class="btn btn-sm btn-info">📤 Forward</button>
+                            </form>
+                      @elseif($rating->status == 'forwarded')
+        <span class="badge bg-success">Forwarded</span>
+    @endif
+                    </td>
                 </tr>
             @empty
                 <tr>
@@ -98,3 +119,4 @@
 
 </div>
 @endsection
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">

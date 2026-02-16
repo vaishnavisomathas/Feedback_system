@@ -31,6 +31,19 @@ Route::post('/logout', [AuthController::class,'logout'])->name('logout');
 // Route::middleware('auth')->group(function () {
 Route::get('/feedback/{division}/{counter}', [FeedbackController::class, 'show'])
     ->name('feedback.show');
+// Route::middleware(['auth','role:USER'])->group(function () {
+Route::post('/admin/feedback/forward/{id}', [FeedbackController::class, 'forwardFeedback'])->name('admin.feedback.forward');
+
+
+// });
+Route::get('/admin/forwarded-complaints', [FeedbackController::class, 'forwardedComplaints'])
+    ->name('admin.forwarded-complaints');
+    // ->middleware('auth', 'role:admin') Only admin or officer
+Route::post('/admin/feedback/{feedback}/forward', [FeedbackController::class, 'forwardFeedback'])
+    ->name('admin.feedback.forward');
+    // ->middleware('auth', 'role:admin');
+
+
 Route::get('/dashboard', [HomeController::class, 'index'])
     ->name('dashboard');
 Route::get('counters/create', [CounterController::class, 'create'])->name('counters.create');

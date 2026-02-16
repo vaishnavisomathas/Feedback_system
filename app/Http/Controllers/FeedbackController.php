@@ -50,10 +50,54 @@ class FeedbackController extends Controller
             'phone'           => $request->phone,
             'vehicle_number'  => $request->vehicle_number,
             'note'            => $request->note,
+            'user_id'         => auth()->id(),
         ]);
 
               session()->forget(['rating_access','rating_counter']);
 
     return redirect()->route('feedback.thankyou');
     }
+
+public function forwardedComplaints(Request $request)
+{
+    $query = Feedback::where('status', 'forwarded')
+                ->with('counter');
+
+    if ($request->counter) {
+        $query->where('counter_id', $request->counter);
+    }
+
+    if ($request->service_quality) {
+        $query->where('service_quality', $request->service_quality);
+    }
+    if ($request->start_date) {
+        $query->whereDate('created_at', '>=', $request->start_date);
+    }
+
+    if ($request->end_date) {
+        $query->whereDate('created_at', '<=', $request->end_date);
+    }
+
+    $ratings = $query->latest()->get();
+
+    $counters = Counter::all();
+
+    return view('admin.forwarded-complaints', compact('ratings','counters'));
+}
+
+
+public function forwardFeedback($id)
+{
+    $feedback = Feedback::findOrFail($id);
+
+    if($feedback->status == 'pending') {
+        $feedback->status = 'forwarded';
+        $feedback->save();
+    }
+
+    return redirect()->route('admin.forwarded-complaints')
+                     ->with('success', 'Feedback forwarded successfully!');
+}
+
+
 }
