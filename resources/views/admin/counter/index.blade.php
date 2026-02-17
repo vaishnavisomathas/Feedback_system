@@ -7,45 +7,63 @@
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
-    <!-- Create / Edit Modal -->
-    <div class="modal fade" id="counterModal" tabindex="-1" aria-hidden="true">
+    <!-- Modal -->
+    <div class="modal fade" id="counterModal" tabindex="-1">
         <div class="modal-dialog">
             <form method="POST" id="counterForm">
                 @csrf
                 <input type="hidden" name="_method" id="methodField" value="POST">
+
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="modalTitle">Add Counter</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
+
                     <div class="modal-body">
 
+                        {{-- District --}}
                         <div class="mb-3">
                             <label>District</label>
-                            <input type="text" name="district" id="district" class="form-control" required>
+                            <select name="district" id="district" class="form-control" required>
+                                <option value="">-- Select District --</option>
+                                <option value="Jaffna">Jaffna</option>
+                                <option value="Kilinochchi">Kilinochchi</option>
+                                <option value="Mullaitivu">Mullaitivu</option>
+                                <option value="Mannar">Mannar</option>
+                                <option value="Vavuniya">Vavuniya</option>
+                            </select>
                         </div>
 
+                        {{-- DS Division --}}
                         <div class="mb-3">
                             <label>DS Division</label>
-                            <input type="text" name="division_name" id="division_name" class="form-control" required>
+                            <select name="division_name" id="division_name" class="form-control" required>
+                                <option value="">-- Select DS Division --</option>
+                            </select>
                         </div>
 
+                        {{-- Counter --}}
                         <div class="mb-3">
                             <label>Counter Name</label>
                             <input type="text" name="counter_name" id="counter_name" class="form-control" required>
                         </div>
+@if(session('error'))
+    <div class="alert alert-danger">{{ session('error') }}</div>
+@endif
 
                     </div>
+
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary" id="saveBtn">Save</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
                     </div>
+
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Button trigger modal -->
     <button class="btn btn-primary mb-3" id="createCounterBtn">Add Counter</button>
 
     <!-- Table -->
@@ -61,65 +79,120 @@
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @foreach($counters as $counter)
-                        <tr>
-                            <td>{{ $counter->district }}</td>
-                            <td>{{ $counter->division_name }}</td>
-                            <td>{{ $counter->counter_name }}</td>
-                            <td>
-                                <button class="btn btn-sm btn-primary editBtn" data-id="{{ $counter->id }}"
-                                    data-district="{{ $counter->district }}"
-                                    data-division="{{ $counter->division_name }}"
-                                    data-counter="{{ $counter->counter_name }}">
-                                    Edit
-                                </button>
 
-                                <form action="{{ route('counters.destroy', $counter->id) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger"
-                                        onclick="return confirm('Are you sure?')">Delete</button>
-                                </form>
-                            </td>
-                        </tr>
-                    @endforeach
+                <tbody>
+                @foreach($counters as $counter)
+                    <tr>
+                        <td>{{ $counter->district }}</td>
+                        <td>{{ $counter->division_name }}</td>
+                        <td>{{ $counter->counter_name }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary editBtn"
+                                data-id="{{ $counter->id }}"
+                                data-district="{{ $counter->district }}"
+                                data-division="{{ $counter->division_name }}"
+                                data-counter="{{ $counter->counter_name }}">
+                                Edit
+                            </button>
+
+                            <form action="{{ route('counters.destroy',$counter->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-sm btn-danger" onclick="return confirm('Delete?')">
+                                    Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
                 </tbody>
+
             </table>
         </div>
     </div>
 
 </div>
-
 @endsection
 
 @section('script')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+
     let modal = new bootstrap.Modal(document.getElementById('counterModal'));
     let form = document.getElementById('counterForm');
+    const districtSelect = document.getElementById('district');
+    const divisionSelect = document.getElementById('division_name');
 
+    /* ================= DS DIVISION DATA ================= */
+    const dsDivisions = {
+
+        Jaffna: [
+            "Jaffna","Nallur","Thenmaradchi","Vadamaradchi North",
+            "Vadamaradchi South-West","Valikamam East","Valikamam West",
+            "Valikamam South","Valikamam North","Island North","Island South"
+        ],
+
+        Kilinochchi: ["Karachchi","Poonakary","Kandavalai","Pachchilaipalli"],
+
+        Mullaitivu: ["Mullaitivu","Maritimepattu","Oddusuddan","Manthai East","Thunukkai","Puthukudiyiruppu"],
+
+        Mannar: ["Mannar Town","Madhu","Manthai West","Nanaddan","Musali"],
+
+        Vavuniya: ["Vavuniya","Vavuniya North","Vavuniya South","Vengalacheddikulam"]
+    };
+
+    /* ========= DISTRICT CHANGE ========= */
+    districtSelect.addEventListener('change', function () {
+
+        let district = this.value;
+        divisionSelect.innerHTML = '<option value="">-- Select DS Division --</option>';
+
+        if (dsDivisions[district]) {
+            dsDivisions[district].forEach(function(division) {
+                let option = document.createElement('option');
+                option.value = division;
+                option.textContent = division;
+                divisionSelect.appendChild(option);
+            });
+        }
+    });
+
+    /* ========= CREATE ========= */
     document.getElementById('createCounterBtn').addEventListener('click', function() {
         form.action = "{{ route('counters.store') }}";
         document.getElementById('methodField').value = 'POST';
         document.getElementById('modalTitle').innerText = 'Add Counter';
         form.reset();
+        divisionSelect.innerHTML = '<option value="">-- Select DS Division --</option>';
         modal.show();
     });
 
+    /* ========= EDIT ========= */
     document.querySelectorAll('.editBtn').forEach(function(btn) {
+
         btn.addEventListener('click', function() {
+
             let id = btn.dataset.id;
       form.action = '/counters/update/' + id;
 document.getElementById('methodField').value = 'PUT';
 
             document.getElementById('modalTitle').innerText = 'Edit Counter';
-            document.getElementById('district').value = btn.dataset.district;
-            document.getElementById('division_name').value = btn.dataset.division;
+
+            districtSelect.value = btn.dataset.district;
+
+            // Load DS divisions
+            districtSelect.dispatchEvent(new Event('change'));
+
+            setTimeout(() => {
+                divisionSelect.value = btn.dataset.division;
+            }, 100);
+
             document.getElementById('counter_name').value = btn.dataset.counter;
+
             modal.show();
         });
     });
+
 });
 </script>
 @endsection

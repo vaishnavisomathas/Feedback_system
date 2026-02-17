@@ -11,13 +11,7 @@
 
     {{-- FILTER FORM --}}
     <form method="GET" class="row mb-3 g-2">
-        <div class="col-md-4">
-            <input type="text"
-                   name="search"
-                   value="{{ request('search') }}"
-                   class="form-control"
-                   placeholder="Search by name, phone, vehicle number or note">
-        </div>
+      
 
         <div class="col-md-3">
             <select name="counter" class="form-control">
@@ -59,7 +53,6 @@
 
     {{-- ACTIONS --}}
     <div class="d-flex justify-content-end mb-3">
-        <button onclick="window.print()" class="btn btn-primary me-2">Print</button>
 
         <a href="{{ route('admin.feedback.downloadPdf', request()->query()) }}"
            class="btn btn-danger">
@@ -74,13 +67,11 @@
                 <th>#</th>
                 <th>DS Division</th>
                 <th>Counter</th>
-                <th>Vehicle</th>
-                <th>Phone</th>
+              
                 <th>Rating</th>
                 <th>Service Quality</th>
-                <th>Complaint</th>
+               
                 <th>Submitted</th>
-                                <th>Action</th> {{-- New column for Forward --}}
 
             </tr>
         </thead>
@@ -90,22 +81,11 @@
                     <td>{{ $ratings->firstItem() + $index }}</td>
                     <td>{{ $rating->counter->division_name ?? '-' }}</td>
                     <td>{{ $rating->counter->counter_name ?? '-' }}</td>
-                    <td>{{ $rating->vehicle_number }}</td>
-                    <td>{{ $rating->phone }}</td>
+                   
                     <td>{{ ['','Bad','Poor','Average','Good','Excellent'][$rating->rating] ?? '-' }}</td>
-                    <td>{{ ucfirst(str_replace('_',' ', $rating->service_quality)) }}</td>
-                    <td>{{ $rating->note }}</td>
+<td>{{ $rating->serviceQuality->name ?? '-' }}</td>
                     <td>{{ $rating->created_at->format('d M Y, H:i') }}</td>
-                       <td>
-                        @if($rating->note && $rating->status == 'pending')
-                            <form method="POST" action="{{ route('admin.feedback.forward', $rating->id) }}">
-                                @csrf
-                                <button class="btn btn-sm btn-info">📤 Forward</button>
-                            </form>
-                      @elseif($rating->status == 'forwarded')
-        <span class="badge bg-success">Forwarded</span>
-    @endif
-                    </td>
+                 
                 </tr>
             @empty
                 <tr>

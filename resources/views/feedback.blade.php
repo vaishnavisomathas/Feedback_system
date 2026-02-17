@@ -90,18 +90,26 @@
     @error('rating') <small class="text-danger">{{ $message }}</small> @enderror
 </div>
                             {{-- SERVICE QUALITY --}}
-                            <div class="mb-3">
-                                <label class="fw-semibold">Quality of Service</label>
-                                <select class="form-control" name="service_quality">
-                                    <option value="">-- Select --</option>
-                                    @foreach(['excellent','good','average','poor','very_poor'] as $q)
-                                        <option value="{{ $q }}" {{ old('service_quality')==$q?'selected':'' }}>
-                                            {{ ucfirst(str_replace('_',' ',$q)) }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('service_quality') <small class="text-danger">{{ $message }}</small> @enderror
-                            </div>
+                        <div class="mb-3">
+    <label class="fw-semibold">Quality of Service</label>
+
+    <select class="form-control" name="service_quality_id">
+        <option value="">-- Select --</option>
+
+        @foreach($qualities as $quality)
+            <option value="{{ $quality->id }}"
+                {{ old('service_quality_id', $feedback->service_quality_id ?? '') == $quality->id ? 'selected' : '' }}>
+                {{ $quality->name }}
+            </option>
+        @endforeach
+
+    </select>
+
+    @error('service_quality_id')
+        <small class="text-danger">{{ $message }}</small>
+    @enderror
+</div>
+
 
                             {{-- COMPLAINT --}}
                             <div class="mb-3">

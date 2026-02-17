@@ -121,7 +121,49 @@
             <span class="hide-menu">Feedback</span>
         </div>
     </a>
+ <li class="nav-small-cap">
+              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
+              <span class="hide-menu">Complaint</span>
+            </li>
+          
+ <li class="sidebar-item">
+    <a class="sidebar-link justify-content-between"  
+    href="{{ route('admin.complain.index') }}" aria-expanded="false">
+        <div class="d-flex align-items-center gap-3">
+            <span class="d-flex">
+                <i class="ti ti-aperture"></i>
+            </span>
+            <span class="hide-menu">Complain</span>
+        </div>
+    </a>
 </li>
+ <li class="nav-small-cap">
+              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
+              <span class="hide-menu">A/O</span>
+            </li>
+          
+<li class="sidebar-item {{ request()->routeIs('complain.types.*') ? 'active' : '' }}">
+    <a href="{{ route('admin.ao.index') }}" class="sidebar-link">
+        <span class="d-flex">
+        <i class="ti ti-user-shield"></i>
+        </span>
+        <span class="hide-menu">Complaiant</span>
+    </a>
+</li>
+<li class="nav-small-cap">
+    <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
+    <span class="hide-menu">Commissioner</span>
+</li>
+
+<li class="sidebar-item {{ request()->routeIs('admin.commissioner.*') ? 'active' : '' }}">
+    <a href="{{ route('admin.commissioner.index') }}" class="sidebar-link">
+        <span class="d-flex">
+            <i class="ti ti-crown"></i>
+        </span>
+        <span class="hide-menu">Commissioner</span>
+    </a>
+</li>
+
 <li class="nav-small-cap">
     <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
     <span class="hide-menu">User Management</span>
@@ -179,14 +221,25 @@
             </a>
         </li>
  
-</li><li class="sidebar-item {{ request()->routeIs('admin.forwarded.*') ? 'active' : '' }}">
-    <a href="{{ route('admin.forwarded-complaints') }}" class="sidebar-link">
+</li>
+<li class="sidebar-item {{ request()->routeIs('complain.types.*') ? 'active' : '' }}">
+    <a href="{{ route('complain.types.index') }}" class="sidebar-link">
         <span class="d-flex">
-            <i class="ti ti-send"></i>
+            <i class="ti ti-list"></i>
         </span>
-        <span class="hide-menu">Forwarded Complaints</span>
+        <span class="hide-menu">Complain Type</span>
     </a>
 </li>
+
+<li class="sidebar-item {{ request()->routeIs('service.quality.*') ? 'active' : '' }}">
+    <a href="{{ route('service.quality.index') }}" class="sidebar-link">
+        <span class="d-flex">
+            <i class="ti ti-stars"></i>
+        </span>
+        <span class="hide-menu">Service Quality</span>
+    </a>
+</li>
+
 
         </ul>
     </div>
@@ -235,10 +288,10 @@
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2">
                   <div class="message-body">
                     <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
-                     <a href="{{ route('users.show', auth()->user()->id) }}" 
+                     <a href="" 
    class="d-flex align-items-center gap-2 dropdown-item text-decoration-none text-dark">
     <i class="ti ti-user fs-6"></i>
-    <p class="mb-0 fs-3">{{ auth()->user()->name }}</p>
+    <p class="mb-0 fs-3"></p>
 </a>
 
 

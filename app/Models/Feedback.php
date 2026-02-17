@@ -12,13 +12,15 @@ class Feedback extends Model
   protected $fillable = [
         'counter_id',
         'rating',
-        'service_quality',
+        'service_quality_id',
         'has_complaint',
         'phone',
         'vehicle_number',
         'note',
-        
+         'complain_type_id', 
          'status',
+           'user_remarks',
+            'ao_remarks'
     ];
     
     public function counter()
@@ -29,4 +31,13 @@ class Feedback extends Model
     {
         return $this->belongsTo(User::class);
     }
+  public function complainType()
+{
+    return $this->belongsTo(ComplainType::class);
+}
+  public function serviceQuality()
+{
+    return $this->belongsTo(ServiceQuality::class);
+}
+
 }

@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('counter_id')->nullable(); // link to DS Division / Counter
             $table->unsignedTinyInteger('rating')->nullable(); // 1-5 rating
-            $table->string('service_quality')->nullable();
             $table->enum('has_complaint', ['yes', 'no'])->nullable();
             $table->string('phone', 10)->nullable();
             $table->string('vehicle_number', 20)->nullable();
