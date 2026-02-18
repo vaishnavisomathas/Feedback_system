@@ -76,6 +76,20 @@ Edit
 
 </div>
 </div>
+   <div class="d-flex justify-content-end align-items-center">
+    <div class="col-md-2 p-0">
+        <form method="GET">
+         
+            <select name="per_page" class="form-control" onchange="this.form.submit()">
+                @foreach([10, 20, 50, 100] as $size)
+                    <option value="{{ $size }}" {{ request('per_page') == $size ? 'selected' : '' }}>
+                        Page {{ $size }}
+                    </option>
+                @endforeach
+            </select>
+        </form>
+    </div>
+    </div>
 </div>
 @endsection
 

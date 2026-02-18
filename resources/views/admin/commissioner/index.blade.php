@@ -37,6 +37,7 @@
 <th>Vehicle</th>
 <th>Phone</th>
 <th>Service Quality</th>
+<th>Rating</th>
 <th>Date</th>
 <th>Status</th>
 </tr>
@@ -55,6 +56,7 @@
 <td>{{ $c->vehicle_number }}</td>
 <td>{{ $c->phone }}</td>
 <td>{{ $c->serviceQuality->name ?? '-' }}</td>
+<td>{{ ['','Bad','Poor','Average','Good','Excellent'][$c->rating] ?? 'N/A' }}</td>
 <td>{{ $c->created_at->format('d M Y') }}</td>
 
 <td>
@@ -65,7 +67,7 @@
 </tr>
 
 <tr class="collapse bg-light" id="commissioner{{ $c->id }}">
-<td colspan="7">
+<td colspan="9">
 <div class="p-3">
 
 <strong>Complaint:</strong><br>
@@ -106,14 +108,26 @@ Completed
 
 @empty
 <tr>
-<td colspan="7" class="text-center">No complaints pending for Commissioner</td>
+<td colspan="9" class="text-center">No complaints pending for Commissioner</td>
 </tr>
 @endforelse
 </tbody>
 </table>
 
-{{ $pendingCommissioner->links() }}
-
+ <div class="d-flex justify-content-end align-items-center">
+    <div class="col-md-2 p-0">
+        <form method="GET">
+         
+            <select name="per_page" class="form-control" onchange="this.form.submit()">
+                @foreach([10, 20, 50, 100] as $size)
+                    <option value="{{ $size }}" {{ request('per_page') == $size ? 'selected' : '' }}>
+                        Page {{ $size }}
+                    </option>
+                @endforeach
+            </select>
+        </form>
+    </div>
+    </div>
 </div>
 
 
@@ -127,6 +141,9 @@ Completed
 <th>DS Division</th>
 <th>Counter</th>
 <th>Vehicle</th>
+<th>Phone</th>
+<th>Service Quality</th>
+<th>Rating</th>
 <th>Date Closed</th>
 <th>Status</th>
 </tr>
@@ -143,6 +160,9 @@ Completed
 <td>{{ $c->counter->division_name ?? '-' }}</td>
 <td>{{ $c->counter->counter_name ?? '-' }}</td>
 <td>{{ $c->vehicle_number }}</td>
+<td>{{ $c->phone }}</td>
+<td>{{ $c->serviceQuality->name ?? '-' }}</td>
+<td>{{ ['','Bad','Poor','Average','Good','Excellent'][$c->rating] ?? 'N/A' }}</td>
 <td>{{ $c->updated_at->format('d M Y') }}</td>
 
 <td>
@@ -153,7 +173,7 @@ Completed
 </tr>
 
 <tr class="collapse bg-light" id="completed{{ $c->id }}">
-<td colspan="6">
+<td colspan="9">
 <div class="p-3">
 
 <strong>Complaint:</strong><br>
@@ -170,14 +190,26 @@ Completed
 
 @empty
 <tr>
-<td colspan="6" class="text-center">No completed complaints</td>
+<td colspan="9" class="text-center">No completed complaints</td>
 </tr>
 @endforelse
 </tbody>
 </table>
 
-{{ $closedCommissioner->links() }}
-
+ <div class="d-flex justify-content-end align-items-center">
+    <div class="col-md-2 p-0">
+        <form method="GET">
+         
+            <select name="per_page" class="form-control" onchange="this.form.submit()">
+                @foreach([10, 20, 50, 100] as $size)
+                    <option value="{{ $size }}" {{ request('per_page') == $size ? 'selected' : '' }}>
+                        Page {{ $size }}
+                    </option>
+                @endforeach
+            </select>
+        </form>
+    </div>
+    </div>
 </div>
 
 </div>

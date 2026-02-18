@@ -68,7 +68,7 @@
                         <form method="POST" action="{{ route('feedback.store') }}">
                             @csrf
                             <input type="hidden" name="counter_id" value="{{ $counter->id }}">
-
+<input type="hidden" name="feedback_token" value="{{ $feedback_token }}">
                             <div class="mb-3">
     <label class="fw-semibold">Service Rating</label>
     <div class="rating-grid mt-2">

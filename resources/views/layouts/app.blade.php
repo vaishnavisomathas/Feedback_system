@@ -18,22 +18,13 @@
     <div class="app-topstrip bg-dark py-6 px-3 w-100 d-lg-flex align-items-center justify-content-between">
       <div class="d-flex align-items-center justify-content-center gap-5 mb-2 mb-lg-0">
         <a class="d-flex justify-content-center" href="#">
-<img src="assets/images/logos/rural-clms-logo.png" 
-                 alt="" 
-                height="40" width="10">        </a>
+          <img src="assets/images/npc_logo.png" alt="" width="60" height="40">
+        </a>
 
         
       </div>
 
-      <div class="d-lg-flex align-items-center gap-2">
-        <h3 class="text-white mb-2 mb-lg-0 fs-5 text-center"></h3>
-        <div class="d-flex align-items-center justify-content-center gap-2">
-          
-          <div class="dropdown d-flex">
-    
-          </div>
-        </div>
-      </div>
+
 
     </div>
     <!-- Sidebar Start -->
@@ -41,8 +32,8 @@
       <!-- Sidebar scroll-->
       <div>
         <div class="brand-logo d-flex align-items-center justify-content-between">
-          <a href="./index.html" class="text-nowrap logo-img">
-<img src="{{ asset('assets/images/logos/Rural_Area_CLMS.png') }}" alt="" width="200" height="60" />
+          <a href="{{ route('dashboard') }}" class="text-nowrap logo-img">
+            <img src="assets/images/pdmt_logo.png" alt=""  width="60" height="60">
           </a>
           <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
             <i class="ti ti-x fs-6"></i>
@@ -55,196 +46,169 @@
               <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
               <span class="hide-menu">Home</span>
             </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link"  href="{{ route('dashboard') }}" aria-expanded="false">
-                <i class="ti ti-atom"></i>
-                <span class="hide-menu">Dashboard</span>
-              </a>
-            </li>
+               <li class="sidebar-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+        <a class="sidebar-link" href="{{ route('dashboard') }}">
+            <span class="d-flex">
+                <i class="ti ti-home"></i>
+            </span>
+            <span class="hide-menu">Dashboard</span>
+        </a>
+    </li>
             <!-- ---------------------------------- -->
             <!-- Dashboard -->
             <!-- ---------------------------------- -->
-            
-
-        
-
-                 <li>
-              <span class="sidebar-divider lg"></span>
-            </li>
             <li class="nav-small-cap">
-              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">Ds Divisions</span>
-            </li>
-                <li class="sidebar-item">
-                  <a class="sidebar-link justify-content-between"  
-     href="{{ route('counters.index') }}">
-                         <div class="d-flex align-items-center gap-3">
-                      <div class="round-16 d-flex align-items-center justify-content-center">
-                        <i class="ti ti-circle"></i>
-                      </div>
-                      <span class="hide-menu">Division List</span>
-                    </div>
-                    
-                  </a>
-                </li> 
-           
-              
-  <li class="nav-small-cap">
-              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">Ds Divisions Qr</span>
-            </li>
-           
- <li class="sidebar-item">
-    <a class="sidebar-link justify-content-between"  
-     href="{{ route('ds-divisions.index') }}" aria-expanded="false">
-        <div class="d-flex align-items-center gap-3">
+        <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
+        <span class="hide-menu">DS Divisions</span>
+    </li>
+
+    <li class="sidebar-item {{ request()->routeIs('counters.*') ? 'active' : '' }}">
+        <a class="sidebar-link" href="{{ route('counters.index') }}">
             <span class="d-flex">
-                <i class="ti ti-aperture"></i>
+                <i class="ti ti-list"></i>
+            </span>
+            <span class="hide-menu">Division List</span>
+        </a>
+    </li>
+
+             <li class="nav-small-cap">
+        <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
+        <span class="hide-menu">DS Division QR</span>
+    </li>
+
+    <li class="sidebar-item {{ request()->routeIs('ds-divisions.*') ? 'active' : '' }}">
+        <a class="sidebar-link" href="{{ route('ds-divisions.index') }}">
+            <span class="d-flex">
+                <i class="ti ti-qrcode"></i>
             </span>
             <span class="hide-menu">Division QR</span>
-        </div>
-    </a>
-</li>
- 
- <li class="nav-small-cap">
-              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">Feedback</span>
-            </li>
-          
- <li class="sidebar-item">
-    <a class="sidebar-link justify-content-between"  
-    href="{{ route('admin.feedback.index') }}" aria-expanded="false">
-        <div class="d-flex align-items-center gap-3">
+        </a>
+    </li>
+              <li class="nav-small-cap">
+        <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
+        <span class="hide-menu">Feedback</span>
+    </li>
+
+    <li class="sidebar-item {{ request()->routeIs('admin.feedback.*') ? 'active' : '' }}">
+        <a class="sidebar-link" href="{{ route('admin.feedback.index') }}">
             <span class="d-flex">
-                <i class="ti ti-aperture"></i>
+                <i class="ti ti-message-dots"></i>
             </span>
             <span class="hide-menu">Feedback</span>
-        </div>
-    </a>
- <li class="nav-small-cap">
-              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">Complaint</span>
-            </li>
-          
- <li class="sidebar-item">
-    <a class="sidebar-link justify-content-between"  
-    href="{{ route('admin.complain.index') }}" aria-expanded="false">
-        <div class="d-flex align-items-center gap-3">
+        </a>
+    </li>
+
+           <li class="nav-small-cap">
+        <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
+        <span class="hide-menu">Complaint</span>
+    </li>
+
+    <li class="sidebar-item {{ request()->routeIs('admin.complain.*') ? 'active' : '' }}">
+        <a class="sidebar-link" href="{{ route('admin.complain.index') }}">
             <span class="d-flex">
-                <i class="ti ti-aperture"></i>
+                <i class="ti ti-alert-circle"></i>
             </span>
-            <span class="hide-menu">Complain</span>
-        </div>
-    </a>
-</li>
- <li class="nav-small-cap">
-              <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-              <span class="hide-menu">A/O</span>
-            </li>
-          
-<li class="sidebar-item {{ request()->routeIs('complain.types.*') ? 'active' : '' }}">
-    <a href="{{ route('admin.ao.index') }}" class="sidebar-link">
-        <span class="d-flex">
-        <i class="ti ti-user-shield"></i>
-        </span>
-        <span class="hide-menu">Complaiant</span>
-    </a>
-</li>
-<li class="nav-small-cap">
-    <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-    <span class="hide-menu">Commissioner</span>
-</li>
+            <span class="hide-menu">Complaint List</span>
+        </a>
+    </li>
 
-<li class="sidebar-item {{ request()->routeIs('admin.commissioner.*') ? 'active' : '' }}">
-    <a href="{{ route('admin.commissioner.index') }}" class="sidebar-link">
-        <span class="d-flex">
-            <i class="ti ti-crown"></i>
-        </span>
+
+            
+        <li class="nav-small-cap">
+        <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
+        <span class="hide-menu">A/O</span>
+    </li>
+
+    <li class="sidebar-item {{ request()->routeIs('admin.ao.*') ? 'active' : '' }}">
+        <a href="{{ route('admin.ao.index') }}" class="sidebar-link">
+            <span class="d-flex">
+                <i class="ti ti-user-shield"></i>
+            </span>
+            <span class="hide-menu">A/O Management</span>
+        </a>
+    </li>
+
+
+           <li class="nav-small-cap">
+        <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
         <span class="hide-menu">Commissioner</span>
-    </a>
-</li>
+    </li>
 
-<li class="nav-small-cap">
-    <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-    <span class="hide-menu">User Management</span>
-</li>
+    <li class="sidebar-item {{ request()->routeIs('admin.commissioner.*') ? 'active' : '' }}">
+        <a href="{{ route('admin.commissioner.index') }}" class="sidebar-link">
+            <span class="d-flex">
+                <i class="ti ti-crown"></i>
+            </span>
+            <span class="hide-menu">Commissioner</span>
+        </a>
+    </li>
+           <li class="nav-small-cap">
+        <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
+        <span class="hide-menu">User Management</span>
+    </li>
 
-<li class="sidebar-item">
-    <a class="sidebar-link justify-content-between"  
-        href="{{ route('users.index') }}" aria-expanded="false">
-        <div class="d-flex align-items-center gap-3">
+    <li class="sidebar-item {{ request()->routeIs('users.*') ? 'active' : '' }}">
+        <a class="sidebar-link" href="{{ route('users.index') }}">
             <span class="d-flex">
                 <i class="ti ti-users"></i>
             </span>
             <span class="hide-menu">Users</span>
-        </div>
-    </a>
-</li>
-    
-<li class="nav-small-cap">
-    <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
-    <span class="hide-menu">Settings</span>
-</li>
-
-{{-- RBAC DROPDOWN --}}
-<li class="sidebar-item">
+        </a>
+    </li>
 
 
+    {{-- ================= SETTINGS ================= --}}
+    <li class="nav-small-cap">
+        <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
+        <span class="hide-menu">Settings</span>
+    </li>
 
-        {{-- Roles --}}
-        <li class="sidebar-item {{ request()->routeIs('roles.*') ? 'active' : '' }}">
-            <a href="{{ route('roles.index') }}" class="sidebar-link">
-                <span class="d-flex">
-                    <i class="ti ti-category"></i>
-                </span>
-                <span class="hide-menu">Roles</span>
-            </a>
-        </li>
+    <li class="sidebar-item {{ request()->routeIs('roles.*') ? 'active' : '' }}">
+        <a href="{{ route('roles.index') }}" class="sidebar-link">
+            <span class="d-flex">
+                <i class="ti ti-category"></i>
+            </span>
+            <span class="hide-menu">Roles</span>
+        </a>
+    </li>
 
-        {{-- Permission Groups --}}
-        <li class="sidebar-item {{ request()->routeIs('permission-groups.*') ? 'active' : '' }}">
-            <a href="{{ route('permission-groups.index') }}" class="sidebar-link">
-                <span class="d-flex">
-                    <i class="ti ti-category"></i>
-                </span>
-                <span class="hide-menu">Permission Groups</span>
-            </a>
-        </li>
+    <li class="sidebar-item {{ request()->routeIs('permission-groups.*') ? 'active' : '' }}">
+        <a href="{{ route('permission-groups.index') }}" class="sidebar-link">
+            <span class="d-flex">
+                <i class="ti ti-category"></i>
+            </span>
+            <span class="hide-menu">Permission Groups</span>
+        </a>
+    </li>
 
-        {{-- Permissions --}}
-        <li class="sidebar-item {{ request()->routeIs('permissions.*') ? 'active' : '' }}">
-            <a href="{{ route('permissions.index') }}" class="sidebar-link">
-                <span class="d-flex">
-                    <i class="ti ti-key"></i>
-                </span>
-                <span class="hide-menu">Permissions</span>
-            </a>
-        </li>
- 
-</li>
-<li class="sidebar-item {{ request()->routeIs('complain.types.*') ? 'active' : '' }}">
-    <a href="{{ route('complain.types.index') }}" class="sidebar-link">
-        <span class="d-flex">
-            <i class="ti ti-list"></i>
-        </span>
-        <span class="hide-menu">Complain Type</span>
-    </a>
-</li>
+    <li class="sidebar-item {{ request()->routeIs('permissions.*') ? 'active' : '' }}">
+        <a href="{{ route('permissions.index') }}" class="sidebar-link">
+            <span class="d-flex">
+                <i class="ti ti-key"></i>
+            </span>
+            <span class="hide-menu">Permissions</span>
+        </a>
+    </li>
 
-<li class="sidebar-item {{ request()->routeIs('service.quality.*') ? 'active' : '' }}">
-    <a href="{{ route('service.quality.index') }}" class="sidebar-link">
-        <span class="d-flex">
-            <i class="ti ti-stars"></i>
-        </span>
-        <span class="hide-menu">Service Quality</span>
-    </a>
-</li>
-
-
-        </ul>
-    </div>
-</nav>
-    <!-- End Sidebar navigation -->
+    <li class="sidebar-item {{ request()->routeIs('service.quality.*') ? 'active' : '' }}">
+        <a href="{{ route('service.quality.index') }}" class="sidebar-link">
+            <span class="d-flex">
+                <i class="ti ti-stars"></i>
+            </span>
+            <span class="hide-menu">Service Quality</span>
+        </a>
+    </li>
+    <li class="sidebar-item {{ request()->routeIs('complain.types.*') ? 'active' : '' }}">
+        <a href="{{ route('complain.types.index') }}" class="sidebar-link">
+            <span class="d-flex">
+                <i class="ti ti-list"></i>
+            </span>
+            <span class="hide-menu">Complaint Type</span>
+        </a>
+    </li>
+</ul>
+        </nav>
+        <!-- End Sidebar navigation -->
       </div>
       <!-- End Sidebar scroll-->
     </aside>
@@ -288,27 +252,11 @@
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2">
                   <div class="message-body">
                     <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
-                     <a href="" 
-   class="d-flex align-items-center gap-2 dropdown-item text-decoration-none text-dark">
-    <i class="ti ti-user fs-6"></i>
-    <p class="mb-0 fs-3"></p>
-</a>
-
-
+                      <i class="ti ti-user fs-6"></i>
+                      <p class="mb-0 fs-3">My Profile</p>
                     </a>
-                   
-<form method="POST" action="{{ route('logout') }}">
-    @csrf
-    <button class="btn btn-danger btn-sm w-100">
-        Logout
-    </button>
-</form>
-
-
-<form id="logout-form" action="" method="POST" class="d-none">
-    @csrf
-</form>
-
+                 
+                    <a href="./authentication-login.html" class="btn btn-outline-primary mx-3 mt-2 d-block">Logout</a>
                   </div>
                 </div>
               </li>
@@ -332,6 +280,8 @@
     </div>
   </div>
   @yield('script')
+<script src="{{ asset('assets/js/app.min.js') }}"></script>
+
 <script src="{{ asset('assets/libs/jquery/dist/jquery.min.js') }}"></script>
 <script src="{{ asset('assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
 <script src="{{ asset('assets/js/sidebarmenu.js') }}"></script>

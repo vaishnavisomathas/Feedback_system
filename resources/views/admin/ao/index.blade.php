@@ -109,8 +109,20 @@ Forward to Commissioner
 </tbody>
 </table>
 
-{{ $pendingAO->links() }}
-
+ <div class="d-flex justify-content-end align-items-center">
+    <div class="col-md-2 p-0">
+        <form method="GET">
+         
+            <select name="per_page" class="form-control" onchange="this.form.submit()">
+                @foreach([10, 20, 50, 100] as $size)
+                    <option value="{{ $size }}" {{ request('per_page') == $size ? 'selected' : '' }}>
+                        Page {{ $size }}
+                    </option>
+                @endforeach
+            </select>
+        </form>
+    </div>
+    </div>
 </div>
 
 {{-- ================= CLOSED / FORWARDED ================= --}}
@@ -159,7 +171,7 @@ Forward to Commissioner
 </tr>
 
 <tr class="collapse bg-light" id="closed{{ $c->id }}">
-<td colspan="7">
+<td colspan="8">
 <div class="p-3">
 
 <strong>Complaint:</strong><br>
@@ -186,23 +198,37 @@ Forward to Commissioner
 
 @empty
 <tr>
-<td colspan="7" class="text-center">No completed complaints</td>
+<td colspan="8" class="text-center">No completed complaints</td>
 </tr>
 @endforelse
 </tbody>
 </table>
 
-{{ $closedAO->links() }}
-
+ <div class="d-flex justify-content-end align-items-center">
+    <div class="col-md-2 p-0">
+        <form method="GET">
+         
+            <select name="per_page" class="form-control" onchange="this.form.submit()">
+                @foreach([10, 20, 50, 100] as $size)
+                    <option value="{{ $size }}" {{ request('per_page') == $size ? 'selected' : '' }}>
+                        Page {{ $size }}
+                    </option>
+                @endforeach
+            </select>
+        </form>
+    </div>
+    </div>
 </div>
 
 </div>
 </div>
 @endsection
-
+@section('script')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 <style>
 tr[aria-expanded="true"] span {
     transform: rotate(180deg);
 }
 span { transition: 0.2s; }
 </style>
+@endsection

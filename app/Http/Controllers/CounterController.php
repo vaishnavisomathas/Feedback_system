@@ -9,11 +9,17 @@ use Illuminate\Http\Request;
 
 class CounterController extends Controller
 {
-  public function index()
-    {
-        $counters = Counter::latest()->get();
-        return view('admin.counter.index', compact('counters'));
-    }
+ public function index(Request $request)
+{
+    $perPage = $request->get('per_page', 10);
+
+    $counters = Counter::latest()
+        ->paginate($perPage)
+        ->withQueryString(); // keeps filters in pagination links
+
+    return view('admin.counter.index', compact('counters'));
+}
+
 
 public function store(Request $request)
 {
@@ -81,9 +87,9 @@ public function store(Request $request)
 
 public function feedback_index(Request $request)
 {
-    $ratings = Feedback::with('counter')
+    $perPage = $request->get('per_page', 10); // default 10 items per page
 
-        // SEARCH (grouped OR conditions)
+    $ratings = Feedback::with('counter')
         ->when($request->filled('search'), function ($q) use ($request) {
             $q->where(function ($query) use ($request) {
                 $query->where('vehicle_number', 'like', '%' . $request->search . '%')
@@ -91,28 +97,18 @@ public function feedback_index(Request $request)
                       ->orWhere('note', 'like', '%' . $request->search . '%');
             });
         })
-
-        // COUNTER FILTER
-        ->when($request->filled('counter'), function ($q) use ($request) {
-            $q->where('counter_id', $request->counter);
-        })
-
-        // DATE FILTERS
-        ->when($request->filled('start_date'), function ($q) use ($request) {
-            $q->whereDate('created_at', '>=', $request->start_date);
-        })
-        ->when($request->filled('end_date'), function ($q) use ($request) {
-            $q->whereDate('created_at', '<=', $request->end_date);
-        })
-
+        ->when($request->filled('counter'), fn($q) => $q->where('counter_id', $request->counter))
+        ->when($request->filled('start_date'), fn($q) => $q->whereDate('created_at', '>=', $request->start_date))
+        ->when($request->filled('end_date'), fn($q) => $q->whereDate('created_at', '<=', $request->end_date))
         ->latest()
-        ->paginate(10)
+        ->paginate($perPage)
         ->withQueryString();
 
     $counters = Counter::orderBy('division_name')->get();
 
     return view('admin.feed_back.index', compact('ratings', 'counters'));
 }
+
 public function downloadPdf(Request $request)
     {
         $ratings = Feedback::with('counter')
