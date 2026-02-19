@@ -69,6 +69,9 @@ class HomeController extends Controller
                 ->whereYear('created_at', now()->year)
                 ->count();
         }
+  $pending = \App\Models\Feedback::whereNull('status')->count();
+    $ao = \App\Models\Feedback::where('status','ao')->count();
+    $commissioner = \App\Models\Feedback::where('status','commissioner')->count();
 
         return view('welcome', compact(
             'totalRatings',
@@ -80,7 +83,7 @@ class HomeController extends Controller
             'divisionLabels',
             'todayChart',
             'monthChart',
-            'yearChart'
+            'yearChart','pending','ao','commissioner'
         ));
     }
     }
