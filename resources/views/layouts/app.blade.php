@@ -254,67 +254,117 @@
       <!--  Header Start -->
       <header class="app-header">
         <nav class="navbar navbar-expand-lg navbar-light">
-          <ul class="navbar-nav">
-            <li class="nav-item d-block d-xl-none">
-              <a class="nav-link sidebartoggler " id="headerCollapse" href="javascript:void(0)">
-                <i class="ti ti-menu-2"></i>
-              </a>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link " href="javascript:void(0)" id="drop1" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="ti ti-bell"></i>
-                <div class="notification bg-primary rounded-circle"></div>
-              </a>
-              <div class="dropdown-menu dropdown-menu-animate-up" aria-labelledby="drop1">
-                <div class="message-body">
-                  <a href="javascript:void(0)" class="dropdown-item">
-                    Item 1
-                  </a>
-                  <a href="javascript:void(0)" class="dropdown-item">
-                    Item 2
-                  </a>
-                </div>
-              </div>
-            </li>
-          </ul>
-          <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
-            <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
-               
-              <li class="nav-item dropdown">
-                <a class="nav-link " href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown"
-                  aria-expanded="false">
-                  <img src="./assets/images/profile/user-1.jpg" alt="" width="35" height="35" class="rounded-circle">
+         <ul class="navbar-nav align-items-center">
+
+    <!-- Mobile Sidebar Toggle -->
+    <li class="nav-item d-block d-xl-none">
+        <a class="nav-link sidebartoggler" id="headerCollapse" href="#">
+            <i class="ti ti-menu-2"></i>
+        </a>
+    </li>
+
+    <!-- Notification -->
+    <li class="nav-item dropdown">
+
+        <a class="nav-link position-relative" href="#" id="notificationDropdown"
+           role="button" data-bs-toggle="dropdown" aria-expanded="false">
+
+            <i class="ti ti-bell fs-5"></i>
+
+            <!-- badge -->
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                2
+            </span>
+        </a>
+
+        <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="notificationDropdown" style="min-width:260px">
+
+            <li class="dropdown-header fw-bold">Notifications</li>
+            <li><hr class="dropdown-divider"></li>
+
+            <li>
+                <a class="dropdown-item" href="#">
+                    New Complaint Received
                 </a>
-                <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2">
-                  <div class="message-body">
-                    <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
-                     <a href="" 
-   class="d-flex align-items-center gap-2 dropdown-item text-decoration-none text-dark">
-    <i class="ti ti-user fs-6"></i>
-    <p class="mb-0 fs-3"></p>
-</a>
+            </li>
+
+            <li>
+                <a class="dropdown-item" href="#">
+                    Feedback Submitted
+                </a>
+            </li>
+
+            <li><hr class="dropdown-divider"></li>
+
+            <li class="text-center">
+                <a class="dropdown-item text-primary" href="#">View All</a>
+            </li>
+
+        </ul>
+    </li>
+
+</ul>
+
+<nav class="navbar navbar-expand-lg navbar-light w-100">
+
+    <div class="container-fluid">
+
+        <!-- LEFT: sidebar toggle (optional) -->
+        <div class="d-flex align-items-center">
+            <a class="nav-link sidebartoggler d-xl-none" id="headerCollapse" href="#">
+                <i class="ti ti-menu-2"></i>
+            </a>
+        </div>
+
+        <!-- RIGHT: notification + user -->
+        <div class="ms-auto d-flex align-items-center gap-3">
+
+            <!-- 🔔 Notification -->
+            <div class="dropdown">
+                <a class="nav-link position-relative" href="#" id="notificationDropdown" data-bs-toggle="dropdown">
+                    <i class="ti ti-bell fs-5"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        2
+                    </span>
+                </a>
+
+                <ul class="dropdown-menu dropdown-menu-end shadow">
+                    <li class="dropdown-header">Notifications</li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item">New Complaint Received</a></li>
+                    <li><a class="dropdown-item">Feedback Submitted</a></li>
+                </ul>
+            </div>
+
+            <!-- 👤 User -->
+            <div class="dropdown">
+                <a class="nav-link p-0" href="#" id="userDropdown" data-bs-toggle="dropdown">
+                    <img src="{{ asset('assets/images/profile/user-1.jpg') }}"
+                         class="rounded-circle border" width="35" height="35">
+                </a>
+
+                <ul class="dropdown-menu dropdown-menu-end shadow">
+                    <li class="px-3 py-2">
+                        <strong>{{ Auth::user()->name ?? 'Admin' }}</strong>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li class="px-3 py-2">
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button class="btn btn-danger btn-sm w-100">Logout</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+    </div>
+
+</nav>
 
 
-                    </a>
-                   
-<form method="POST" action="{{ route('logout') }}">
-    @csrf
-    <button class="btn btn-danger btn-sm w-100">
-        Logout
-    </button>
-</form>
 
-
-<form id="logout-form" action="" method="POST" class="d-none">
-    @csrf
-</form>
-
-                  </div>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </nav>
       </header>
       <!--  Header End -->
       <div class="body-wrapper-inner">
