@@ -8,6 +8,75 @@
 <div class="container">
 
 <h2 class="mb-4">Commissioner Complaints</h2>
+<div class="d-flex justify-content-end mb-2">
+    <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#filterBox">
+        <i class="bi bi-funnel"></i> Filters <span id="arrow">▼</span>
+    </button>
+</div>
+
+<div class="collapse {{ request()->hasAny(['division','counter','status','from','to','service_quality','rating']) ? 'show' : '' }}" id="filterBox">
+    <div class="card card-body mb-3">
+        <form method="GET" class="row">
+            <input type="hidden" name="active_tab" id="active_tab" value="{{ request('active_tab','pending') }}">
+
+            <div class="col-md-3">
+                <label>DS Division</label>
+                <input type="text" name="division" value="{{ $filters['division'] ?? '' }}" class="form-control" placeholder="Enter Division">
+            </div>
+
+            <div class="col-md-3">
+                <label>Counter</label>
+                <input type="text" name="counter" value="{{ $filters['counter'] ?? '' }}" class="form-control" placeholder="Enter Counter">
+            </div>
+
+            <div class="col-md-2">
+                <label>Status</label>
+                <select name="status" class="form-control">
+                    <option value="">All</option>
+                    <option value="commissioner" {{ ($filters['status'] ?? '') == 'commissioner' ? 'selected' : '' }}>Pending</option>
+                    <option value="completed" {{ ($filters['status'] ?? '') == 'completed' ? 'selected' : '' }}>Completed</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <label>From Date</label>
+                <input type="date" name="from" value="{{ $filters['from'] ?? '' }}" class="form-control">
+            </div>
+
+            <div class="col-md-2">
+                <label>To Date</label>
+                <input type="date" name="to" value="{{ $filters['to'] ?? '' }}" class="form-control">
+            </div>
+
+            <div class="col-md-2">
+                <label>Service Quality</label>
+                <select name="service_quality" class="form-control">
+                    <option value="">All</option>
+                    @foreach($serviceQualities as $quality)
+                        <option value="{{ $quality->id }}" {{ ($filters['service_quality'] ?? '') == $quality->id ? 'selected' : '' }}>
+                            {{ $quality->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <label>Rating</label>
+                <select name="rating" class="form-control">
+                    <option value="">All</option>
+                    @foreach(['1'=>'Bad','2'=>'Poor','3'=>'Average','4'=>'Good','5'=>'Excellent'] as $key => $val)
+                        <option value="{{ $key }}" {{ ($filters['rating'] ?? '') == $key ? 'selected' : '' }}>{{ $val }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="col-md-12 mt-3">
+                <button class="btn btn-primary"><i class="bi bi-search"></i></button>
+                <a href="{{ url()->current() }}" class="btn btn-danger"><i class="bi bi-arrow-clockwise me-1"></i></a>
+            </div>
+        </form>
+    </div>
+</div>
 
 {{-- TABS --}}
 <ul class="nav nav-tabs mb-3">
@@ -181,6 +250,14 @@ Completed
 
 <hr>
 
+<strong>Supervisor Remarks:</strong><br>
+{{ $c->user_remarks ?? '-' }}
+
+<hr>
+
+<strong>AO Remarks:</strong><br>
+{{ $c->ao_remarks ?? '-' }}
+<hr>
 <strong>Final Commissioner Decision:</strong><br>
 {{ $c->commissioner_remarks }}
 
@@ -214,4 +291,16 @@ Completed
 
 </div>
 </div>
+@endsection
+@section('script')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const filterBox = document.getElementById('filterBox');
+    const arrow = document.getElementById('arrow');
+
+    filterBox.addEventListener('show.bs.collapse', () => arrow.innerHTML = '▲');
+    filterBox.addEventListener('hide.bs.collapse', () => arrow.innerHTML = '▼');
+});
+</script>
 @endsection

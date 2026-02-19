@@ -38,7 +38,7 @@
         </div>
        
 <div class="col-md-1 d-grid">
-    <button class="btn btn-primary"> <i class="bi bi-funnel-fill me-1"></i></button>
+    <button class="btn btn-primary"> <i class="bi bi-search"></i></button>
 </div>
 
 @if(request()->hasAny(['search','counter','start_date','end_date']))

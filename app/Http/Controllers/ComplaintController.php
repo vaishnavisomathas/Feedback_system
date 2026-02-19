@@ -6,6 +6,7 @@ use App\Models\ComplainType;
 use App\Models\Counter;
 use App\Models\Feedback;
 use App\Models\ReadComplaint;
+use App\Models\ServiceQuality;
 use Illuminate\Http\Request;
 
 class ComplaintController extends Controller
@@ -16,24 +17,58 @@ public function index()
         ->whereNotNull('note')
         ->where('note','!=','');
 
-    // Pending tab
+   
+    if(request('division')){
+        $baseQuery->whereHas('counter', function($q){
+            $q->where('division_name','like','%'.request('division').'%');
+        });
+    }
+
+    if(request('counter')){
+        $baseQuery->whereHas('counter', function($q){
+            $q->where('counter_name','like','%'.request('counter').'%');
+        });
+    }
+
+    if(request('status')){
+        $baseQuery->where('status', request('status'));
+    }
+
+    if(request('from')){
+        $baseQuery->whereDate('created_at','>=', request('from'));
+    }
+
+    if(request('to')){
+        $baseQuery->whereDate('created_at','<=', request('to'));
+    }
+
+ if(request('service_quality')){
+    $baseQuery->where('service_quality_id', request('service_quality'));
+}
+
+if(request('rating')){
+    $baseQuery->where('rating', request('rating'));
+}
+
     $allRatings = (clone $baseQuery)
         ->where(function($q){
             $q->whereNull('status')
               ->orWhere('status','pending');
         })
         ->latest()
-        ->paginate(10,['*'],'pending_page');
+        ->paginate(request('per_page',10), ['*'], 'pending_page')
+        ->withQueryString();
 
-    // All complaints tab (everything except pending)
     $readRatings = (clone $baseQuery)
         ->whereNotNull('status')
         ->latest()
-        ->paginate(10,['*'],'all_page');
+        ->paginate(request('per_page',10), ['*'], 'all_page')
+        ->withQueryString();
 
     $types = ComplainType::all();
+    $serviceQualities = \App\Models\ServiceQuality::all();
 
-    return view('admin.complain.index',compact('allRatings','readRatings','types'));
+    return view('admin.complain.index', compact('allRatings','readRatings','types','serviceQualities'));
 }
 
 public function saveuserRemarks(Request $request, $id)
@@ -77,50 +112,102 @@ public function forward(Request $request,$id)
         ->with('success','Complaint forwarded successfully');
 }
 
-public function aoIndex()
+public function aoIndex(Request $request)
 {
-    // Complaints currently at AO
-    $pendingAO = Feedback::with(['counter','complainType'])
+    $serviceQualities = ServiceQuality::all(); 
+    $filters = [
+        'division' => $request->division,
+        'counter' => $request->counter,
+        'from' => $request->from,
+        'to' => $request->to,
+        'service_quality' => $request->service_quality,
+        'rating' => $request->rating,
+    ];
+
+    $pendingAO = Feedback::with(['counter','complainType','serviceQuality'])
         ->where('status','ao')
+        ->when($filters['division'], fn($q) => $q->whereHas('counter', fn($q) => $q->where('division_name', 'like', "%{$filters['division']}%")))
+        ->when($filters['counter'], fn($q) => $q->whereHas('counter', fn($q) => $q->where('counter_name', 'like', "%{$filters['counter']}%")))
+        ->when($filters['service_quality'], fn($q) => $q->where('service_quality_id', $filters['service_quality']))
+        ->when($filters['rating'], fn($q) => $q->where('rating', $filters['rating']))
+        ->when($filters['from'], fn($q) => $q->whereDate('created_at', '>=', $filters['from']))
+        ->when($filters['to'], fn($q) => $q->whereDate('created_at', '<=', $filters['to']))
         ->latest()
-        ->paginate(10, ['*'], 'pending');
+        ->paginate($request->per_page ?? 10, ['*'], 'pending');
 
-    // Complaints already forwarded OR completed
-    $closedAO = Feedback::with(['counter','complainType'])
-        ->whereIn('status',['commissioner','completed'])
+    $closedAO = Feedback::with(['counter','complainType','serviceQuality'])
+        ->whereIn('status',['commissioner','completed','rejected'])
+        ->when($filters['division'], fn($q) => $q->whereHas('counter', fn($q) => $q->where('division_name', 'like', "%{$filters['division']}%")))
+        ->when($filters['counter'], fn($q) => $q->whereHas('counter', fn($q) => $q->where('counter_name', 'like', "%{$filters['counter']}%")))
+        ->when($filters['service_quality'], fn($q) => $q->where('service_quality_id', $filters['service_quality']))
+        ->when($filters['rating'], fn($q) => $q->where('rating', $filters['rating']))
+        ->when($filters['from'], fn($q) => $q->whereDate('created_at', '>=', $filters['from']))
+        ->when($filters['to'], fn($q) => $q->whereDate('created_at', '<=', $filters['to']))
         ->latest()
-        ->paginate(10, ['*'], 'closed');
+        ->paginate($request->per_page ?? 10, ['*'], 'closed');
 
-    return view('admin.ao.index', compact('pendingAO','closedAO'));
+    return view('admin.ao.index', compact('pendingAO','closedAO','serviceQualities','filters'));
 }
+
 
 public function aoSave(Request $request, $id)
 {
     $feedback = Feedback::findOrFail($id);
 
-    $feedback->ao_remarks = $request->ao_remarks;
+       $feedback->ao_remarks = $request->ao_remarks;
 
-    $feedback->status = 'commissioner';  
+    if ($request->action === 'forward') {
+        $feedback->status = 'commissioner';
+    } elseif ($request->action === 'reject') {
+        $feedback->status = 'rejected';
+    }
+
     $feedback->save();
 
-    return back()->with('success','Forwarded to Commissioner');
+    return redirect()->back()->with('success', 'Complaint updated successfully.');
 }
 
-public function commissionerIndex()
+public function commissionerIndex(Request $request)
 {
-    $pendingCommissioner = Feedback::with(['counter','complainType'])
+    $serviceQualities = ServiceQuality::all();
+
+    $filters = [
+        'division' => $request->division,
+        'counter' => $request->counter,
+        'status' => $request->status,
+        'from' => $request->from,
+        'to' => $request->to,
+        'service_quality' => $request->service_quality,
+        'rating' => $request->rating,
+    ];
+
+    $pendingCommissioner = Feedback::with(['counter','complainType','serviceQuality'])
         ->where('status','commissioner')
+        ->when($filters['division'], fn($q) => $q->whereHas('counter', fn($q) => $q->where('division_name','like',"%{$filters['division']}%")))
+        ->when($filters['counter'], fn($q) => $q->whereHas('counter', fn($q) => $q->where('counter_name','like',"%{$filters['counter']}%")))
+        ->when($filters['service_quality'], fn($q) => $q->where('service_quality_id', $filters['service_quality']))
+        ->when($filters['rating'], fn($q) => $q->where('rating', $filters['rating']))
+        ->when($filters['from'], fn($q) => $q->whereDate('created_at', '>=', $filters['from']))
+        ->when($filters['to'], fn($q) => $q->whereDate('created_at', '<=', $filters['to']))
         ->latest()
-        ->paginate(10);
+        ->paginate($request->per_page ?? 10, ['*'], 'pending');
 
-    $closedCommissioner = Feedback::with(['counter','complainType'])
+    $closedCommissioner = Feedback::with(['counter','complainType','serviceQuality'])
         ->where('status','completed')
+        ->when($filters['division'], fn($q) => $q->whereHas('counter', fn($q) => $q->where('division_name','like',"%{$filters['division']}%")))
+        ->when($filters['counter'], fn($q) => $q->whereHas('counter', fn($q) => $q->where('counter_name','like',"%{$filters['counter']}%")))
+        ->when($filters['service_quality'], fn($q) => $q->where('service_quality_id', $filters['service_quality']))
+        ->when($filters['rating'], fn($q) => $q->where('rating', $filters['rating']))
+        ->when($filters['from'], fn($q) => $q->whereDate('created_at', '>=', $filters['from']))
+        ->when($filters['to'], fn($q) => $q->whereDate('created_at', '<=', $filters['to']))
         ->latest()
-        ->paginate(10);
+        ->paginate($request->per_page ?? 10, ['*'], 'closed');
 
-    return view('admin.commissioner.index',
-        compact('pendingCommissioner','closedCommissioner'));
+    return view('admin.commissioner.index', compact(
+        'pendingCommissioner','closedCommissioner','serviceQualities','filters'
+    ));
 }
+
 public function commissionerClose(Request $request,$id)
 {
     

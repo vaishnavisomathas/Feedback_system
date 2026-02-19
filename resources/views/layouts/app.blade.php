@@ -97,7 +97,11 @@
             <span class="hide-menu">Feedback</span>
         </a>
     </li>
-
+    @auth
+    @php
+    $role = auth()->user()->role; // single role string
+@endphp
+@if($role != 'Commissioner' && $role != 'Administrative Officer')
            <li class="nav-small-cap">
         <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
         <span class="hide-menu">Complaint</span>
@@ -112,8 +116,8 @@
         </a>
     </li>
 
-
-            
+@endif
+            @if($role != 'Commissioner' && $role != 'User1')
         <li class="nav-small-cap">
         <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
         <span class="hide-menu">A/O</span>
@@ -122,13 +126,14 @@
     <li class="sidebar-item {{ request()->routeIs('admin.ao.*') ? 'active' : '' }}">
         <a href="{{ route('admin.ao.index') }}" class="sidebar-link">
             <span class="d-flex">
-                <i class="ti ti-user-shield"></i>
+                <i class="ti ti-shield"></i>
             </span>
             <span class="hide-menu">A/O Management</span>
         </a>
     </li>
-
-
+@endif
+<!-- Commissioner -->
+@if($role != 'Administrative Officer' && $role != 'User1')
            <li class="nav-small-cap">
         <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
         <span class="hide-menu">Commissioner</span>
@@ -142,6 +147,8 @@
             <span class="hide-menu">Commissioner</span>
         </a>
     </li>
+    @endif
+    @if($role != 'Administrative Officer' && $role != 'User1')
            <li class="nav-small-cap">
         <iconify-icon icon="solar:menu-dots-linear" class="nav-small-cap-icon fs-4"></iconify-icon>
         <span class="hide-menu">User Management</span>
@@ -206,6 +213,8 @@
             <span class="hide-menu">Complaint Type</span>
         </a>
     </li>
+    @endif
+    @endauth
 </ul>
         </nav>
         <!-- End Sidebar navigation -->
@@ -226,20 +235,42 @@
             </li>
             <li class="nav-item dropdown">
               <a class="nav-link " href="javascript:void(0)" id="drop1" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="ti ti-bell"></i>
-                <div class="notification bg-primary rounded-circle"></div>
-              </a>
+
+        <i class="ti ti-bell"></i>
+
+        @if($notificationCount > 0)
+            <span class="position-absolute top-10 start-100 translate-middle badge rounded-pill bg-danger">
+                {{ $notificationCount }}
+            </span>
+        @endif
+
+    </a>
+
               <div class="dropdown-menu dropdown-menu-animate-up" aria-labelledby="drop1">
-                <div class="message-body">
-                  <a href="javascript:void(0)" class="dropdown-item">
-                    Item 1
-                  </a>
-                  <a href="javascript:void(0)" class="dropdown-item">
-                    Item 2
-                  </a>
-                </div>
-              </div>
-            </li>
+
+        <div class="message-body">
+
+            @if(auth()->user()->role == 'Commissioner')
+                <a href="{{ route('admin.commissioner.index') }}" class="dropdown-item">
+                    Commissioner Complaints ({{ $notificationCount }})
+                </a>
+
+            @elseif(auth()->user()->role == 'Administrative Officer')
+                <a href="{{ route('admin.ao.index') }}" class="dropdown-item">
+                    AO Complaints ({{ $notificationCount }})
+                </a>
+
+            @else
+                <a href="{{ route('admin.complain.index') }}" class="dropdown-item">
+                    Pending Complaints ({{ $notificationCount }})
+                </a>
+            @endif
+
+        </div>
+
+    </div>
+</li>
+
           </ul>
           <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
             <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
@@ -253,11 +284,16 @@
                   <div class="message-body">
                     <a href="javascript:void(0)" class="d-flex align-items-center gap-2 dropdown-item">
                       <i class="ti ti-user fs-6"></i>
-                      <p class="mb-0 fs-3">My Profile</p>
-                    </a>
+                      <a href="{{ route('users.show', auth()->user()->id) }}"    class="d-flex align-items-center gap-2 dropdown-item text-decoration-none text-dark">
+
+  <p class="mb-0 fs-3">{{ auth()->user()->name }}</p>                    </a>
                  
-                    <a href="./authentication-login.html" class="btn btn-outline-primary mx-3 mt-2 d-block">Logout</a>
-                  </div>
+
+<form method="POST" action="{{ route('logout') }}">
+    @csrf
+    <button class="btn btn-danger btn-sm w-100">
+        Logout
+    </button>                  </div>
                 </div>
               </li>
             </ul>

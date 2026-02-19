@@ -31,7 +31,12 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [AuthController::class,'showLogin'])->name('login');
 Route::post('/login', [AuthController::class,'login'])->name('login.post');
 Route::post('/logout', [AuthController::class,'logout'])->name('logout');
-// Route::middleware('auth')->group(function () {
+Route::middleware('auth')->group(function () {
+
+
+
+
+
 Route::get('/feedback/{division}/{counter}', [FeedbackController::class, 'show'])
     ->name('feedback.show');
 // Route::middleware(['auth','role:USER'])->group(function () {
@@ -110,4 +115,4 @@ Route::get('/service-quality',[ServiceQualityController::class,'index'])->name('
 Route::post('/service-quality',[ServiceQualityController::class,'store'])->name('service.quality.store');
 Route::put('/service-quality/{id}',[ServiceQualityController::class,'update'])->name('service.quality.update');
 Route::delete('/service-quality/{id}',[ServiceQualityController::class,'destroy'])->name('service.quality.destroy');
-// });
+});

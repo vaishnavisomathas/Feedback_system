@@ -26,12 +26,10 @@
 
               <!-- LOGO AREA -->
               <div class="text-center py-3">
-
-                <img src="{{ asset('assets/images/logos/pdmt-logo.png') }}"
-                     alt="PDMT Northern Province"
-                     class="img-fluid"
-                     style="max-width:130px;">
-
+               <img src="{{ asset('assets/images/pdmt_Logo.png') }}"
+             alt="PDMT Logo"
+             class="img-fluid"
+             style="max-width:90px;">
                 <h5 class="mt-3 mb-1 fw-bold">
                   Provincial Department of Motor Traffic
                 </h5>
