@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-<title>Complaints - PDMT</title>
+Complaints - PDMT
 @endsection
 
 @section('content')
@@ -25,17 +25,19 @@
         <form method="GET" class="row">
             <input type="hidden" name="active_tab" id="active_tab" value="{{ request('active_tab','all') }}">
 
-            <div class="col-md-3">
-                <label>DS Division</label>
-                <input type="text" name="division" value="{{ request('division') }}" class="form-control" placeholder="Enter Division">
-            </div>
-
-            <div class="col-md-3">
-                <label>Counter</label>
-                <input type="text" name="counter" value="{{ request('counter') }}" class="form-control" placeholder="Enter Counter">
-            </div>
-
-            <div class="col-md-2">
+           <div class="col-md-2">
+                            <label>Division-Counter</label>
+       <select name="counter" class="form-control">
+    <option value="">-- All Counters --</option>
+    @foreach($counters as $counterOption)
+        <option value="{{ $counterOption->id }}"
+            {{ ($filters['counter'] ?? '') == $counterOption->id ? 'selected' : '' }}>
+            {{ $counterOption->division_name }} – {{ $counterOption->counter_name }}
+        </option>
+    @endforeach
+</select>
+        </div>
+ <div class="col-md-2">
                 <label>Status</label>
                 <select name="status" class="form-control">
                     <option value="">All</option>
@@ -43,6 +45,8 @@
                     <option value="ao" {{ request('status')=='ao'?'selected':'' }}>Fowarded A/O</option>
                     <option value="commissioner" {{ request('status')=='commissioner'?'selected':'' }}>Commissioner</option>
                     <option value="completed" {{ request('status')=='completed'?'selected':'' }}>Completed</option>
+                                       <option value="rejected" {{ ($filters['status'] ?? '')=='rejected'?'selected':'' }}>Rejected</option>
+
                 </select>
             </div>
 
@@ -94,13 +98,14 @@
 {{-- TABS --}}
 <ul class="nav nav-tabs mb-3">
     <li class="nav-item">
-        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#all">
+        <button class="nav-link {{ request('active_tab','pending') == 'pending' ? 'active' : '' }}"
+            data-bs-toggle="tab" data-bs-target="#pending">
             Pending Complaints
         </button>
     </li>
     <li class="nav-item">
-        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#read">
-            All Complaints
+  <button class="nav-link {{ request('active_tab') == 'closed' ? 'active' : '' }}"
+                data-bs-toggle="tab" data-bs-target="#closed">            All Complaints
         </button>
     </li>
 </ul>
@@ -108,7 +113,7 @@
 <div class="tab-content">
 
 {{-- ================= ALL COMPLAINTS ================= --}}
-<div class="tab-pane fade show active" id="all">
+    <div class="tab-pane fade {{ request('active_tab','pending') == 'pending' ? 'show active' : '' }}" id="pending">
 
 <table class="table table-bordered table-hover">
 <thead class="table-dark">
@@ -175,44 +180,45 @@
 
 {{-- DETAILS --}}
 <tr class="collapse bg-light" id="complaint{{ $rating->id }}">
-<td colspan="9">
+    <td colspan="9">
+        <div class="card shadow-sm border-secondary mb-2">
+            <div class="card-body p-3">
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <strong>Complaint:</strong>
+                        <p class="mb-0">{{ $rating->note ?? 'No complaint provided' }}</p>
+                    </div>
 
-<div class="p-3">
+                    <div class="col-md-6 mb-2">
+                        <form method="POST" action="{{ route('admin.complain.remarks', $rating->id) }}">
+                            @csrf
+                            <div class="mb-2">
+                                <label><strong>Complaint Type:</strong></label>
+                                <select name="complain_type_id" class="form-control">
+                                    <option value="">-- Select Type --</option>
+                                    @foreach($types as $type)
+                                        <option value="{{ $type->id }}"
+                                            {{ $rating->complain_type_id == $type->id ? 'selected' : '' }}>
+                                            {{ $type->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-<div class="mb-3">
-<strong>Complaint:-</strong>{{ $rating->note ?? 'No complaint provided' }}
-</div>
+                            <div class="mb-2">
+                                <label><strong>Remarks:</strong></label>
+                                <textarea name="user_remarks" class="form-control" rows="3">{{ $rating->remarks }}</textarea>
+                            </div>
 
-<form method="POST" action="{{ route('admin.complain.remarks',$rating->id) }}">
-@csrf
-
-<div class="mb-3">
-<label><strong>Complaint Type:-</strong></label>
-<select name="complain_type_id" class="form-control">
-    <option value="">-- Select Type --</option>
-    @foreach($types as $type)
-        <option value="{{ $type->id }}"
-            {{ $rating->complain_type_id == $type->id ? 'selected' : '' }}>
-            {{ $type->name }}
-        </option>
-    @endforeach
-</select>
-</div>
-
-<label><strong>Remarks:-</strong></label>
-<textarea name="user_remarks" class="form-control" rows="3">{{ $rating->remarks }}</textarea>
-
-<button class="btn btn-danger btn-sm">
-    Forward to Administrative Officer
-</button>
-
-
-
-</form>
-
-</div>
-
-</td>
+                            <button class="btn btn-danger btn-sm">
+                                Forward to Administrative Officer
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div> 
+        </div> 
+    </td>
 </tr>
 
 @empty
@@ -238,7 +244,7 @@
 </div>
 
 {{-- ================= All COMPLAINTS ================= --}}
-<div class="tab-pane fade" id="read">
+    <div class="tab-pane fade {{ request('active_tab') == 'closed' ? 'show active' : '' }}" id="closed">
 
 <table class="table table-bordered table-hover">
 <thead class="table-success">
@@ -320,26 +326,24 @@
 
 <tr class="collapse bg-light" id="readComplaint{{ $rating->id }}">
 <td colspan="9">
-
-<div class="p-3">
-
-<div class="mb-3">
-<strong>Complaint:-</strong>{{ $rating->note }}
+ <div class="card card-sm shadow-sm border-secondary mb-2">
+    <div class="card-body p-2">
+        <div class="row">
+            <div class="col-md-6 mb-2">
+                <strong>Complaint:</strong>
+                <p class="mb-0">{{ $rating->note }}</p>
+            </div>
+            <div class="col-md-6 mb-2">
+                <strong>Complaint Type:</strong>
+                <p class="mb-0">{{ $rating->complainType->name ?? 'Not specified' }}</p>
+            </div>
+            <div class="col-md-6 mb-2">
+                <strong>User Remarks:</strong>
+                <p class="mb-0">{{ $rating->user_remarks ?? '-' }}</p>
+            </div>
 </div>
-
-<div class="mb-3">
-<strong>Complaint Type:-</strong><br>
-{{ $rating->complainType->name ?? 'Not specified' }}
-</div>
-
-<div class="mb-3">
-<strong>Remarks:-</strong><br>
-{{ $rating->user_remarks ?? 'No remarks added' }}
-</div>
-
-
-</div>
-
+    </div>
+ </div>
 </td>
 </tr>
 
@@ -378,6 +382,11 @@ span { transition: 0.2s; }
 </style>
 
 <script>
+    document.querySelectorAll('.nav-tabs .nav-link').forEach(tab => {
+    tab.addEventListener('click', function() {
+        document.getElementById('active_tab').value = this.dataset.bsTarget.replace('#','') === 'pending' ? 'pending' : 'closed';
+    });
+});
 document.addEventListener("DOMContentLoaded", function () {
     const filterBox = document.getElementById('filterBox');
     const arrow = document.getElementById('arrow');

@@ -1,11 +1,12 @@
 @extends('layouts.app')
 
 @section('title')
-<title>Complaint Types</title>
+Complaint Types- PDMT
 @endsection
 
 @section('content')
 <div class="container">
+<h3 class="mb-3">Complaint Types Management</h3>
 
 @if(session('success'))
 <div class="alert alert-success">{{ session('success') }}</div>

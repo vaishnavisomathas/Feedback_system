@@ -1,5 +1,7 @@
 @extends('layouts.app')
-
+@section('title')
+Division- PDMT
+@endsection
 @section('content')
 <div class="container">
 

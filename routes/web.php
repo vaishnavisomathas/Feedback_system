@@ -7,6 +7,7 @@ use App\Http\Controllers\CounterController;
 use App\Http\Controllers\DsDivisionController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PermissionGroupController;
 use App\Http\Controllers\RoleController;
@@ -65,6 +66,7 @@ Route::get('/admin/feedbacks/pdf', [CounterController::class, 'downloadPdf'])
     Route::get('ds-divisions', [DsDivisionController::class, 'index'])->name('ds-divisions.index');
   // Show QR page
     Route::get('/{counterId}/qr', [DsDivisionController::class, 'showQr'])->name('showQr');
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
 
     // Generate QR (optional, if you want a POST method to generate)
 

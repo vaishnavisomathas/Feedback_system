@@ -1,5 +1,8 @@
 @extends('layouts.app')
-@section('title','Service Quality')
+@section('title')
+Service Quality-PDMT
+
+@endsection
 
 @section('content')
 <div class="container">
@@ -37,7 +40,8 @@
 </div>
 
 <div class="modal-footer">
-<button class="btn btn-success">Save</button>
+    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+<button class="btn btn-primary">Save</button>
 </div>
 
 </div>

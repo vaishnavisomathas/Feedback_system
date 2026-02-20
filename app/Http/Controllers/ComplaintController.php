@@ -13,22 +13,32 @@ class ComplaintController extends Controller
 {
 public function index()
 {
+     $statusMap = [
+    'pending' => null,
+    'ao' => 'ao',
+    'commissioner' => 'commissioner',
+    'completed' => 'completed',
+    'rejected' => 'rejected',
+];
+
+$status = $statusMap[$filters['status'] ?? ''] ?? null;
+    $filters = [
+    'division' => request('division'),
+    'counter' => request('counter'),
+    'status' => request('status'),
+    'from' => request('from'),
+    'to' => request('to'),
+    'service_quality' => request('service_quality'),
+    'rating' => request('rating'),
+];
+  $counters = Counter::orderBy('district')
+        ->orderBy('division_name')
+        ->orderBy('counter_name')
+        ->get();
     $baseQuery = Feedback::with(['counter','complainType','serviceQuality'])
         ->whereNotNull('note')
         ->where('note','!=','');
 
-   
-    if(request('division')){
-        $baseQuery->whereHas('counter', function($q){
-            $q->where('division_name','like','%'.request('division').'%');
-        });
-    }
-
-    if(request('counter')){
-        $baseQuery->whereHas('counter', function($q){
-            $q->where('counter_name','like','%'.request('counter').'%');
-        });
-    }
 
     if(request('status')){
         $baseQuery->where('status', request('status'));
@@ -55,12 +65,24 @@ if(request('rating')){
             $q->whereNull('status')
               ->orWhere('status','pending');
         })
+          ->when($filters['counter'], fn($q) => $q->where('counter_id', $filters['counter']))
+       ->when($filters['division'], fn($q) => 
+        $q->whereHas('counter', fn($q2) => $q2->where('division_name','like', "%{$filters['division']}%"))
+    )
+       ->when($status === null && ($filters['status'] ?? '') === 'pending', fn($q) => $q->whereNull('status'))
+            ->when($status && $status !== 'pending', fn($q) => $q->where('status', $status))
         ->latest()
         ->paginate(request('per_page',10), ['*'], 'pending_page')
         ->withQueryString();
 
     $readRatings = (clone $baseQuery)
         ->whereNotNull('status')
+           ->when($status === null && ($filters['status'] ?? '') === 'pending', fn($q) => $q->whereNull('status'))
+            ->when($status && $status !== 'pending', fn($q) => $q->where('status', $status))
+          ->when($filters['counter'], fn($q) => $q->where('counter_id', $filters['counter']))
+       ->when($filters['division'], fn($q) => 
+        $q->whereHas('counter', fn($q2) => $q2->where('division_name','like', "%{$filters['division']}%"))
+    )
         ->latest()
         ->paginate(request('per_page',10), ['*'], 'all_page')
         ->withQueryString();
@@ -68,7 +90,7 @@ if(request('rating')){
     $types = ComplainType::all();
     $serviceQualities = \App\Models\ServiceQuality::all();
 
-    return view('admin.complain.index', compact('allRatings','readRatings','types','serviceQualities'));
+    return view('admin.complain.index', compact('allRatings','readRatings','types','serviceQualities','counters','filters'));
 }
 
 public function saveuserRemarks(Request $request, $id)
@@ -122,12 +144,29 @@ public function aoIndex(Request $request)
         'to' => $request->to,
         'service_quality' => $request->service_quality,
         'rating' => $request->rating,
+         'status' => $request->status, 
     ];
+    $statusMap = [
+    'pending' => null,
+    'ao' => 'ao',
+    'commissioner' => 'commissioner',
+    'completed' => 'completed',
+    'rejected' => 'rejected',
+];
 
+$status = $statusMap[$filters['status'] ?? ''] ?? null;
+  $counters = Counter::orderBy('district')
+        ->orderBy('division_name')
+        ->orderBy('counter_name')
+        ->get();
     $pendingAO = Feedback::with(['counter','complainType','serviceQuality'])
         ->where('status','ao')
-        ->when($filters['division'], fn($q) => $q->whereHas('counter', fn($q) => $q->where('division_name', 'like', "%{$filters['division']}%")))
-        ->when($filters['counter'], fn($q) => $q->whereHas('counter', fn($q) => $q->where('counter_name', 'like', "%{$filters['counter']}%")))
+            ->when($status === null && ($filters['status'] ?? '') === 'pending', fn($q) => $q->whereNull('status'))
+            ->when($status && $status !== 'pending', fn($q) => $q->where('status', $status))
+        ->when($filters['counter'], fn($q) => $q->where('counter_id', $filters['counter']))
+       ->when($filters['division'], fn($q) => 
+        $q->whereHas('counter', fn($q2) => $q2->where('division_name','like', "%{$filters['division']}%"))
+    )
         ->when($filters['service_quality'], fn($q) => $q->where('service_quality_id', $filters['service_quality']))
         ->when($filters['rating'], fn($q) => $q->where('rating', $filters['rating']))
         ->when($filters['from'], fn($q) => $q->whereDate('created_at', '>=', $filters['from']))
@@ -137,8 +176,12 @@ public function aoIndex(Request $request)
 
     $closedAO = Feedback::with(['counter','complainType','serviceQuality'])
         ->whereIn('status',['commissioner','completed','rejected'])
-        ->when($filters['division'], fn($q) => $q->whereHas('counter', fn($q) => $q->where('division_name', 'like', "%{$filters['division']}%")))
-        ->when($filters['counter'], fn($q) => $q->whereHas('counter', fn($q) => $q->where('counter_name', 'like', "%{$filters['counter']}%")))
+                  ->when($status === null && ($filters['status'] ?? '') === 'pending', fn($q) => $q->whereNull('status'))
+            ->when($status && $status !== 'pending', fn($q) => $q->where('status', $status))
+       ->when($filters['counter'], fn($q) => $q->where('counter_id', $filters['counter']))
+       ->when($filters['division'], fn($q) => 
+        $q->whereHas('counter', fn($q2) => $q2->where('division_name','like', "%{$filters['division']}%"))
+    )
         ->when($filters['service_quality'], fn($q) => $q->where('service_quality_id', $filters['service_quality']))
         ->when($filters['rating'], fn($q) => $q->where('rating', $filters['rating']))
         ->when($filters['from'], fn($q) => $q->whereDate('created_at', '>=', $filters['from']))
@@ -146,7 +189,7 @@ public function aoIndex(Request $request)
         ->latest()
         ->paginate($request->per_page ?? 10, ['*'], 'closed');
 
-    return view('admin.ao.index', compact('pendingAO','closedAO','serviceQualities','filters'));
+    return view('admin.ao.index', compact('pendingAO','closedAO','serviceQualities','filters','counters'));
 }
 
 
@@ -180,11 +223,27 @@ public function commissionerIndex(Request $request)
         'service_quality' => $request->service_quality,
         'rating' => $request->rating,
     ];
+       $statusMap = [
+    'pending' => null,
+    'ao' => 'ao',
+    'commissioner' => 'commissioner',
+    'completed' => 'completed',
+    'rejected' => 'rejected',
+];
 
+$status = $statusMap[$filters['status'] ?? ''] ?? null;
+   $counters = Counter::orderBy('district')
+        ->orderBy('division_name')
+        ->orderBy('counter_name')
+        ->get();
     $pendingCommissioner = Feedback::with(['counter','complainType','serviceQuality'])
         ->where('status','commissioner')
-        ->when($filters['division'], fn($q) => $q->whereHas('counter', fn($q) => $q->where('division_name','like',"%{$filters['division']}%")))
-        ->when($filters['counter'], fn($q) => $q->whereHas('counter', fn($q) => $q->where('counter_name','like',"%{$filters['counter']}%")))
+              ->when($status === null && ($filters['status'] ?? '') === 'pending', fn($q) => $q->whereNull('status'))
+            ->when($status && $status !== 'pending', fn($q) => $q->where('status', $status))
+       ->when($filters['counter'], fn($q) => $q->where('counter_id', $filters['counter']))
+       ->when($filters['division'], fn($q) => 
+        $q->whereHas('counter', fn($q2) => $q2->where('division_name','like', "%{$filters['division']}%"))
+    )
         ->when($filters['service_quality'], fn($q) => $q->where('service_quality_id', $filters['service_quality']))
         ->when($filters['rating'], fn($q) => $q->where('rating', $filters['rating']))
         ->when($filters['from'], fn($q) => $q->whereDate('created_at', '>=', $filters['from']))
@@ -194,8 +253,12 @@ public function commissionerIndex(Request $request)
 
     $closedCommissioner = Feedback::with(['counter','complainType','serviceQuality'])
         ->where('status','completed')
-        ->when($filters['division'], fn($q) => $q->whereHas('counter', fn($q) => $q->where('division_name','like',"%{$filters['division']}%")))
-        ->when($filters['counter'], fn($q) => $q->whereHas('counter', fn($q) => $q->where('counter_name','like',"%{$filters['counter']}%")))
+              ->when($status === null && ($filters['status'] ?? '') === 'pending', fn($q) => $q->whereNull('status'))
+            ->when($status && $status !== 'pending', fn($q) => $q->where('status', $status))
+   ->when($filters['counter'], fn($q) => $q->where('counter_id', $filters['counter']))
+        ->when($filters['division'], fn($q) => 
+        $q->whereHas('counter', fn($q2) => $q2->where('division_name','like', "%{$filters['division']}%"))
+    )
         ->when($filters['service_quality'], fn($q) => $q->where('service_quality_id', $filters['service_quality']))
         ->when($filters['rating'], fn($q) => $q->where('rating', $filters['rating']))
         ->when($filters['from'], fn($q) => $q->whereDate('created_at', '>=', $filters['from']))
@@ -204,7 +267,7 @@ public function commissionerIndex(Request $request)
         ->paginate($request->per_page ?? 10, ['*'], 'closed');
 
     return view('admin.commissioner.index', compact(
-        'pendingCommissioner','closedCommissioner','serviceQualities','filters'
+        'pendingCommissioner','closedCommissioner','serviceQualities','filters','counters'
     ));
 }
 

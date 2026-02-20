@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-<title>Administrative Officer Complaints</title>
+Administrative Officer Complaints- PDMT
 @endsection
 
 @section('content')
@@ -19,26 +19,30 @@
         <form method="GET" class="row">
             <input type="hidden" name="active_tab" id="active_tab" value="{{ request('active_tab','pending') }}">
 
-            <div class="col-md-3">
-                <label>DS Division</label>
-                <input type="text" name="division" value="{{ $filters['division'] ?? '' }}" class="form-control" placeholder="Enter Division">
-            </div>
-
-            <div class="col-md-3">
-                <label>Counter</label>
-                <input type="text" name="counter" value="{{ $filters['counter'] ?? '' }}" class="form-control" placeholder="Enter Counter">
-            </div>
-
             <div class="col-md-2">
-                <label>From Date</label>
-                <input type="date" name="from" value="{{ $filters['from'] ?? '' }}" class="form-control">
-            </div>
-
-            <div class="col-md-2">
-                <label>To Date</label>
-                <input type="date" name="to" value="{{ $filters['to'] ?? '' }}" class="form-control">
-            </div>
-
+               <label>Division-Counter</label>
+               <select name="counter" class="form-control">
+                   <option value="">-- All Counters --</option>
+                   @foreach($counters as $counterOption)
+                       <option value="{{ $counterOption->id }}"
+                           {{ ($filters['counter'] ?? '') == $counterOption->id ? 'selected' : '' }}>
+                           {{ $counterOption->division_name }} – {{ $counterOption->counter_name }}
+                       </option>
+                   @endforeach
+               </select>
+           </div>
+  <div class="col-md-2">
+               <label>Status</label>
+               <select name="status" class="form-control">
+                   <option value="">All</option>
+                   <option value="pending" {{ ($filters['status'] ?? '')=='pending'?'selected':'' }}>Pending</option>
+                   <option value="ao" {{ ($filters['status'] ?? '')=='ao'?'selected':'' }}>Forwarded A/O</option>
+                   <option value="commissioner" {{ ($filters['status'] ?? '')=='commissioner'?'selected':'' }}>Sent to Commissioner</option>
+                   <option value="completed" {{ ($filters['status'] ?? '')=='completed'?'selected':'' }}>Completed</option>
+                   <option value="rejected" {{ ($filters['status'] ?? '')=='rejected'?'selected':'' }}>Rejected</option>
+               </select>
+           </div>
+       
             <div class="col-md-2">
                 <label>Service Quality</label>
                 <select name="service_quality" class="form-control">
@@ -60,6 +64,15 @@
                     @endforeach
                 </select>
             </div>
+     <div class="col-md-2">
+                <label>From Date</label>
+                <input type="date" name="from" value="{{ $filters['from'] ?? '' }}" class="form-control">
+            </div>
+
+            <div class="col-md-2">
+                <label>To Date</label>
+                <input type="date" name="to" value="{{ $filters['to'] ?? '' }}" class="form-control">
+            </div>
 
             <div class="col-md-12 mt-3">
                 <button class="btn btn-primary"><i class="bi bi-search"></i></button>
@@ -71,12 +84,14 @@
 {{-- TABS --}}
 <ul class="nav nav-tabs mb-3">
     <li class="nav-item">
-        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#pending">
-            Pending AO
+        <button class="nav-link {{ request('active_tab','pending') == 'pending' ? 'active' : '' }}"
+                data-bs-toggle="tab" data-bs-target="#pending">
+            Pending at A/O
         </button>
     </li>
     <li class="nav-item">
-        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#closed">
+        <button class="nav-link {{ request('active_tab') == 'closed' ? 'active' : '' }}"
+                data-bs-toggle="tab" data-bs-target="#closed">
             Completed / Forwarded
         </button>
     </li>
@@ -85,7 +100,7 @@
 <div class="tab-content">
 
 {{-- ================= PENDING AO ================= --}}
-<div class="tab-pane fade show active" id="pending">
+<div class="tab-pane fade {{ request('active_tab','pending') == 'pending' ? 'show active' : '' }}" id="pending">
 
 <table class="table table-bordered table-hover">
 <thead class="table-danger">
@@ -126,43 +141,45 @@
 </tr>
 
 <tr class="collapse bg-light" id="complaint{{ $rating->id }}">
-<td colspan="9">
-<div class="p-3">
+    <td colspan="9">
+        <div class="card shadow-sm border-secondary mb-2">
+            <div class="card-body p-2">
+              <div class="row">
+                    <div class="col-md-6 mb-2">
+                    <strong>Complaint:</strong>
+                    <p class="mb-0">{{ $rating->note }}</p>
+                </div>
 
-<strong>Complaint:</strong><br>
-{{ $rating->note }}
+                    <div class="col-md-6 mb-2">
+                    <strong>Complaint Type:</strong>
+                    <p class="mb-0">{{ $rating->complainType->name ?? 'Not specified' }}</p>
+                </div>
 
-<hr>
+                    <div class="col-md-6 mb-2">
+                    <strong>User Remarks:</strong>
+                    <p class="mb-0">{{ $rating->user_remarks ?? 'No remarks added' }}</p>
+                </div>
+ <div class="col-md-12 mb-2">
+            
+                <form method="POST" action="{{ route('admin.ao.save', $rating->id) }}">
+                    @csrf
+                        <label><strong>AO Final Remarks</strong></label>
+                        <textarea name="ao_remarks" class="form-control" rows="3" required></textarea>
+                    
 
-<strong>Complaint Type:</strong><br>
-{{ $rating->complainType->name ?? 'Not specified' }}
-
-<hr>
-
-<strong>Supervisor Remarks:</strong><br>
-{{ $rating->user_remarks ?? 'No remarks added' }}
-
-<hr>
-
-<form method="POST" action="{{ route('admin.ao.save',$rating->id) }}">
-@csrf
-
-<label><strong>AO Final Remarks</strong></label>
-<textarea name="ao_remarks" class="form-control mb-3" rows="3" required></textarea>
-
-    <div class="d-flex gap-2">
-        <button class="btn btn-success btn-sm" type="submit" name="action" value="forward">
-            Forward to Commissioner
-        </button>
-
-        <button class="btn btn-danger btn-sm" type="submit" name="action" value="reject">
-            Reject
-        </button>
-    </div>
-</form>
-
-</div>
-</td>
+               
+                        <button class="btn btn-danger btn-sm" type="submit" name="action" value="reject">
+                            Reject
+                        </button>
+                        <button class="btn btn-success btn-sm" type="submit" name="action" value="forward">
+                            Forward to Commissioner
+                        </button>
+                 
+                </form>
+            </div> 
+            </div> 
+        </div> 
+    </td>
 </tr>
 
 @empty
@@ -190,7 +207,7 @@
 </div>
 
 {{-- ================= CLOSED / FORWARDED ================= --}}
-<div class="tab-pane fade" id="closed">
+<div class="tab-pane fade {{ request('active_tab') == 'closed' ? 'show active' : '' }}" id="closed">
 
 <table class="table table-bordered table-hover">
 <thead class="table-success">
@@ -236,31 +253,39 @@
 
 
 </tr>
-
 <tr class="collapse bg-light" id="closed{{ $c->id }}">
-<td colspan="8">
-<div class="p-3">
+    <td colspan="8">
+        <div class="card shadow-sm border-secondary mb-2">
+            <div class="card-body p-3">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <strong>Complaint:</strong>
+                        <p class="mb-0">{{ $c->note }}</p>
+                    </div>
 
-<strong>Complaint:</strong><br>
-{{ $c->note }}
+                    <div class="col-md-6 mb-3">
+                        <strong>Complaint Type:</strong>
+                        <p class="mb-0">{{ $c->complainType->name ?? 'Not specified' }}</p>
+                    </div>
 
-<hr>
+                    <div class="col-md-6 mb-3">
+                        <strong>Supervisor Remarks:</strong>
+                        <p class="mb-0">{{ $c->user_remarks ?? '-' }}</p>
+                    </div>
 
-<strong>Complaint Type:</strong><br>
-{{ $c->complainType->name ?? 'Not specified' }}
+                    <div class="col-md-6 mb-3">
+                        <strong>Administrative Officer Remarks:</strong>
+                        <p class="mb-0">{{ $c->ao_remarks ?? '-' }}</p>
+                    </div>
 
-<hr>
-
-<strong>Supervisor Remarks:</strong><br>
-{{ $c->user_remarks ?? '-' }}
-
-<hr>
-
-<strong>Administrative Officer Remarks:</strong><br>
-{{ $c->ao_remarks ?? '-' }}
-
-</div>
-</td>
+                    <div class="col-md-6 mb-3">
+                        <strong>Final Commissioner Decision:</strong>
+                        <p class="mb-0">{{ $c->commissioner_remarks ?? '-' }}</p>
+                    </div>
+                </div>
+            </div> 
+        </div>
+    </td>
 </tr>
 
 @empty
@@ -297,14 +322,21 @@ tr[aria-expanded="true"] span {
     transform: rotate(180deg);
 }
 span { transition: 0.2s; }
-</style>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const filterBox = document.getElementById('filterBox');
-    const arrow = document.getElementById('arrow');
 
-    filterBox.addEventListener('show.bs.collapse', () => arrow.innerHTML = '▲');
-    filterBox.addEventListener('hide.bs.collapse', () => arrow.innerHTML = '▼');
-});
+/style>
+<script>
+    document.querySelectorAll('.nav-link[data-bs-toggle="tab"]').forEach(link => {
+        link.addEventListener('shown.bs.tab', function (e) {
+            document.getElementById('active_tab').value = e.target.dataset.bsTarget.substring(1);
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const filterBox = document.getElementById('filterBox');
+        const arrow = document.getElementById('arrow');
+
+        filterBox.addEventListener('show.bs.collapse', () => arrow.innerHTML = '▲');
+        filterBox.addEventListener('hide.bs.collapse', () => arrow.innerHTML = '▼');
+    });
 </script>
 @endsection
