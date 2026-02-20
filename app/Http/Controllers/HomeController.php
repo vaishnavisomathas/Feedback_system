@@ -45,32 +45,12 @@ class HomeController extends Controller
             ->orderByDesc('total')
             ->first();
 
-        // Feedback counts for chart
-        $divisionLabels = Counter::pluck('division_name')->unique()->toArray();
 
-      $todayChart = [];
-        $monthChart = [];
-        $yearChart = [];
-
-        foreach ($divisionLabels as $division) {
-            // Today
-            $todayChart[] = Feedback::whereHas('counter', fn($q) => $q->where('division_name', $division))
-                ->whereDate('created_at', now())
-                ->count();
-
-            // This Month
-            $monthChart[] = Feedback::whereHas('counter', fn($q) => $q->where('division_name', $division))
-                ->whereMonth('created_at', now()->month)
-                ->whereYear('created_at', now()->year)
-                ->count();
-
-            // This Year
-            $yearChart[] = Feedback::whereHas('counter', fn($q) => $q->where('division_name', $division))
-                ->whereYear('created_at', now()->year)
-                ->count();
-        }
-  $pending = \App\Models\Feedback::whereNull('status')->count();
-    $ao = \App\Models\Feedback::where('status','ao')->count();
+$pending = \App\Models\Feedback::where('status', 'pending')
+            ->whereNotNull('note')
+            ->where('note', '!=', '')
+            ->count();    
+            $ao = \App\Models\Feedback::where('status','ao')->count();
     $commissioner = \App\Models\Feedback::where('status','commissioner')->count();
 
         return view('welcome', compact(
@@ -80,10 +60,8 @@ class HomeController extends Controller
             'highestToday',
             'highestMonth',
             'highestYear',
-            'divisionLabels',
-            'todayChart',
-            'monthChart',
-            'yearChart','pending','ao','commissioner'
+            
+            'pending','ao','commissioner'
         ));
     }
     }

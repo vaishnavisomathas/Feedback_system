@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    <title>DS Divisions - PDMT</title>
+    DS Divisions QR- PDMT
 @endsection
 
 @section('content')
@@ -10,17 +10,24 @@
 
     <!-- Search Form -->
     <form method="GET" action="" class="mb-3 row g-2">
+      
         <div class="col-md-4">
-            <input
-                type="text"
-                name="search"
-                class="form-control"
-                placeholder="Search DS Divisions..."
-                value="{{ $search ?? '' }}" />
+            <select name="counter" class="form-control" onchange="this.form.submit()">
+                <option value="">-- All Counters --</option>
+                @foreach($counters as $counterOption)
+                    <option value="{{ $counterOption->id }}"
+                        {{ ($selectedCounter ?? '') == $counterOption->id ? 'selected' : '' }}>
+                        {{ $counterOption->division_name }} – {{ $counterOption->counter_name }}
+                    </option>
+                @endforeach
+            </select>
         </div>
-        <div class="col-auto">
-            <button class="btn btn-primary btn-sm">Search</button>
-        </div>
+         <div class="col-auto d-flex gap-2">
+      
+        <a href="{{ url()->current() }}" class="btn btn-danger btn-sm">
+            <i class="bi bi-arrow-clockwise me-1"></i>
+        </a>
+    </div>
     </form>
 
     <!-- Counters Table -->
@@ -90,4 +97,8 @@ Generate QR
     </div>
     </div>
 </div>
+@endsection
+@section('script')
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 @endsection

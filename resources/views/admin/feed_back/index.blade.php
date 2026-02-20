@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    <title>Counters Feedbacks - PDMT</title>
+    Counters Feedbacks - PDMT
 @endsection
 
 @section('content')
@@ -39,6 +39,7 @@
        
 <div class="col-md-1 d-grid">
     <button class="btn btn-primary"> <i class="bi bi-search"></i></button>
+    
 </div>
 
 @if(request()->hasAny(['search','counter','start_date','end_date']))

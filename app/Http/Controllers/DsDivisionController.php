@@ -10,21 +10,25 @@ use Illuminate\Support\Facades\Storage;
 
 class DsDivisionController extends Controller
 {
-    public function index(Request $request)
-    {
-        $search = $request->input('search');
+  public function index(Request $request)
+{
+    $search = $request->input('search');
+    $selectedCounter = $request->input('counter');
 
-        $counters = Counter::when($search, function($query, $search) {
-                return $query->where('district', 'like', "%$search%")
-                             ->orWhere('division_name', 'like', "%$search%")
-                             ->orWhere('counter_name', 'like', "%$search%");
-            })
-            ->orderBy('district')
-            ->paginate(10)
-            ->withQueryString();
+    $counters = Counter::when($search, function($query, $search) {
+            return $query->where('district', 'like', "%$search%")
+                         ->orWhere('division_name', 'like', "%$search%")
+                         ->orWhere('counter_name', 'like', "%$search%");
+        })
+        ->when($selectedCounter, function($query, $selectedCounter) {
+            return $query->where('id', $selectedCounter);
+        })
+        ->orderBy('district')
+        ->paginate($request->input('per_page', 10))
+        ->withQueryString();
 
-        return view('admin.ds_division.index', compact('counters', 'search'));
-    }
+    return view('admin.ds_division.index', compact('counters', 'search', 'selectedCounter'));
+}
 
    public function showQr($counterId)
     {

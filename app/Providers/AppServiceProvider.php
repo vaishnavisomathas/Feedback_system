@@ -23,30 +23,47 @@ class AppServiceProvider extends ServiceProvider
 public function boot()
 {
     Schema::defaultStringLength(191);
-    View::composer('*', function ($view) {
+   View::composer('*', function ($view) {
 
-        if (!auth()->check()) return;
-
-        $role = auth()->user()->role;
-
-        $count = 0;
-
-        if ($role == 'Commissioner') {
-            $count = Feedback::where('status', 'commissioner')->count();
+        if (!auth()->check()) {
+            $view->with('notificationCount', 0);
+            $view->with('notificationList', []);
+            return;
         }
 
-        elseif ($role == 'Administrative Officer') {
+        $user = auth()->user();
+
+     if ($user->role == 'User1') {
+    $notifications = Feedback::where(function ($q) {
+                            $q->whereNull('status')
+                              ->orWhere('status', 'pending');
+                        })
+                        ->whereNotNull('note')
+                        ->where('note', '!=', '')
+                        ->latest()
+                        ->take(25)
+                        ->get();
+
+    $count = Feedback::where(function ($q) {
+                        $q->whereNull('status')
+                          ->orWhere('status', 'pending');
+                    })
+                    ->whereNotNull('note')
+                    ->where('note', '!=', '')
+                    ->count();
+}
+                                  elseif ($user->role == 'Administrative Officer') {
+            $notifications = Feedback::where('status', 'ao')->latest()->take(25)->get();
             $count = Feedback::where('status', 'ao')->count();
-        }
-
-        else {
-            $count = Feedback::where(function ($q) {
-                $q->whereNull('status')
-                  ->orWhere('status', 'pending');
-            })->count();
+        } elseif ($user->role == 'Commissioner') {
+            $notifications = Feedback::where('status', 'commissioner')->latest()->take(25)->get();
+            $count = Feedback::where('status', 'commissioner')->count();
+        } else {
+            $notifications = [];
+            $count = 0;
         }
 
         $view->with('notificationCount', $count);
+        $view->with('notificationList', $notifications);
     });
-}
-}
+}}
