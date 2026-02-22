@@ -32,22 +32,18 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [AuthController::class,'showLogin'])->name('login');
 Route::post('/login', [AuthController::class,'login'])->name('login.post');
 Route::post('/logout', [AuthController::class,'logout'])->name('logout');
-Route::middleware('auth')->group(function () {
-
-
-
 
 
 Route::get('/feedback/{division}/{counter}', [FeedbackController::class, 'show'])
     ->name('feedback.show');
+     Route::post('feedback/store', [FeedbackController::class, 'store']) ->name('feedback.store');
+        Route::view('/thank-you','thankyou')->name('feedback.thankyou');
+Route::view('/closed','closed')->name('feedback.closed');
+Route::middleware('auth')->group(function () {
 Route::post('/admin/feedback/forward/{id}', [FeedbackController::class, 'forwardFeedback'])->name('admin.feedback.forward');
 
-
-
-    // ->middleware('auth', 'role:admin') Only admin or officer
 Route::post('/admin/feedback/{feedback}/forward', [FeedbackController::class, 'forwardFeedback'])
     ->name('admin.feedback.forward');
-    // ->middleware('auth', 'role:admin');
 
 
 Route::get('/dashboard', [HomeController::class, 'index'])
@@ -66,7 +62,6 @@ Route::get('/admin/feedbacks/pdf', [CounterController::class, 'downloadPdf'])
     Route::get('ds-divisions', [DsDivisionController::class, 'index'])->name('ds-divisions.index');
   // Show QR page
     Route::get('/{counterId}/qr', [DsDivisionController::class, 'showQr'])->name('showQr');
-    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
 
     // Generate QR (optional, if you want a POST method to generate)
 
@@ -80,9 +75,7 @@ Route::post('/ds-divisions/generate-qr', [DsDivisionController::class, 'generate
 Route::get('ds-divisions/{counterId}/download-qr', [DsDivisionController::class, 'downloadQr'])
     ->name('admin.ds-divisions.qr-pdf');
 
-        Route::post('feedback/store', [FeedbackController::class, 'store']) ->name('feedback.store');
-        Route::view('/thank-you','thankyou')->name('feedback.thankyou');
-Route::view('/closed','closed')->name('feedback.closed');
+       
 
         Route::resource('users', UserController::class);
         

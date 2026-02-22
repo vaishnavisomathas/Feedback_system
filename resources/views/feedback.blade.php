@@ -37,6 +37,15 @@
       color: #000;
       font-weight: 600;
     }
+    .header-logo {
+  height: 45px;
+  width: auto;
+}
+
+.header-title {
+  font-size: 14px;
+  white-space: nowrap; /* prevent breaking */
+}
     .form-control, .form-select { border-radius: 10px; }
     .submit-btn { border-radius: 12px; padding: 10px; font-weight: 600; }
     .header-box { background: #fff; border-radius: 12px; padding: 10px; }
@@ -45,6 +54,18 @@
       .rating-grid { gap: 4px; }
       .rating-button span { font-size: 22px; }
       .rating-button small { font-size: 10px; }
+
+  .header-logo {
+    height: 40px;
+  }
+
+  .header-title {
+    font-size: 12px;
+  }
+
+  .header-box {
+    padding: 8px;
+  }
     }
   </style>
 </head>
@@ -64,13 +85,26 @@
         @endif
 
         {{-- HEADER --}}
-        <div class="text-center mb-3 header-box">
-          <img src="{{ asset('assets/images/npc_logo.png') }}" height="80" width="100">
-          <h6 class="mt-2 fw-bold">
-            Provincial Department Of Motor Traffic – NP
-          </h6>
-          <img src="{{ asset('assets/images/pdmt_logo.png') }}" height="50" width="50"class="mt-1">
-        </div>
+        
+<div class="d-flex align-items-center justify-content-between mb-3 header-box text-center">
+    
+    <!-- Left Logo -->
+    <img src="{{ asset('assets/images/npc_logo.png') }}" class="header-logo">
+
+    <!-- Center Text -->
+    <div class="flex-grow-1 px-2">
+        <h6 class="fw-bold mb-0 header-title">
+            Provincial Department Of Motor Traffic
+      </h6>
+        <h6 class="fw-bold mb-0 header-title">
+            Northern Province
+      </h6>
+    </div>
+
+    <!-- Right Logo -->
+    <img src="{{ asset('assets/images/pdmt_logo.png') }}" class="header-logo">
+
+</div>
 
         {{-- COUNTER --}}
         <div class="text-center mb-3">
@@ -141,7 +175,7 @@
           <div id="complaintDetails" class="border rounded p-3 bg-light" style="display:none;">
             <div class="mb-2">
               <label>Phone</label>
-              <input type="tel" class="form-control" name="phone" maxlength="10" value="{{ old('phone') }}">
+<input type="tel" class="form-control" name="phone" placeholder="07XXXXXXXX" maxlength="10">
             </div>
             <div class="mb-2">
               <label>Vehicle Number</label>
@@ -169,9 +203,27 @@
 <script src="/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+  
      @if(!session('rating_access'))
     window.location.href = "{{ route('feedback.closed') }}";
 @endif
+  const phoneInput = document.querySelector('input[name="phone"]');
+
+  if (phoneInput) {
+    phoneInput.addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+
+      if (value.startsWith('94')) {
+        value = '0' + value.substring(2);
+      }
+
+      if (!value.startsWith('0')) {
+        value = '0' + value;
+      }
+
+      e.target.value = value.substring(0, 10);
+    });
+  }
   const checkbox = document.getElementById('hasComplaint');
   const hiddenInput = document.getElementById('hasComplaintValue');
   checkbox.addEventListener('change', function () {

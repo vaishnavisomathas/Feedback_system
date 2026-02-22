@@ -55,18 +55,30 @@ class FeedbackController extends Controller
             'rating'           => 'required|integer|min:1|max:5',
 'service_quality_id'  => 'required|exists:service_qualities,id',
             'has_complaint'    => 'required|in:yes,no',
-            'phone'            => 'nullable|required_if:has_complaint,yes|digits:10',
+'phone' => 'nullable|required_if:has_complaint,yes|digits_between:9,10',
             'vehicle_number'   => 'nullable|string|max:20',
             'note'             => 'nullable|string|max:300',
               
         ]);
+$phone = $request->phone;
 
+if ($phone) {
+    $phone = preg_replace('/[^0-9]/', '', $phone);
+
+    if (str_starts_with($phone, '0')) {
+        $phone = '94' . substr($phone, 1);
+    }
+
+    elseif (!str_starts_with($phone, '94')) {
+        $phone = '94' . $phone;
+    }
+}
         Feedback::create([
             'counter_id'     => $request->counter_id,
             'rating'          => $request->rating,
 'service_quality_id' => $request->service_quality_id,
             'has_complaint'   => $request->has_complaint,
-            'phone'           => $request->phone,
+'phone'          => $phone,
             'vehicle_number'  => $request->vehicle_number,
             'note'            => $request->note,
             'user_id'         => auth()->id(),
