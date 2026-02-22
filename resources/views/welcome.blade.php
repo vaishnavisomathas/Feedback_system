@@ -65,18 +65,33 @@
     </div>
 
     <!-- Highest Feedback -->
-    @foreach(['Today' => $highestToday, 'This Month' => $highestMonth, 'This Year' => $highestYear] as $period => $data)
-    <div class="col-lg-4 col-md-6 mt-3">
-        <div class="card shadow-sm border-0">
-            <div class="card-body text-center">
-                <h5 class="card-title">Highest Feedback {{ $period }}</h5>
-                <p class="text-muted mb-2">Division / Counter with most feedbacks</p>
-                <h6>{{ $data->counter->division_name ?? '-' }} / {{ $data->counter->counter_name ?? '-' }}</h6>
-                <span class="badge bg-warning">{{ $data->total ?? 0 }} Feedbacks</span>
+ @foreach(['Today' => $highestToday, 'This Month' => $highestMonth, 'This Year' => $highestYear] as $period => $data)
+<div class="col-lg-4 col-md-6 mt-3">
+    <div class="card shadow-sm border-0">
+        <div class="card-body text-center">
+
+            <h5 class="card-title">Highest Feedback {{ $period }}</h5>
+            <p class="text-muted mb-2">Division / Counter with most feedbacks</p>
+
+            <h6>
+                {{ $data->counter->division_name ?? '-' }} /
+                {{ $data->counter->counter_name ?? '-' }}
+            </h6>
+
+            <!-- TOTAL -->
+            <span class="badge bg-warning mb-2">
+                {{ $data->total ?? 0 }} Feedbacks
+            </span>
+
+            <!-- ⭐ AVERAGE RATING -->
+            <div class="fw-bold text-primary">
+                ⭐ {{ number_format($data->avg_rating ?? 0, 1) }} / 5
             </div>
+
         </div>
     </div>
-    @endforeach
+</div>
+@endforeach
 
 
 

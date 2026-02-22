@@ -15,35 +15,48 @@ class HomeController extends Controller
         // Total Ratings
         $totalRatings = Feedback::count();
 
-        // Ratings submitted today
-        $todayRatings = Feedback::whereDate('created_at', now())->count();
-   $monthRatings = Feedback::whereYear('created_at', Carbon::now()->year)
-                            ->whereMonth('created_at', Carbon::now()->month)
-                            ->count();
-        // Highest feedback Today
-        $highestToday = Feedback::select('counter_id', DB::raw('COUNT(*) as total'))
-            ->whereDate('created_at', now())
-            ->groupBy('counter_id')
-            ->with('counter')
-            ->orderByDesc('total')
-            ->first();
+    $todayRatings = Feedback::whereDate('created_at', now())->count();
 
-        // Highest feedback This Month
-        $highestMonth = Feedback::select('counter_id', DB::raw('COUNT(*) as total'))
-            ->whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
-            ->groupBy('counter_id')
-            ->with('counter')
-            ->orderByDesc('total')
-            ->first();
+    $monthRatings = Feedback::whereYear('created_at', Carbon::now()->year)
+        ->whereMonth('created_at', Carbon::now()->month)
+        ->count();
 
-        // Highest feedback This Year
-        $highestYear = Feedback::select('counter_id', DB::raw('COUNT(*) as total'))
-            ->whereYear('created_at', now()->year)
-            ->groupBy('counter_id')
-            ->with('counter')
-            ->orderByDesc('total')
-            ->first();
+    // ================= TODAY =================
+    $highestToday = Feedback::select(
+            'counter_id',
+            DB::raw('COUNT(*) as total'),
+            DB::raw('AVG(rating) as avg_rating')
+        )
+        ->whereDate('created_at', now())
+        ->groupBy('counter_id')
+        ->with('counter')
+        ->orderByDesc('total')
+        ->first();
+
+    // ================= MONTH =================
+    $highestMonth = Feedback::select(
+            'counter_id',
+            DB::raw('COUNT(*) as total'),
+            DB::raw('AVG(rating) as avg_rating')
+        )
+        ->whereMonth('created_at', now()->month)
+        ->whereYear('created_at', now()->year)
+        ->groupBy('counter_id')
+        ->with('counter')
+        ->orderByDesc('total')
+        ->first();
+
+    // ================= YEAR =================
+    $highestYear = Feedback::select(
+            'counter_id',
+            DB::raw('COUNT(*) as total'),
+            DB::raw('AVG(rating) as avg_rating')
+        )
+        ->whereYear('created_at', now()->year)
+        ->groupBy('counter_id')
+        ->with('counter')
+        ->orderByDesc('total')
+        ->first();
 
 
 $pending = \App\Models\Feedback::where('status', 'pending')
