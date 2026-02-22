@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PDMT - Feedback Management System Login</title>
 
-  <link rel="shortcut icon" type="image/png" href="/assets/images/logos/pdmt-logo.png" />
+  <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/pdmt_logo.png') }}">
   <link rel="stylesheet" href="/assets/css/styles.min.css" />
 </head>
 
@@ -27,7 +27,7 @@
               <!-- LOGO AREA -->
               <div class="text-center py-3">
 
-                <img src="{{ asset('assets/images/logos/pdmt-logo.png') }}"
+                <img src="{{ asset('assets/images/pdmt_logo.png') }}"
                      alt="PDMT Northern Province"
                      class="img-fluid"
                      style="max-width:130px;">
