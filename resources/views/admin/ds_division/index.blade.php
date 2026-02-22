@@ -10,18 +10,28 @@
 
     <!-- Search Form -->
     <form method="GET" action="" class="mb-3 row g-2">
-      
-        <div class="col-md-4">
-            <select name="counter" class="form-control" onchange="this.form.submit()">
-                <option value="">-- All Counters --</option>
-                @foreach($counters as $counterOption)
-                    <option value="{{ $counterOption->id }}"
-                        {{ ($selectedCounter ?? '') == $counterOption->id ? 'selected' : '' }}>
-                        {{ $counterOption->division_name }} – {{ $counterOption->counter_name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
+      <div class="col-md-3">
+    <select name="district" class="form-control select2" onchange="this.form.submit()">
+        <option value="">-- All Districts --</option>
+        @foreach($districts as $district)
+            <option value="{{ $district }}"
+                {{ request('district') == $district ? 'selected' : '' }}>
+                {{ $district }}
+            </option>
+        @endforeach
+    </select>
+</div>
+     <div class="col-md-4">
+        <select name="counter" class="form-control select2" onchange="this.form.submit()">
+            <option value="">-- All Counters --</option>
+            @foreach($counterOptions as $counterOption)
+                <option value="{{ $counterOption->id }}"
+                    {{ ($selectedCounter ?? '') == $counterOption->id ? 'selected' : '' }}>
+                    {{ $counterOption->division_name }} – {{ $counterOption->counter_name }}
+                </option>
+            @endforeach
+        </select>
+    </div>
          <div class="col-auto d-flex gap-2">
       
         <a href="{{ url()->current() }}" class="btn btn-danger btn-sm">
@@ -101,4 +111,20 @@ Generate QR
 @section('script')
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+
+<script>
+$(document).ready(function() {
+    $('.select2').select2({
+        placeholder: "Search...",
+        allowClear: true,
+        width: '100%'
+    });
+
+    // Reset counter when district changes
+    $('select[name="district"]').on('change', function() {
+        $('select[name="counter"]').val('').trigger('change');
+    });
+});
+</script>
 @endsection

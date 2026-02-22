@@ -4,6 +4,7 @@ Division- PDMT
 @endsection
 @section('content')
 <div class="container">
+<h2 class="mb-4">Division List</h2>
 
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
@@ -89,6 +90,7 @@ Division- PDMT
                         <td>{{ $counter->division_name }}</td>
                         <td>{{ $counter->counter_name }}</td>
                         <td>
+                            
                             <button class="btn btn-sm btn-primary editBtn"
                                 data-id="{{ $counter->id }}"
                                 data-district="{{ $counter->district }}"
@@ -141,19 +143,19 @@ document.addEventListener('DOMContentLoaded', function () {
     /* ================= DS DIVISION DATA ================= */
     const dsDivisions = {
 
-        Jaffna: [
-            "Jaffna","Nallur","Thenmaradchi","Vadamaradchi North",
-            "Vadamaradchi South-West","Valikamam East","Valikamam West",
-            "Valikamam South","Valikamam North","Island North","Island South"
+        Jaffna: ["PDMT",
+            "Jaffna","Nallur","Thenmaradchi","Vadamaradchi North","Vadamaradchi East",
+            "Vadamaradchi South-West","Valikamam East","Valikamam West","Karainagar","Delft",
+            "Valikamam South","Valikamam North","Valikamam South-West","Island North","Island South"
         ],
 
         Kilinochchi: ["Karachchi","Poonakary","Kandavalai","Pachchilaipalli"],
 
-        Mullaitivu: ["Mullaitivu","Maritimepattu","Oddusuddan","Manthai East","Thunukkai","Puthukudiyiruppu"],
+        Mullaitivu: ["Maritimepattu","Oddusuddan","Manthai-East","Thunukkai","Puthukudiyiruppu","Welioya"],
 
-        Mannar: ["Mannar Town","Madhu","Manthai West","Nanaddan","Musali"],
+        Mannar: ["Mannar Town","Madhu","Manthai-West","Nanaddan","Musali"],
 
-        Vavuniya: ["Vavuniya","Vavuniya North","Vavuniya South","Vengalacheddikulam"]
+        Vavuniya: ["Vavuniya Town","Vavuniya-North","Vavuniya-South","Vengalacheddikulam"]
     };
 
     /* ========= DISTRICT CHANGE ========= */

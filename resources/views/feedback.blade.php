@@ -158,32 +158,38 @@
                 </option>
               @endforeach
             </select>
-            @error('service_quality_id') <small class="text-danger">{{ $message }}</small> @enderror
+            {{-- @error('service_quality_id') <small class="text-danger">{{ $message }}</small> @enderror --}}
           </div>
 
           {{-- COMPLAINT --}}
-          <div class="mb-3">
+      <div class="mb-3">
             <label class="fw-semibold">Any complaint?</label>
             <div class="form-check mt-2">
-              <input class="form-check-input" type="checkbox" id="hasComplaint">
+              <input class="form-check-input" type="checkbox" id="hasComplaint"
+                {{ old('has_complaint') === 'yes' ? 'checked' : '' }}>
               <label class="form-check-label">Yes</label>
             </div>
-            @error('has_complaint') <small class="text-danger">{{ $message }}</small> @enderror
           </div>
 
           {{-- COMPLAINT DETAILS --}}
           <div id="complaintDetails" class="border rounded p-3 bg-light" style="display:none;">
             <div class="mb-2">
               <label>Phone</label>
-<input type="tel" class="form-control" name="phone" placeholder="07XXXXXXXX" maxlength="10">
+<input type="tel" class="form-control" name="phone" placeholder="07XXXXXXXX" value="{{ old('phone') }}" maxlength="10">
+            @error('phone') <small class="text-danger">{{ $message }}</small> @enderror
+
             </div>
             <div class="mb-2">
               <label>Vehicle Number</label>
-              <input type="text" class="form-control text-uppercase" name="vehicle_number" value="{{ old('vehicle_number') }}">
+              <input type="text" class="form-control text-uppercase" name="vehicle_number" placeholder="CAH-9891/7-652" value="{{ old('vehicle_number') }}" maxlength="12" >
+                          @error('vehicle_number') <small class="text-danger">{{ $message }}</small> @enderror
+
             </div>
             <div class="mb-2">
               <label>Complaint</label>
               <textarea class="form-control" name="note" rows="3" maxlength="300">{{ old('note') }}</textarea>
+                                        @error('note') <small class="text-danger">{{ $message }}</small> @enderror
+
             </div>
           </div>
 
@@ -203,38 +209,64 @@
 <script src="/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-  
-     @if(!session('rating_access'))
+@if(!session('rating_access'))
     window.location.href = "{{ route('feedback.closed') }}";
 @endif
-  const phoneInput = document.querySelector('input[name="phone"]');
 
-  if (phoneInput) {
+// PHONE FORMAT
+const phoneInput = document.querySelector('input[name="phone"]');
+
+if (phoneInput) {
     phoneInput.addEventListener('input', function(e) {
-      let value = e.target.value.replace(/\D/g, '');
+        let value = e.target.value.replace(/\D/g, '');
 
-      if (value.startsWith('94')) {
-        value = '0' + value.substring(2);
-      }
+        if (value.startsWith('94')) {
+            value = '0' + value.substring(2);
+        }
 
-      if (!value.startsWith('0')) {
-        value = '0' + value;
-      }
+        if (!value.startsWith('0')) {
+            value = '0' + value;
+        }
 
-      e.target.value = value.substring(0, 10);
+        e.target.value = value.substring(0, 10);
     });
-  }
-  const checkbox = document.getElementById('hasComplaint');
-  const hiddenInput = document.getElementById('hasComplaintValue');
-  checkbox.addEventListener('change', function () {
-    document.getElementById('complaintDetails').style.display = this.checked ? 'block' : 'none';
-    hiddenInput.value = this.checked ? 'yes' : 'no';
-  });
+}
 
-  function toggleRating(input) {
+const checkbox = document.getElementById('hasComplaint');
+const hiddenInput = document.getElementById('hasComplaintValue');
+const complaintBox = document.getElementById('complaintDetails');
+
+checkbox.addEventListener('change', function () {
+    const isChecked = this.checked;
+
+    complaintBox.style.display = isChecked ? 'block' : 'none';
+    hiddenInput.value = isChecked ? 'yes' : 'no';
+});
+
+// ✅ FIX: Only open if complaint was selected before
+@if(old('has_complaint') === 'yes')
+    checkbox.checked = true;
+    complaintBox.style.display = 'block';
+    hiddenInput.value = 'yes';
+@endif
+
+
+@if($errors->has('phone') || $errors->has('vehicle_number') || $errors->has('note'))
+    complaintBox.scrollIntoView({ behavior: 'smooth' });
+@endif
+
+
+function toggleRating(input) {
     document.querySelectorAll('.rating-button').forEach(btn => btn.classList.remove('active-rating'));
     input.closest('label').classList.add('active-rating');
-  }
+}
+
+
+window.addEventListener("pageshow", function (event) {
+    if (event.persisted || performance.navigation.type === 2) {
+        window.location.href = "{{ route('feedback.closed') }}";
+    }
+});
 
 </script>
 

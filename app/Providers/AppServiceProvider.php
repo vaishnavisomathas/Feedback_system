@@ -33,7 +33,7 @@ public function boot()
 
         $user = auth()->user();
 
-     if ($user->role == 'User1') {
+     if ($user->role == 'User') {
     $notifications = Feedback::where(function ($q) {
                             $q->whereNull('status')
                               ->orWhere('status', 'pending');

@@ -9,6 +9,12 @@ use Illuminate\Http\Request;
 
 class CounterController extends Controller
 {
+//  public function __construct()
+//     {
+//         $this->middleware('permission:ds_division.create')->only(['store']);
+//         $this->middleware('permission:ds_division.edit')->only(['edit','update']);
+//         $this->middleware('permission:ds_division.delete')->only(['destroy']);
+//     }
  public function index(Request $request)
 {
     $perPage = $request->get('per_page', 10);
@@ -87,9 +93,13 @@ public function store(Request $request)
 
 public function feedback_index(Request $request)
 {
-    $perPage = $request->get('per_page', 10); // default 10 items per page
+    $perPage = $request->get('per_page', 10);
+    $district = $request->input('district');
+    $selectedCounter = $request->input('counter');
 
-    $ratings = Feedback::with('counter')
+    // ================= MAIN DATA =================
+    $ratings = Feedback::with(['counter', 'serviceQuality'])
+
         ->when($request->filled('search'), function ($q) use ($request) {
             $q->where(function ($query) use ($request) {
                 $query->where('vehicle_number', 'like', '%' . $request->search . '%')
@@ -97,18 +107,50 @@ public function feedback_index(Request $request)
                       ->orWhere('note', 'like', '%' . $request->search . '%');
             });
         })
-        ->when($request->filled('counter'), fn($q) => $q->where('counter_id', $request->counter))
-        ->when($request->filled('start_date'), fn($q) => $q->whereDate('created_at', '>=', $request->start_date))
-        ->when($request->filled('end_date'), fn($q) => $q->whereDate('created_at', '<=', $request->end_date))
+
+        // ✅ District filter
+        ->when($district, function ($q) use ($district) {
+            $q->whereHas('counter', function ($query) use ($district) {
+                $query->where('district', $district);
+            });
+        })
+
+        // ✅ Counter filter
+        ->when($selectedCounter, fn($q) => $q->where('counter_id', $selectedCounter))
+
+        // ✅ Date filters
+        ->when($request->filled('start_date'),
+            fn($q) => $q->whereDate('created_at', '>=', $request->start_date))
+
+        ->when($request->filled('end_date'),
+            fn($q) => $q->whereDate('created_at', '<=', $request->end_date))
+
         ->latest()
         ->paginate($perPage)
         ->withQueryString();
 
-    $counters = Counter::orderBy('division_name')->get();
+    // ================= DISTRICTS =================
+    $districts = Counter::select('district')
+        ->distinct()
+        ->orderBy('district')
+        ->pluck('district');
 
-    return view('admin.feed_back.index', compact('ratings', 'counters'));
+    // ================= COUNTER DROPDOWN =================
+    $counterOptions = Counter::when($district, function ($query) use ($district) {
+            $query->where('district', $district);
+        })
+        ->orderBy('division_name')
+        ->get();
+
+    // ================= RETURN =================
+    return view('admin.feed_back.index', compact(
+        'ratings',
+        'districts',
+        'counterOptions',
+        'selectedCounter',
+        'district'
+    ));
 }
-
 public function downloadPdf(Request $request)
     {
         $ratings = Feedback::with('counter')

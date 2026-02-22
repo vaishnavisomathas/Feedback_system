@@ -38,7 +38,7 @@
                 </p>
 
                 <p class="small text-secondary">
-                    To give another rating, please scan the QR code again.
+                    To give another Feedback or Complaint please scan the QR code again.
                 </p>
 
             </div>

@@ -53,29 +53,9 @@ Commissioner Complaints- PDMT
                 <input type="date" name="to" value="{{ $filters['to'] ?? '' }}" class="form-control">
             </div>
 
-            <div class="col-md-2">
-                <label>Service Quality</label>
-                <select name="service_quality" class="form-control">
-                    <option value="">All</option>
-                    @foreach($serviceQualities as $quality)
-                        <option value="{{ $quality->id }}" {{ ($filters['service_quality'] ?? '') == $quality->id ? 'selected' : '' }}>
-                            {{ $quality->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+           
 
-            <div class="col-md-2">
-                <label>Rating</label>
-                <select name="rating" class="form-control">
-                    <option value="">All</option>
-                    @foreach(['1'=>'Bad','2'=>'Poor','3'=>'Average','4'=>'Good','5'=>'Excellent'] as $key => $val)
-                        <option value="{{ $key }}" {{ ($filters['rating'] ?? '') == $key ? 'selected' : '' }}>{{ $val }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div class="col-md-12 mt-3">
+            <div class="col-md-4 mt-4">
                 <button class="btn btn-primary"><i class="bi bi-search"></i></button>
                 <a href="{{ url()->current() }}" class="btn btn-danger"><i class="bi bi-arrow-clockwise me-1"></i></a>
             </div>
@@ -119,7 +99,7 @@ Commissioner Complaints- PDMT
 </tr>
 </thead>
 
-<tbody>
+<tbody id="pendingcommiAccordion">
 @forelse($pendingCommissioner as $c)
 
 <tr data-bs-toggle="collapse"
@@ -141,8 +121,10 @@ Commissioner Complaints- PDMT
 </td>
 
 </tr>
+<tr class="collapse bg-light"
+    id="commissioner{{ $c->id }}"
+    data-bs-parent="#pendingcommiAccordion">
 
-<tr class="collapse bg-light" id="commissioner{{ $c->id }}">
     <td colspan="9">
         <div class="card card-sm shadow-sm border-secondary mb-2">
             <div class="card-body p-2">
@@ -220,7 +202,7 @@ Commissioner Complaints- PDMT
 </tr>
 </thead>
 
-<tbody>
+<tbody id="closedcommiAccordion">
 @forelse($closedCommissioner as $c)
 
 <tr data-bs-toggle="collapse"
@@ -242,8 +224,8 @@ Commissioner Complaints- PDMT
 </td>
 
 </tr>
-
-<tr class="collapse bg-light" id="completed{{ $c->id }}">
+<tr class="collapse bg-light"
+id="completed{{ $c->id }}"    data-bs-parent="#closedcommiAccordion">
 <td colspan="9">
  <div class="card card-sm shadow-sm border-secondary mb-2">
             <div class="card-body p-2">

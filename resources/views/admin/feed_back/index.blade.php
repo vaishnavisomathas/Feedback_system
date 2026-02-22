@@ -10,39 +10,59 @@
     <h2 class="mb-4">Counters Feedbacks</h2>
 
     {{-- FILTER FORM --}}
-    <form method="GET" class="row mb-3 g-2">
-      
+   <form method="GET" class="row g-3 align-items-end mb-3">
 
-        <div class="col-md-3">
-            <select name="counter" class="form-control">
-                <option value="">-- All Counters --</option>
-                @foreach($counters as $counter)
-                    <option value="{{ $counter->id }}"
-                        {{ request('counter') == $counter->id ? 'selected' : '' }}>
-                        {{ $counter->division_name }} – {{ $counter->counter_name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
+    <!-- COUNTER -->
+       <div class="col-md-3">
+        <label class="form-label fw-semibold">District</label>
+        <select name="district" class="form-control select2">
+            <option value="">-- All Districts --</option>
+            @foreach($districts as $district)
+                <option value="{{ $district }}"
+                    {{ request('district') == $district ? 'selected' : '' }}>
+                    {{ $district }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label fw-semibold">Division</label>
+        <select name="counter" class="form-control select2">
+            <option value="">-- All Counters --</option>
+           @foreach($counterOptions as $counterOption)
+                <option value="{{ $counterOption->id }}"
+                    {{ ($selectedCounter ?? '') == $counterOption->id ? 'selected' : '' }}>
+                    {{ $counterOption->division_name }} – {{ $counterOption->counter_name }}
+                </option>
+            @endforeach
+        </select>
+    </div>
 
-        <div class="col-md-2">
-            <input type="date" name="start_date"
-                   value="{{ request('start_date') }}"
-                   class="form-control">
-        </div>
+    <!-- FROM DATE -->
+    <div class="col-md-2">
+        <label class="form-label fw-semibold">From Date</label>
+        <input type="date" name="start_date"
+               value="{{ request('start_date') }}"
+               class="form-control">
+    </div>
 
-        <div class="col-md-2">
-            <input type="date" name="end_date"
-                   value="{{ request('end_date') }}"
-                   class="form-control">
-        </div>
-       
-<div class="col-md-1 d-grid">
-    <button class="btn btn-primary"> <i class="bi bi-search"></i></button>
-    
-</div>
+    <!-- TO DATE -->
+    <div class="col-md-2">
+        <label class="form-label fw-semibold">To Date</label>
+        <input type="date" name="end_date"
+               value="{{ request('end_date') }}"
+               class="form-control">
+    </div>
 
-@if(request()->hasAny(['search','counter','start_date','end_date']))
+    <!-- SEARCH BUTTON -->
+    <div class="col-md-1 d-grid">
+        <button class="btn btn-primary">
+            <i class="bi bi-search me-1"></i> 
+        </button>
+    </div>
+
+    <!-- RESET BUTTON -->
+  @if(request()->hasAny(['search','counter','start_date','end_date','district']))
 <div class="col-md-1 d-grid">
     <a href="{{ route('admin.feedback.index') }}" 
        class="btn btn-danger">
@@ -50,6 +70,8 @@
     </a>
 </div>
 @endif
+
+
 
     </form>
 
@@ -117,4 +139,18 @@
 @endsection
 @section('script')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<script>
+$(document).ready(function() {
+    $('.select2').select2({
+        placeholder: "Search...",
+        allowClear: true,
+        width: '100%'
+    });
+
+    // Reset counter when district changes
+    $('select[name="district"]').on('change', function() {
+        $('select[name="counter"]').val('').trigger('change');
+    });
+});
+</script>
 @endsection

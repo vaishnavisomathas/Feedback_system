@@ -14,20 +14,47 @@ class DsDivisionController extends Controller
 {
     $search = $request->input('search');
     $selectedCounter = $request->input('counter');
+    $district = $request->input('district');
 
-    $counters = Counter::when($search, function($query, $search) {
-            return $query->where('district', 'like', "%$search%")
-                         ->orWhere('division_name', 'like', "%$search%")
-                         ->orWhere('counter_name', 'like', "%$search%");
+    // Get unique districts
+    $districts = Counter::select('district')
+        ->distinct()
+        ->orderBy('district')
+        ->pluck('district');
+
+    // Counter dropdown (filtered by district)
+    $counterOptions = Counter::when($district, function ($query, $district) {
+            return $query->where('district', $district);
         })
-        ->when($selectedCounter, function($query, $selectedCounter) {
+        ->orderBy('division_name')
+        ->get();
+
+    // Main table data
+    $counters = Counter::when($search, function ($query, $search) {
+            return $query->where(function ($q) use ($search) {
+                $q->where('district', 'like', "%$search%")
+                  ->orWhere('division_name', 'like', "%$search%")
+                  ->orWhere('counter_name', 'like', "%$search%");
+            });
+        })
+        ->when($district, function ($query, $district) {
+            return $query->where('district', $district);
+        })
+        ->when($selectedCounter, function ($query, $selectedCounter) {
             return $query->where('id', $selectedCounter);
         })
         ->orderBy('district')
         ->paginate($request->input('per_page', 10))
         ->withQueryString();
 
-    return view('admin.ds_division.index', compact('counters', 'search', 'selectedCounter'));
+    return view('admin.ds_division.index', compact(
+        'counters',
+        'search',
+        'selectedCounter',
+        'district',
+        'districts',
+        'counterOptions'
+    ));
 }
 
    public function showQr($counterId)

@@ -130,7 +130,7 @@ Complaints - PDMT
 </tr>
 </thead>
 
-<tbody>
+<tbody id="pendingAccordion">
 @forelse($allRatings as $index => $rating)
 
 <tr data-bs-toggle="collapse"
@@ -179,7 +179,9 @@ Complaints - PDMT
 </tr>
 
 {{-- DETAILS --}}
-<tr class="collapse bg-light" id="complaint{{ $rating->id }}">
+<tr class="collapse bg-light"
+    id="complaint{{ $rating->id }}"
+    data-bs-parent="#pendingAccordion">
     <td colspan="9">
         <div class="card shadow-sm border-secondary mb-2">
             <div class="card-body p-3">
@@ -261,7 +263,8 @@ Complaints - PDMT
 </tr>
 </thead>
 
-<tbody>
+<tbody id="closedAccordion">
+
 @forelse($readRatings as $index => $rating)
 
 <tr data-bs-toggle="collapse"
@@ -324,8 +327,10 @@ Complaints - PDMT
 </td>
 </tr>
 
-<tr class="collapse bg-light" id="readComplaint{{ $rating->id }}">
-<td colspan="9">
+<tr class="collapse bg-light"
+    id="readComplaint{{ $rating->id }}"
+    data-bs-parent="#closedAccordion">
+    <td colspan="9">
  <div class="card card-sm shadow-sm border-secondary mb-2">
     <div class="card-body p-2">
         <div class="row">

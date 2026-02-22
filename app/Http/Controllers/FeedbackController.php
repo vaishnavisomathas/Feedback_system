@@ -16,24 +16,32 @@ class FeedbackController extends Controller
         $response = $next($request);
         return $response->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
                         ->header('Pragma', 'no-cache')
-                        ->header('Expires', '0');
+                        ->header('Expires', 'Sat, 01 Jan 1990 00:00:00 GMT');
     });
 }
    public function show($division, $counterName)
-{
+{  
+    if (!session()->has('feedback_token')) {
+        $counter = Counter::where('division_name',$division)
+            ->where('counter_name',$counterName)
+            ->firstOrFail();
 
-
-    $counter = Counter::where('division_name',$division)
-        ->where('counter_name',$counterName)
-        ->firstOrFail();
-
-     if (!session()->has('feedback_token')) {
         session([
             'rating_access' => true,
             'feedback_token' => bin2hex(random_bytes(16)),
             'rating_counter' => $counter->id,
         ]);
     }
+    if (!session('rating_access')) {
+        return redirect()->route('feedback.closed');
+    }
+
+
+    $counter = Counter::where('division_name',$division)
+        ->where('counter_name',$counterName)
+        ->firstOrFail();
+
+ 
  $qualities = ServiceQuality::orderBy('name')->get();
         return view('feedback', [
             'counter' => $counter,
@@ -50,29 +58,40 @@ class FeedbackController extends Controller
             return redirect()->route('feedback.closed')
                 ->with('error', '⚠ Session Expired. Please scan the QR code again.');
         }
-        $request->validate([
-                  'counter_id'       => 'required|exists:counters,id',
-            'rating'           => 'required|integer|min:1|max:5',
-'service_quality_id'  => 'required|exists:service_qualities,id',
-            'has_complaint'    => 'required|in:yes,no',
-'phone' => 'nullable|required_if:has_complaint,yes|digits_between:9,10',
-            'vehicle_number'   => 'nullable|string|max:20',
-            'note'             => 'nullable|string|max:300',
-              
-        ]);
+
 $phone = $request->phone;
 
 if ($phone) {
     $phone = preg_replace('/[^0-9]/', '', $phone);
 
+    // If starts with 0 → convert to 94
     if (str_starts_with($phone, '0')) {
         $phone = '94' . substr($phone, 1);
     }
 
-    elseif (!str_starts_with($phone, '94')) {
+    elseif (str_starts_with($phone, '94')) {
+        // do nothing
+    }
+
+    else {
         $phone = '94' . $phone;
     }
+
+    $phone = substr($phone, 0, 11);
 }
+
+        $request->validate([
+                  'counter_id'       => 'required|exists:counters,id',
+            'rating'           => 'required|integer|min:1|max:5',
+// 'service_quality_id'  => 'required|exists:service_qualities,id',
+            'has_complaint'    => 'required|in:yes,no',
+'phone' => 'nullable|required_if:has_complaint,yes|digits:10',
+'vehicle_number' => 'nullable|string|max:12|required_if:has_complaint,yes',
+'note' => 'nullable|required_if:has_complaint,yes|max:100',
+              
+        ]);
+
+
         Feedback::create([
             'counter_id'     => $request->counter_id,
             'rating'          => $request->rating,
@@ -86,8 +105,9 @@ if ($phone) {
         ]);
 
 session()->forget(['rating_access', 'feedback_token', 'rating_counter']);
-    return redirect()->route('feedback.thankyou');
-    }
+return redirect()->route('feedback.thankyou')->withHeaders([
+    'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+]);    }
 
    public function closed()
     {

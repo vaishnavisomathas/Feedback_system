@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Session Expired</title>
+<title>Your Feedback is already Submited</title>
 
 <link rel="stylesheet" href="/assets/css/styles.min.css" />
 
@@ -29,13 +29,11 @@
         <div class="card shadow-sm border-0 text-center">
             <div class="card-body p-5">
 
-                <div class="text-danger icon mb-3">⚠</div>
+                <div class="text-danger icon mb-3">✔</div>
 
-                <h3 class="fw-bold text-danger">Session Expired</h3>
+                <h3 class="fw-bold text-success">Your Feedback is already Submited</h3>
 
-                <p class="text-muted mt-2">
-                    This feedback session is already completed.
-                </p>
+               
 
                 <p class="small text-secondary">
                     Please scan the QR code again to open a new feedback form.
