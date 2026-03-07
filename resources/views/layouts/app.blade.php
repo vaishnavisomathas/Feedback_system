@@ -31,7 +31,23 @@ body {
 
 /* LOGO */
 .brand-logos {
-    top: 40px;;
+  top: 40px;;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brand-logos h5 {
+  margin: 0;
+}
+
+.brand-logos img {
+  margin-top: 8px;
+}
+
+.brand-logos img {
+  margin-top: 10px;
+  margin-left: 8px;
 }
 
 /* SCROLL */
@@ -227,7 +243,8 @@ body {
 
   <!-- LOGO -->
   <div class="brand-logos">
-    <img src="{{ asset('assets/images/npc_logo.png') }}" width="60">
+    <img src="{{ asset('assets/images/npc_logo.png') }}" width="60">  
+    <h5>PDMT-NP</h5>
   </div>
 
   <nav class="scroll-sidebars">
