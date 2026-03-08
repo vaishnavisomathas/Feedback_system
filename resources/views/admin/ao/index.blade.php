@@ -3,7 +3,28 @@
 @section('title')
 Administrative Officer Complaints- PDMT
 @endsection
+<style>
+.ao-table th{
+    font-weight:600;
+    font-size:14px;
+}
 
+.ao-table td{
+    font-size:14px;
+}
+
+.ao-table tbody tr{
+    cursor:pointer;
+}
+
+.ao-table tbody tr:hover{
+    background-color:#f8f9fa;
+}
+
+.modal-content{
+    border-radius:8px;
+}
+</style>
 @section('content')
 <div class="container">
 
@@ -87,9 +108,9 @@ Administrative Officer Complaints- PDMT
 
 {{-- ================= PENDING ================= --}}
 <div class="tab-pane fade {{ request('active_tab','pending') == 'pending' ? 'show active' : '' }}" id="pending">
+<table class="table table-striped table-hover align-middle ao-table">
 
-<table class="table table-bordered table-hover">
-<thead class="table-danger">
+<thead class="table-dark">
 <tr>
 <th>#</th>
 <th>DS Division</th>
@@ -137,13 +158,21 @@ Administrative Officer Complaints- PDMT
 <div class="row">
 
 <div class="col-md-6 mb-2">
+<strong>Vehicle:</strong>
+<p>{{ $rating->vehicle_number }}</p>
+</div>
+<div class="col-md-6 mb-2">
+<strong>Phone:</strong>
+<p>{{ $rating->phone }}</p>
+</div>
+<div class="col-md-6 mb-2">
 <strong>Complaint:</strong>
 <p>{{ $rating->note }}</p>
 </div>
 
 <div class="col-md-6 mb-2">
 <strong>Complaint Type:</strong>
-<p>{{ $rating->complainType->name ?? '-' }}</p>
+<p><span class="badge bg-warning text-dark">{{ $rating->complainType->name ?? '-' }}</span></p>
 </div>
 
 <div class="col-md-6 mb-2">
@@ -205,8 +234,9 @@ Page {{ $size }}
 {{-- ================= CLOSED ================= --}}
 <div class="tab-pane fade {{ request('active_tab') == 'closed' ? 'show active' : '' }}" id="closed">
 
-<table class="table table-bordered table-hover">
-<thead class="table-success">
+<table class="table table-striped table-hover align-middle ao-table">
+
+<thead class="table-secondary">
 <tr>
 <th>#</th>
 <th>DS Division</th>
@@ -258,7 +288,12 @@ data-bs-parent="#closedaoAccordion">
 <div class="card shadow-sm border-secondary mb-2">
 <div class="card-body p-2">
 
+<p><strong>Vehicle:</strong> {{ $c->vehicle_number }}</p>
+<p><strong>Phone:</strong> {{ $c->phone }}</p>
 <p><strong>Complaint:</strong> {{ $c->note }}</p>
+<p><strong>Complaint Type:</strong><span class="badge bg-warning text-dark">
+ {{ $c->complainType->name ?? '-' }}</span></p>
+<p><strong>User Remarks:</strong> {{ $c->user_remarks ?? '-' }}</p>
 <p><strong>AO Remarks:</strong> {{ $c->ao_remarks }}</p>
 <p><strong>Commissioner Remarks:</strong> {{ $c->commissioner_remarks }}</p>
 

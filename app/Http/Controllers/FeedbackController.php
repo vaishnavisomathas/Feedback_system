@@ -87,7 +87,7 @@ if ($phone) {
             'has_complaint'    => 'required|in:yes,no',
 'phone' => 'nullable|required_if:has_complaint,yes|digits:10',
 'vehicle_number' => 'nullable|string|max:12|required_if:has_complaint,yes',
-'note' => 'nullable|required_if:has_complaint,yes|max:100',
+'note' => 'nullable|required_if:has_complaint,yes|max:500',
               
         ]);
 

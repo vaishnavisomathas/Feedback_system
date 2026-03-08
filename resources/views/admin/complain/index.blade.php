@@ -3,7 +3,28 @@
 @section('title')
 Complaints - PDMT
 @endsection
+<style>
+    .complaint-table th{
+    font-weight:600;
+    font-size:14px;
+}
 
+.complaint-table td{
+    font-size:14px;
+}
+
+.complaint-table tbody tr{
+    cursor:pointer;
+}
+
+.complaint-table tbody tr:hover{
+    background-color:#f8f9fa;
+}
+
+.card-sm{
+    border-radius:8px;
+}
+</style>
 @section('content')
 <div class="container">
 
@@ -115,8 +136,7 @@ Complaints - PDMT
 {{-- ================= ALL COMPLAINTS ================= --}}
     <div class="tab-pane fade {{ request('active_tab','pending') == 'pending' ? 'show active' : '' }}" id="pending">
 
-<table class="table table-bordered table-hover">
-<thead class="table-dark">
+<table class="table table-striped table-hover align-middle complaint-table"><thead class="table-dark">
 <tr>
 <th>#</th>
 <th>DS Division</th>
@@ -187,6 +207,14 @@ Complaints - PDMT
             <div class="card-body p-3">
                 <div class="row">
                     <div class="col-md-6 mb-2">
+                        <strong>Vehicle:</strong>
+                        <p class="mb-0">{{ $rating->vehicle_number ?? '-' }}</p>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <strong>Phone:</strong>
+                        <p class="mb-0">{{ $rating->phone ?? '-' }}</p>
+                    </div>
+                    <div class="col-md-6 mb-2">
                         <strong>Complaint:</strong>
                         <p class="mb-0">{{ $rating->note ?? 'No complaint provided' }}</p>
                     </div>
@@ -248,8 +276,8 @@ Complaints - PDMT
 {{-- ================= All COMPLAINTS ================= --}}
     <div class="tab-pane fade {{ request('active_tab') == 'closed' ? 'show active' : '' }}" id="closed">
 
-<table class="table table-bordered table-hover">
-<thead class="table-success">
+<table class="table table-striped table-hover align-middle complaint-table">
+    <thead class="table-secondary">
 <tr>
 <th>#</th>
 <th>DS Division</th>
@@ -334,18 +362,42 @@ Complaints - PDMT
  <div class="card card-sm shadow-sm border-secondary mb-2">
     <div class="card-body p-2">
         <div class="row">
+                <div class="col-md-6 mb-2">
+                        <strong>Vehicle:</strong>
+                        <p class="mb-0">{{ $rating->vehicle_number ?? '-' }}</p>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <strong>Phone:</strong>
+                        <p class="mb-0">{{ $rating->phone ?? '-' }}</p>
+                    </div>
             <div class="col-md-6 mb-2">
                 <strong>Complaint:</strong>
                 <p class="mb-0">{{ $rating->note }}</p>
             </div>
             <div class="col-md-6 mb-2">
                 <strong>Complaint Type:</strong>
-                <p class="mb-0">{{ $rating->complainType->name ?? 'Not specified' }}</p>
+                <p class="mb-0"><span class="badge bg-warning text-dark">{{ $rating->complainType->name ?? 'Not specified' }}</span></p>
             </div>
             <div class="col-md-6 mb-2">
                 <strong>User Remarks:</strong>
                 <p class="mb-0">{{ $rating->user_remarks ?? '-' }}</p>
             </div>
+                 @if($rating->status == 'completed')
+                     <div class="col-md-6 mb-2">
+                <strong>AO Remarks:</strong>
+                <p class="mb-0">{{ $rating->ao_remarks ?? '-' }}</p>
+            </div>
+            <div class="col-md-6 mb-2">
+                <strong>Final Commissioner Decision:</strong>
+                <p class="mb-0">{{ $rating->commissioner_remarks ?? '-' }}</p>
+            </div>
+            @endif
+                 @if($rating->status == 'commissioner')
+            <div class="col-md-6 mb-2">
+                <strong>AO Remarks:</strong>
+                <p class="mb-0">{{ $rating->ao_remarks ?? '-' }}</p>
+            </div>
+            @endif
 </div>
     </div>
  </div>
