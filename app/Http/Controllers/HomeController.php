@@ -57,7 +57,10 @@ class HomeController extends Controller
         ->with('counter')
         ->orderByDesc('total')
         ->first();
-
+   $latestComplaints = Feedback::with('counter')
+        ->latest()
+        ->limit(5)
+        ->get();
 
 $pending = \App\Models\Feedback::where('status', 'pending')
             ->whereNotNull('note')
@@ -65,7 +68,15 @@ $pending = \App\Models\Feedback::where('status', 'pending')
             ->count();    
             $ao = \App\Models\Feedback::where('status','ao')->count();
     $commissioner = \App\Models\Feedback::where('status','commissioner')->count();
-
+ $topDivisions = Feedback::select(
+            'counter_id',
+            DB::raw('AVG(rating) as avg_rating')
+        )
+        ->with('counter')
+        ->groupBy('counter_id')
+        ->orderByDesc('avg_rating')
+        ->limit(5)
+        ->get();
         return view('welcome', compact(
             'totalRatings',
             'todayRatings',
@@ -73,7 +84,8 @@ $pending = \App\Models\Feedback::where('status', 'pending')
             'highestToday',
             'highestMonth',
             'highestYear',
-            
+            'latestComplaints',
+            'topDivisions',
             'pending','ao','commissioner'
         ));
     }

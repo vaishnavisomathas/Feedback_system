@@ -105,8 +105,30 @@ Complaints - PDMT
     </select>
 </div>
 
-            <div class="col-md-12 mt-3">
-                <button class="btn btn-primary"> <i class="bi bi-search"></i> </button>
+
+<div class="col-md-2">
+<label>Complaint Type</label>
+<select name="complain_type" class="form-control">
+<option value="">All</option>
+
+@foreach($types as $type)
+<option value="{{ $type->id }}"
+{{ request('complain_type')==$type->id?'selected':'' }}>
+{{ $type->name }}
+</option>
+@endforeach
+
+</select>
+</div>
+<div class="col-md-2">
+<label>Search</label>
+<input type="text" name="search"
+       value="{{ request('search') }}"
+       class="form-control"
+       placeholder="Vehicle or Phone">
+</div>
+            <div class="col-md-8 mt-4 d-flex justify-content-end">
+                <button class="btn btn-primary "> <i class="bi bi-search"></i> </button>
                 <a href="{{ url()->current() }}" class="btn btn-danger"><i class="bi bi-arrow-clockwise me-1"></i></a>
             </div>
 

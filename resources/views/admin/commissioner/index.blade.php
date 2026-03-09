@@ -131,21 +131,37 @@ class="form-control">
 </div>
 
 
-<div class="col-md-3 d-flex align-items-end gap-2">
+<div class="col-md-2">
+<label>Complaint Type</label>
+<select name="complain_type" class="form-control">
+<option value="">All</option>
 
-<button class="btn btn-primary w-50">
+      @foreach($complainTypes as $type)
+            <option value="{{ $type->id }}"
+                {{ request('complain_type') == $type->id ? 'selected' : '' }}>
+                {{ $type->name }}
+            </option>
+        @endforeach
 
+</select>
+</div>
+<div class="col-md-4">
+<label>Vehicle / Phone</label>
+<input type="text"
+       name="search"
+       value="{{ request('search') }}"
+       class="form-control"
+       placeholder="Vehicle or Phone">
+</div>
+     <div class="col-md-2 d-flex align-items-end gap-2">
+<button type="submit" class="btn btn-primary w-100">
 <i class="bi bi-search"></i>
-
 </button>
 
 <a href="{{ url()->current() }}"
-class="btn btn-danger w-50">
-
+class="btn btn-danger w-100">
 <i class="bi bi-arrow-clockwise"></i>
-
 </a>
-
 </div>
 
 </div>

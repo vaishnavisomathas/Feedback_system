@@ -30,6 +30,8 @@ $status = $statusMap[$filters['status'] ?? ''] ?? null;
     'to' => request('to'),
     'service_quality' => request('service_quality'),
     'rating' => request('rating'),
+    'search' => request('search'),
+    'complain_type' => request('complain_type'),
 ];
   $counters = Counter::orderBy('district')
         ->orderBy('division_name')
@@ -59,7 +61,16 @@ $status = $statusMap[$filters['status'] ?? ''] ?? null;
 if(request('rating')){
     $baseQuery->where('rating', request('rating'));
 }
+if(request('complain_type')){
+    $baseQuery->where('complain_type_id', request('complain_type'));
+}
 
+if(request('search')){
+    $baseQuery->where(function($q){
+        $q->where('vehicle_number','like','%'.request('search').'%')
+          ->orWhere('phone','like','%'.request('search').'%');
+    });
+}
     $allRatings = (clone $baseQuery)
         ->where(function($q){
             $q->whereNull('status')
@@ -136,6 +147,7 @@ public function forward(Request $request,$id)
 
 public function aoIndex(Request $request)
 {
+    $complainTypes = ComplainType::all();
     $serviceQualities = ServiceQuality::all(); 
     $filters = [
         'division' => $request->division,
@@ -145,6 +157,8 @@ public function aoIndex(Request $request)
         'service_quality' => $request->service_quality,
         'rating' => $request->rating,
          'status' => $request->status, 
+           'search' => $request->search,
+    'complain_type' => $request->complain_type,
     ];
     $statusMap = [
     'pending' => null,
@@ -171,6 +185,13 @@ $status = $statusMap[$filters['status'] ?? ''] ?? null;
         ->when($filters['rating'], fn($q) => $q->where('rating', $filters['rating']))
         ->when($filters['from'], fn($q) => $q->whereDate('created_at', '>=', $filters['from']))
         ->when($filters['to'], fn($q) => $q->whereDate('created_at', '<=', $filters['to']))
+        ->when($filters['search'], function($q) use ($filters){
+    $q->where(function($sub) use ($filters){
+        $sub->where('vehicle_number','like','%'.$filters['search'].'%')
+            ->orWhere('phone','like','%'.$filters['search'].'%');
+    });
+})
+->when($filters['complain_type'], fn($q) => $q->where('complain_type_id', $filters['complain_type']))
         ->latest()
         ->paginate($request->per_page ?? 10, ['*'], 'pending');
 
@@ -186,10 +207,17 @@ $status = $statusMap[$filters['status'] ?? ''] ?? null;
         ->when($filters['rating'], fn($q) => $q->where('rating', $filters['rating']))
         ->when($filters['from'], fn($q) => $q->whereDate('created_at', '>=', $filters['from']))
         ->when($filters['to'], fn($q) => $q->whereDate('created_at', '<=', $filters['to']))
+          ->when($filters['search'], function($q) use ($filters){
+    $q->where(function($sub) use ($filters){
+        $sub->where('vehicle_number','like','%'.$filters['search'].'%')
+            ->orWhere('phone','like','%'.$filters['search'].'%');
+    });
+})
+->when($filters['complain_type'], fn($q) => $q->where('complain_type_id', $filters['complain_type']))
         ->latest()
         ->paginate($request->per_page ?? 10, ['*'], 'closed');
 
-    return view('admin.ao.index', compact('pendingAO','closedAO','serviceQualities','filters','counters'));
+    return view('admin.ao.index', compact('pendingAO','closedAO','serviceQualities','filters','counters','complainTypes'));
 }
 
 
@@ -213,6 +241,7 @@ public function aoSave(Request $request, $id)
 public function commissionerIndex(Request $request)
 {
     $serviceQualities = ServiceQuality::all();
+    $complainTypes = ComplainType::all();
 
     $filters = [
         'division' => $request->division,
@@ -222,6 +251,8 @@ public function commissionerIndex(Request $request)
         'to' => $request->to,
         'service_quality' => $request->service_quality,
         'rating' => $request->rating,
+          'search' => $request->search,
+    'complain_type' => $request->complain_type,
     ];
        $statusMap = [
     'pending' => null,
@@ -248,6 +279,14 @@ $status = $statusMap[$filters['status'] ?? ''] ?? null;
         ->when($filters['rating'], fn($q) => $q->where('rating', $filters['rating']))
         ->when($filters['from'], fn($q) => $q->whereDate('created_at', '>=', $filters['from']))
         ->when($filters['to'], fn($q) => $q->whereDate('created_at', '<=', $filters['to']))
+           ->when($filters['complain_type'], fn($q) => $q->where('complain_type_id', $filters['complain_type']))
+
+    ->when($filters['search'], function($q) use ($filters){
+        $q->where(function($sub) use ($filters){
+            $sub->where('vehicle_number','like','%'.$filters['search'].'%')
+                ->orWhere('phone','like','%'.$filters['search'].'%');
+        });
+    })
         ->latest()
         ->paginate($request->per_page ?? 10, ['*'], 'pending');
 
@@ -263,11 +302,19 @@ $status = $statusMap[$filters['status'] ?? ''] ?? null;
         ->when($filters['rating'], fn($q) => $q->where('rating', $filters['rating']))
         ->when($filters['from'], fn($q) => $q->whereDate('created_at', '>=', $filters['from']))
         ->when($filters['to'], fn($q) => $q->whereDate('created_at', '<=', $filters['to']))
+           ->when($filters['complain_type'], fn($q) => $q->where('complain_type_id', $filters['complain_type']))
+
+    ->when($filters['search'], function($q) use ($filters){
+        $q->where(function($sub) use ($filters){
+            $sub->where('vehicle_number','like','%'.$filters['search'].'%')
+                ->orWhere('phone','like','%'.$filters['search'].'%');
+        });
+    })
         ->latest()
         ->paginate($request->per_page ?? 10, ['*'], 'closed');
 
     return view('admin.commissioner.index', compact(
-        'pendingCommissioner','closedCommissioner','serviceQualities','filters','counters'
+        'pendingCommissioner','closedCommissioner','serviceQualities','filters','counters','complainTypes'
     ));
 }
 
