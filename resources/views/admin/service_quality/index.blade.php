@@ -3,6 +3,23 @@
 Service Quality-PDMT
 
 @endsection
+<style>
+
+@media (max-width:768px){
+
+h3{
+font-size:20px;
+}
+
+.table th,
+.table td{
+font-size:12px;
+padding:6px;
+}
+
+}
+
+</style>
 
 @section('content')
 <div class="container">

@@ -149,7 +149,7 @@ class DsDivisionController extends Controller
             'url'     => $url,
         ]);
 
-        return $pdf->download('qr_' . $counter->id . '.pdf');
+        return $pdf->download('qr_' . $counter->division_name . '_' . $counter->counter_name . '.pdf');
     }
 
 }

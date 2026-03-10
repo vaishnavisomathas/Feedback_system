@@ -2,105 +2,176 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PDMT - Feedback Management System Login</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/pdmt_logo.png') }}">
-  <link rel="stylesheet" href="/assets/css/styles.min.css" />
+<title>PDMT - Feedback Management System Login</title>
+
+<link rel="shortcut icon" href="{{ asset('assets/images/pdmt_logo.png') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/styles.min.css') }}">
+
+<style>
+
+body{
+background:#f4f6f9;
+}
+
+/* Login Card */
+
+.login-card{
+border-radius:12px;
+padding:10px;
+}
+
+/* Logo */
+
+.login-logo{
+max-width:120px;
+}
+
+/* Mobile adjustments */
+
+@media (max-width:768px){
+
+.login-logo{
+max-width:90px;
+}
+
+.login-title{
+font-size:16px;
+}
+
+.login-subtitle{
+font-size:13px;
+}
+
+.login-system{
+font-size:14px;
+}
+
+}
+
+</style>
+
 </head>
 
 <body>
 
-<div class="page-wrapper" id="main-wrapper" data-layout="vertical"
-     data-navbarbg="skin6" data-sidebartype="full"
-     data-sidebar-position="fixed" data-header-position="fixed">
+<div class="min-vh-100 d-flex align-items-center justify-content-center">
 
-  <div class="position-relative overflow-hidden text-bg-light min-vh-100 d-flex align-items-center justify-content-center">
-    <div class="d-flex align-items-center justify-content-center w-100">
-      <div class="row justify-content-center w-100">
+<div class="container">
 
-        <div class="col-md-8 col-lg-6 col-xxl-3">
-          <div class="card shadow">
-            <div class="card-body">
+<div class="row justify-content-center">
 
-              <!-- LOGO AREA -->
-              <div class="text-center py-3">
+<div class="col-12 col-sm-10 col-md-8 col-lg-5 col-xl-4">
 
-                <img src="{{ asset('assets/images/pdmt_logo.png') }}"
-                     alt="PDMT Northern Province"
-                     class="img-fluid"
-                     style="max-width:130px;">
+<div class="card shadow login-card">
 
-                <h5 class="mt-3 mb-1 fw-bold">
-                  Provincial Department of Motor Traffic
-                </h5>
+<div class="card-body">
 
-                <small class="text-muted d-block mb-2">
-                  Northern Province
-                </small>
+<!-- LOGO -->
 
-                <p class="fw-semibold mb-0">Digital Feedback Management System</p>
-                <small class="text-muted">Please sign in to continue</small>
-              </div>
+<div class="text-center mb-4">
 
-              <!-- LOGIN FORM -->
-              <form method="POST" action="{{ route('login.post') }}">
-                @csrf
+<img src="{{ asset('assets/images/pdmt_logo.png') }}"
+class="img-fluid login-logo"
+alt="PDMT">
 
-                <div class="mb-3">
-                  <label class="form-label">Email Address</label>
-                  <input type="email"
-                         name="email"
-                         value="{{ old('email') }}"
-                         class="form-control @error('email') is-invalid @enderror"
-                         required>
+<h5 class="fw-bold mt-3 login-title">
+Provincial Department of Motor Traffic
+</h5>
 
-                  @error('email')
-                    <div class="text-danger small">{{ $message }}</div>
-                  @enderror
-                </div>
+<div class="text-muted login-subtitle">
+Northern Province
+</div>
 
-                <div class="mb-3">
-                  <label class="form-label">Password</label>
-                  <input type="password"
-                         name="password"
-                         class="form-control @error('password') is-invalid @enderror"
-                         required>
+<p class="fw-semibold mt-2 mb-0 login-system">
+Digital Feedback Management System
+</p>
 
-                  @error('password')
-                    <div class="text-danger small">{{ $message }}</div>
-                  @enderror
-                </div>
-
-                <button type="submit" class="btn btn-primary w-100 mb-3">
-                  Sign In
-                </button>
-
-           
-
-              </form>
-
-              <!-- FOOTER -->
-              <div class="text-center mt-4">
-                <small class="text-muted">
-                  © {{ date('Y') }} PDMT Northern Province — All Rights Reserved
-                </small>
-              </div>
-
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
+<small class="text-muted">
+Please sign in to continue
+</small>
 
 </div>
 
-<script src="/assets/libs/jquery/dist/jquery.min.js"></script>
-<script src="/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+
+<!-- LOGIN FORM -->
+
+<form method="POST" action="{{ route('login.post') }}">
+@csrf
+
+
+<div class="mb-3">
+
+<label class="form-label">Email Address</label>
+
+<input type="email"
+name="email"
+value="{{ old('email') }}"
+class="form-control @error('email') is-invalid @enderror"
+required>
+
+@error('email')
+<div class="text-danger small">{{ $message }}</div>
+@enderror
+
+</div>
+
+
+
+<div class="mb-3">
+
+<label class="form-label">Password</label>
+
+<input type="password"
+name="password"
+class="form-control @error('password') is-invalid @enderror"
+required>
+
+@error('password')
+<div class="text-danger small">{{ $message }}</div>
+@enderror
+
+</div>
+
+
+<button type="submit"
+class="btn btn-primary w-100 mb-3">
+
+Sign In
+
+</button>
+
+</form>
+
+
+<!-- FOOTER -->
+
+<div class="text-center mt-4">
+
+<small class="text-muted">
+© {{ date('Y') }} PDMT Northern Province — All Rights Reserved
+</small>
+
+</div>
+
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<script src="{{ asset('assets/libs/jquery/dist/jquery.min.js') }}"></script>
+<script src="{{ asset('assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
 
 </body>
 </html>

@@ -3,7 +3,26 @@
 @section('title')
 <title>{{ $counter->division_name }} - QR</title>
 @endsection
+<style>
 
+.qr-box svg{
+max-width:200px;
+height:auto;
+}
+
+@media (max-width:768px){
+
+h3{
+font-size:20px;
+}
+
+.qr-box svg{
+max-width:150px;
+}
+
+}
+
+</style>
 @section('content')
 <div class="container text-center mt-4">
 

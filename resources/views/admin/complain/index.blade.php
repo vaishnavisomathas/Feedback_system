@@ -24,6 +24,27 @@ Complaints - PDMT
 .card-sm{
     border-radius:8px;
 }
+@media (max-width:768px){
+
+.complaint-table th,
+.complaint-table td{
+font-size:12px;
+padding:6px;
+}
+
+h2{
+font-size:20px;
+}
+
+.card-body{
+padding:10px;
+}
+
+textarea{
+font-size:13px;
+}
+
+}
 </style>
 @section('content')
 <div class="container">

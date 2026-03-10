@@ -3,7 +3,28 @@
 @section('title')
     Counters Feedbacks - PDMT
 @endsection
+<style>
 
+.table th,
+.table td{
+font-size:14px;
+}
+
+@media (max-width:768px){
+
+h2{
+font-size:20px;
+}
+
+.table th,
+.table td{
+font-size:12px;
+padding:6px;
+}
+
+}
+
+</style> 
 @section('content')
 <div class="container">
 

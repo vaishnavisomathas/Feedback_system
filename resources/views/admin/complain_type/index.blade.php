@@ -3,7 +3,28 @@
 @section('title')
 Complaint Types- PDMT
 @endsection
+<style>
 
+.table td,
+.table th{
+font-size:14px;
+}
+
+@media (max-width:768px){
+
+h3{
+font-size:20px;
+}
+
+.table td,
+.table th{
+font-size:12px;
+padding:6px;
+}
+
+}
+
+</style>
 @section('content')
 <div class="container">
 <h3 class="mb-3">Complaint Types Management</h3>

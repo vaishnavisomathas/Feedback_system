@@ -29,27 +29,23 @@ body {
   z-index:1000;
 }
 
-/* LOGO */
-.brand-logos {
-  top: 40px;;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.brand-logos{
+display:flex;
+align-items:center;
+gap:10px;
+padding:15px 12px;
 }
 
-.brand-logos h5 {
-  margin: 0;
+.sidebar-logo{
+width:45px;
+height:auto;
 }
 
-.brand-logos img {
-  margin-top: 8px;
+.sidebar-title{
+font-size:18px;
+font-weight:600;
+margin:0;
 }
-
-.brand-logos img {
-  margin-top: 10px;
-  margin-left: 8px;
-}
-
 /* SCROLL */
 .scroll-sidebars {
   height:calc(100vh - 80px);
@@ -231,6 +227,53 @@ body {
     margin-left:0;
   }
 }
+/* =========================
+MOBILE
+========================= */
+
+@media (max-width:768px){
+
+.app-headers{
+height:55px;
+padding:0 10px;
+}
+
+.app-headers .fw-semibold{
+font-size:14px;
+max-width:150px;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+
+.container-fluids{
+padding:15px 10px;
+}
+
+.notif-dropdown{
+width:95vw;
+right:-10px;
+}
+
+}
+
+/* EXTRA SMALL */
+
+@media (max-width:576px){
+
+.container-fluids{
+padding:10px;
+}
+
+.brand-logos img{
+width:38px;
+}
+
+.brand-logos h5{
+font-size:14px;
+}
+
+}
 </style>
 </head>
 
@@ -242,10 +285,10 @@ body {
   <aside class="left-sidebar">
 
   <!-- LOGO -->
-  <div class="brand-logos">
-    <img src="{{ asset('assets/images/npc_logo.png') }}" width="60">  
-    <h5>PDMT-NP</h5>
-  </div>
+<div class="brand-logos">
+    <img src="{{ asset('assets/images/npc_logo.png') }}" class="sidebar-logo">
+    <h5 class="sidebar-title">PDMT-NP</h5>
+</div>
 
   <nav class="scroll-sidebars">
     <ul>

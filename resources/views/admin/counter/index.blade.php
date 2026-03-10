@@ -2,6 +2,33 @@
 @section('title')
 Division- PDMT
 @endsection
+
+<style>
+
+.table td,
+.table th{
+font-size:14px;
+}
+
+@media (max-width:768px){
+
+h2{
+font-size:20px;
+}
+
+.table td,
+.table th{
+font-size:12px;
+padding:6px;
+}
+
+.card-body{
+padding:10px;
+}
+
+}
+
+</style>
 @section('content')
 <div class="container">
 <h2 class="mb-4">Division List</h2>

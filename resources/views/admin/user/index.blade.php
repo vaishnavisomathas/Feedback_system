@@ -2,7 +2,23 @@
 
 @section('content')
 <div class="container">
+<style>
 
+@media (max-width:768px){
+
+h5{
+font-size:18px;
+}
+
+.table th,
+.table td{
+font-size:12px;
+padding:6px;
+}
+
+}
+
+</style>
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif

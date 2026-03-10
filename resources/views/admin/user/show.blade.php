@@ -1,6 +1,26 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+
+@media (max-width:768px){
+
+h4{
+font-size:20px;
+}
+
+.user-label{
+font-size:13px;
+font-weight:600;
+}
+
+.user-value{
+font-size:14px;
+}
+
+}
+
+</style>
 <div class="container">
 
     <div class="card">

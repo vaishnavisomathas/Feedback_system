@@ -24,6 +24,24 @@ Commissioner Complaints - PDMT
 .modal-content{
     border-radius:8px;
 }
+@media (max-width:768px){
+
+.commissioner-table th,
+.commissioner-table td{
+font-size:12px;
+padding:6px;
+}
+
+h3{
+font-size:20px;
+}
+
+.modal-body{
+font-size:14px;
+}
+
+}
+
 </style>
 @section('content')
 

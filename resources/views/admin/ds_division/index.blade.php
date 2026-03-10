@@ -3,7 +3,32 @@
 @section('title')
     DS Divisions QR- PDMT
 @endsection
+<style>
 
+.table td,
+.table th{
+font-size:14px;
+}
+
+@media (max-width:768px){
+
+h2{
+font-size:20px;
+}
+
+.table td,
+.table th{
+font-size:12px;
+padding:6px;
+}
+
+img{
+max-width:120px;
+}
+
+}
+
+</style>
 @section('content')
 <div class="container">
     <h2 class="mb-4">DS Divisions</h2>
