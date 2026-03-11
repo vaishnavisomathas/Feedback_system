@@ -4,48 +4,191 @@
 
 <style>
 
-.dashboard-card{
-border-radius:12px;
+/* ======================
+SECTION TITLE
+====================== */
+
+.section-title{
+font-size:18px;
+font-weight:600;
+margin:25px 0 15px 0;
+color:#2c3e50;
+border-left:4px solid #0d6efd;
+padding-left:10px;
+}
+
+/* ======================
+STAT CARDS
+====================== */
+
+.stat-card{
+border-radius:10px;
 transition:0.25s;
+box-shadow:0 2px 6px rgba(0,0,0,0.06);
 }
 
-.dashboard-card:hover{
-transform:translateY(-4px);
-box-shadow:0 8px 20px rgba(0,0,0,0.08);
+.stat-card:hover{
+transform:translateY(-3px);
+box-shadow:0 12px 25px rgba(0,0,0,0.10);
 }
 
-.card-icon{
+.stat-icon{
+font-size:24px;
+}
+
+.stat-number{
 font-size:28px;
-margin-bottom:8px;
-}
-
-.card-number{
-font-size:32px;
 font-weight:700;
+margin-bottom:3px;
 }
 
-/* Light backgrounds */
+/* GOVERNMENT STYLE COLORS */
 
-.bg-total{ background:#e8f8f1; color:#28a745; }
-.bg-today{ background:#e7f9ff; color:#17a2b8; }
-.bg-month{ background:#eef3ff; color:#4e73df; }
-.bg-pending{ background:#fff8e1; color:#f6c23e; }
-.bg-ao{ background:#f1f3f5; color:#6c757d; }
-.bg-commissioner{ background:#fdecea; color:#dc3545; }
+.bg-total{
+background:#e6f4ea;
+color:#1e7e34;
+}
 
-.feedback-card{
+.bg-today{
+background:#e8f7fb;
+color:#0c5460;
+}
+
+.bg-month{
+background:#eef2ff;
+color:#2f4db3;
+}
+
+.bg-pending{
+background:#fff3cd;
+color:#856404;
+}
+
+.bg-ao{
+background:#e2e3e5;
+color:#383d41;
+}
+
+.bg-commissioner{
+background:#fde2e1;
+color:#842029;
+}
+
+/* ======================
+TABLE DESIGN
+====================== */
+
+.dashboard-table{
 background:#ffffff;
-border-radius:12px;
+border-radius:10px;
+overflow:hidden;
+}
+
+.dashboard-table thead{
+background:#2f4db3;
+color:#fff;
+font-size:14px;
+}
+
+.dashboard-table thead th{
+padding:12px;
+border:none;
+}
+
+.dashboard-table tbody td{
+padding:12px;
+font-size:14px;
+vertical-align:middle;
+}
+
+.dashboard-table tbody tr{
+border-bottom:1px solid #f0f0f0;
+transition:0.2s;
+}
+
+.dashboard-table tbody tr:hover{
+background:#f5f8ff;
+}
+
+.table-card{
+border-radius:10px;
+box-shadow:0 3px 10px rgba(0,0,0,0.05);
+}
+
+.table-header{
+background:#f4f6f9;
+font-weight:600;
+font-size:15px;
+padding:12px;
+}
+
+/* STATUS BADGES */
+
+.status-badge{
+padding:6px 12px;
+border-radius:20px;
+font-size:12px;
+font-weight:600;
+}
+
+.status-pending{
+background:#fff3cd;
+color:#856404;
+}
+
+.status-ao{
+background:#d1ecf1;
+color:#0c5460;
+}
+
+.status-commissioner{
+background:#cfe2ff;
+color:#084298;
+}
+
+.status-completed{
+background:#d1e7dd;
+color:#0f5132;
+}
+
+.status-rejected{
+background:#f8d7da;
+color:#842029;
+}
+
+/* ======================
+RESPONSIVE
+====================== */
+
+@media (max-width:768px){
+
+.stat-number{
+font-size:24px;
+}
+
+.section-title{
+font-size:16px;
+}
+
 }
 
 </style>
 
+
+
+{{-- ======================
+TOP PERFORMING COUNTERS
+====================== --}}
+
+<div class="section-title">Top Performing Counters</div>
+
 <div class="row g-3">
-<!-- Highest Feedback -->
-@foreach(['Today' => $highestToday, 'This Month' => $highestMonth, 'This Year' => $highestYear] as $period => $data)
+
+@foreach(['Today'=>$highestToday,'This Month'=>$highestMonth,'This Year'=>$highestYear] as $period=>$data)
 
 <div class="col-lg-4 col-md-6">
-<div class="card feedback-card shadow-sm border-0">
+
+<div class="card shadow-sm border-0">
 
 <div class="card-body text-center">
 
@@ -54,7 +197,7 @@ border-radius:12px;
 </h6>
 
 <p class="text-muted small">
-Division / Counter with most feedbacks
+Division / Counter with most feedback
 </p>
 
 <h6>
@@ -67,108 +210,126 @@ Division / Counter with most feedbacks
 </span>
 
 <div class="fw-bold text-primary">
-⭐ {{ number_format($data->avg_rating ?? 0, 1) }} / 5
+⭐ {{ number_format($data->avg_rating ?? 0,1) }} / 5
 </div>
 
 </div>
 
 </div>
+
 </div>
 
 @endforeach
-<!-- Total Ratings -->
-<div class="col-lg-4 col-md-6">
-<div class="card dashboard-card bg-total border-0">
+
+</div>
+
+
+
+{{-- ======================
+STATISTICS
+====================== --}}
+
+<div class="section-title">Dashboard Overview</div>
+
+<div class="row g-3">
+
+<div class="col-lg-2 col-md-4 col-6">
+<div class="card stat-card bg-total border-0">
 <div class="card-body text-center">
-<div class="card-icon"><i class="bi bi-star-fill"></i></div>
-<h6>Total Ratings</h6>
-<div class="card-number">{{ $totalRatings ?? 0 }}</div>
+<div class="stat-icon mb-2"><i class="bi bi-star-fill"></i></div>
+<div class="stat-number">{{ $totalRatings ?? 0 }}</div>
+<div>Total Ratings</div>
 </div>
 </div>
 </div>
 
-<!-- Today Ratings -->
-<div class="col-lg-4 col-md-6">
-<div class="card dashboard-card bg-today border-0">
+
+<div class="col-lg-2 col-md-4 col-6">
+<div class="card stat-card bg-today border-0">
 <div class="card-body text-center">
-<div class="card-icon"><i class="bi bi-calendar-day"></i></div>
-<h6>New Ratings Today</h6>
-<div class="card-number">{{ $todayRatings ?? 0 }}</div>
+<div class="stat-icon mb-2"><i class="bi bi-calendar-day"></i></div>
+<div class="stat-number">{{ $todayRatings ?? 0 }}</div>
+<div>Today's Feedback</div>
 </div>
 </div>
 </div>
 
-<!-- Month Ratings -->
-<div class="col-lg-4 col-md-6">
-<div class="card dashboard-card bg-month border-0">
+
+<div class="col-lg-2 col-md-4 col-6">
+<div class="card stat-card bg-month border-0">
 <div class="card-body text-center">
-<div class="card-icon"><i class="bi bi-calendar-month"></i></div>
-<h6>New Ratings This Month</h6>
-<div class="card-number">{{ $monthRatings ?? 0 }}</div>
+<div class="stat-icon mb-2"><i class="bi bi-calendar-month"></i></div>
+<div class="stat-number">{{ $monthRatings ?? 0 }}</div>
+<div>This Month</div>
 </div>
 </div>
 </div>
 
-<!-- Pending -->
-<div class="col-lg-4 col-md-6">
-<div class="card dashboard-card bg-pending border-0">
+
+<div class="col-lg-2 col-md-4 col-6">
+<div class="card stat-card bg-pending border-0">
 <div class="card-body text-center">
-<div class="card-icon"><i class="bi bi-hourglass-split"></i></div>
-<h6>Pending Complaints</h6>
-<div class="card-number">{{ $pending ?? 0 }}</div>
+<div class="stat-icon mb-2"><i class="bi bi-hourglass-split"></i></div>
+<div class="stat-number">{{ $pending ?? 0 }}</div>
+<div>Pending</div>
 </div>
 </div>
 </div>
 
-<!-- AO -->
-<div class="col-lg-4 col-md-6">
-<div class="card dashboard-card bg-ao border-0">
+
+<div class="col-lg-2 col-md-4 col-6">
+<div class="card stat-card bg-ao border-0">
 <div class="card-body text-center">
-<div class="card-icon"><i class="bi bi-person-badge"></i></div>
-<h6>Forwarded to A/O</h6>
-<div class="card-number">{{ $ao ?? 0 }}</div>
+<div class="stat-icon mb-2"><i class="bi bi-person-badge"></i></div>
+<div class="stat-number">{{ $ao ?? 0 }}</div>
+<div>At AO</div>
 </div>
 </div>
 </div>
 
-<!-- Commissioner -->
-<div class="col-lg-4 col-md-6">
-<div class="card dashboard-card bg-commissioner border-0">
+
+<div class="col-lg-2 col-md-4 col-6">
+<div class="card stat-card bg-commissioner border-0">
 <div class="card-body text-center">
-<div class="card-icon"><i class="bi bi-person-workspace"></i></div>
-<h6>Forwarded to Commissioner</h6>
-<div class="card-number">{{ $commissioner ?? 0 }}</div>
+<div class="stat-icon mb-2"><i class="bi bi-person-workspace"></i></div>
+<div class="stat-number">{{ $commissioner ?? 0 }}</div>
+<div>Commissioner</div>
 </div>
 </div>
 </div>
 
+</div>
 
 
 
-{{-- ================= TABLE SECTION ================= --}}
+{{-- ======================
+TABLE SECTION
+====================== --}}
+
 <div class="row mt-4 g-3">
 
 
 {{-- Latest Complaints --}}
 <div class="col-lg-6">
 
-<div class="card shadow-sm border-0">
+<div class="card table-card shadow-sm">
 
-<div class="card-header d-flex justify-content-between align-items-center bg-light">
+<div class="card-header table-header d-flex justify-content-between">
 
-<h6 class="mb-0">Latest Complaints</h6>
+<span>Latest Complaints</span>
 
-<a href="{{ route('admin.complain.index') }}" class="btn btn-sm btn-primary">
+<a href="{{ route('admin.complain.index') }}" 
+class="btn btn-sm btn-primary">
 View All
 </a>
 
 </div>
 
-<div class="card-body p-0">
+<div class="table-responsive">
 
-<table class="table table-striped mb-0">
+<table class="table dashboard-table mb-0">
 
-<thead class="table-dark">
+<thead>
 <tr>
 <th>Vehicle</th>
 <th>Division</th>
@@ -183,9 +344,13 @@ View All
 
 <tr>
 
-<td>{{ $complaint->vehicle_number }}</td>
+<td class="fw-semibold">
+{{ $complaint->vehicle_number }}
+</td>
 
-<td>{{ $complaint->counter->division_name ?? '-' }}</td>
+<td>
+{{ $complaint->counter->division_name ?? '-' }}
+</td>
 
 <td>
 {{ ['','⭐','⭐⭐','⭐⭐⭐','⭐⭐⭐⭐','⭐⭐⭐⭐⭐'][$complaint->rating] ?? '' }}
@@ -194,19 +359,19 @@ View All
 <td>
 
 @if($complaint->status == null || $complaint->status == 'pending')
-<span class="badge bg-warning text-dark">Pending</span>
+<span class="status-badge status-pending">Pending</span>
 
 @elseif($complaint->status == 'ao')
-<span class="badge bg-info">AO</span>
+<span class="status-badge status-ao">AO</span>
 
 @elseif($complaint->status == 'commissioner')
-<span class="badge bg-primary">Commissioner</span>
+<span class="status-badge status-commissioner">Commissioner</span>
 
 @elseif($complaint->status == 'completed')
-<span class="badge bg-success">Completed</span>
+<span class="status-badge status-completed">Completed</span>
 
 @elseif($complaint->status == 'rejected')
-<span class="badge bg-danger">Rejected</span>
+<span class="status-badge status-rejected">Rejected</span>
 @endif
 
 </td>
@@ -235,24 +400,24 @@ No complaints found
 
 
 
-{{-- Top Divisions Leaderboard --}}
+{{-- Top DS Divisions --}}
 <div class="col-lg-6">
 
-<div class="card shadow-sm border-0">
+<div class="card table-card shadow-sm">
 
-<div class="card-header bg-light">
-<h6 class="mb-0">Top DS Divisions (Avg Rating)</h6>
+<div class="card-header table-header">
+Top DS Divisions (Average Rating)
 </div>
 
-<div class="card-body p-0">
+<div class="table-responsive">
 
-<table class="table table-striped mb-0">
+<table class="table dashboard-table mb-0">
 
-<thead class="table-dark">
+<thead>
 <tr>
 <th>Rank</th>
 <th>Division</th>
-<th>Avg Rating</th>
+<th>Average Rating</th>
 </tr>
 </thead>
 
@@ -268,11 +433,11 @@ No complaints found
 </span>
 </td>
 
-<td>
+<td class="fw-semibold">
 {{ $division->counter->division_name ?? '-' }}
 </td>
 
-<td class="fw-bold text-warning">
+<td class="text-warning fw-bold">
 ⭐ {{ number_format($division->avg_rating,1) }}
 </td>
 
@@ -300,10 +465,8 @@ No ranking data
 
 </div>
 
-</div>
-
-
 @endsection
+
 
 
 @push('scripts')
