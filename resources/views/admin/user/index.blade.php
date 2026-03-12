@@ -2,25 +2,23 @@
 
 @section('content')
 <div class="container">
-<style>
+    <style>
+        @media (max-width:768px) {
 
-@media (max-width:768px){
+            h5 {
+                font-size: 18px;
+            }
 
-h5{
-font-size:18px;
-}
+            .table th,
+            .table td {
+                font-size: 12px;
+                padding: 6px;
+            }
 
-.table th,
-.table td{
-font-size:12px;
-padding:6px;
-}
-
-}
-
-</style>
+        }
+    </style>
     @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+    <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
     <!-- Create / Edit Modal -->
@@ -53,15 +51,15 @@ padding:6px;
                             <input type="text" name="nic_number" id="nic_number" class="form-control" required>
                         </div>
 
-<div class="col-md-6 mb-3">
-    <label>Role</label>
-    <select name="role" id="role" class="form-control" required>
-        <option value="" disabled selected>Select a role</option>
-        @foreach($roles as $r)
-            <option value="{{ $r->name }}">{{ ucfirst($r->name) }}</option>
-        @endforeach
-    </select>
-</div>
+                        <div class="col-md-6 mb-3">
+                            <label>Role</label>
+                            <select name="role" id="role" class="form-control" required>
+                                <option value="" disabled selected>Select a role</option>
+                                @foreach($roles as $r)
+                                <option value="{{ $r->name }}">{{ ucfirst($r->name) }}</option>
+                                @endforeach
+                            </select>
+                        </div>
 
 
                         <div class="col-md-6 mb-3">
@@ -73,11 +71,11 @@ padding:6px;
                             <label>Phone</label>
                             <input type="text" name="phone" id="phone" class="form-control" required>
                         </div>
-<div class="col-md-6 mb-3">
-    <label>Password</label>
-    <input type="password" name="password" id="password" class="form-control" 
-           placeholder="Enter password">
-</div>
+                        <div class="col-md-6 mb-3">
+                            <label>Password</label>
+                            <input type="password" name="password" id="password" class="form-control"
+                                placeholder="Enter password">
+                        </div>
 
 
                     </div>
@@ -113,45 +111,43 @@ padding:6px;
                 </thead>
                 <tbody>
                     @foreach($users as $user)
-                        <tr>
-                            <td>{{ $user->name }}</td>
-                            <td>{{ $user->dob }}</td>
-                            <td>{{ $user->nic_number }}</td>
-                            <td>{{ ucfirst($user->role) }}</td>
-                            <td>{{ $user->email }}</td>
-                            <td>{{ $user->phone }}</td>
+                    <tr>
+                        <td>{{ $user->name }}</td>
+                        <td>{{ $user->dob }}</td>
+                        <td>{{ $user->nic_number }}</td>
+                        <td>{{ ucfirst($user->role) }}</td>
+                        <td>{{ $user->email }}</td>
+                        <td>{{ $user->phone }}</td>
                         <td>
-    <a href="{{ route('users.show', $user->id) }}" 
-       class="btn btn-sm btn-info">
-       <i class="bi bi-eye"></i>
-    </a>
+                            <a href="{{ route('users.show', $user->id) }}"
+                                class="btn btn-sm btn-info">
+                                <i class="bi bi-eye"></i>
+                            </a>
 
-    <button class="btn btn-sm btn-primary editBtn"
-        data-id="{{ $user->id }}"
-        data-name="{{ $user->name }}"
-        data-dob="{{ $user->dob }}"
-        data-nic="{{ $user->nic_number }}"
-        data-role="{{ $user->role }}"
-        data-email="{{ $user->email }}"
-        data-phone="{{ $user->phone }}"
-        >
-        <i class="bi bi-pencil-square"></i>
-    </button>
+                            <button class="btn btn-sm btn-primary editBtn"
+                                data-id="{{ $user->id }}"
+                                data-name="{{ $user->name }}"
+                                data-dob="{{ $user->dob }}"
+                                data-nic="{{ $user->nic_number }}"
+                                data-role="{{ $user->role }}"
+                                data-email="{{ $user->email }}"
+                                data-phone="{{ $user->phone }}">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
 
-    <form action="{{ route('users.destroy', $user->id) }}"
-          method="POST" class="d-inline">
-        @csrf
-        @method('DELETE')
-        <button type="submit"
-                class="btn btn-sm btn-danger"
-                onclick="return confirm('Are you sure?')"
-                >
-            <i class="bi bi-trash"></i>
-        </button>
-    </form>
-</td>
+                            <form action="{{ route('users.destroy', $user->id) }}"
+                                method="POST" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                    class="btn btn-sm btn-danger"
+                                    onclick="return confirm('Are you sure?')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
 
-                        </tr>
+                    </tr>
                     @endforeach
                 </tbody>
             </table>
@@ -166,41 +162,41 @@ padding:6px;
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
 
-    let modal = new bootstrap.Modal(document.getElementById('userModal'));
-    let form = document.getElementById('userForm');
+        let modal = new bootstrap.Modal(document.getElementById('userModal'));
+        let form = document.getElementById('userForm');
 
-    // Create
-    document.getElementById('createUserBtn').addEventListener('click', function () {
-        form.action = "{{ route('users.store') }}";
-        document.getElementById('methodField').value = 'POST';
-        document.getElementById('modalTitle').innerText = 'Add User';
-        form.reset();
-        modal.show();
-    });
-
-    // Edit
-    document.querySelectorAll('.editBtn').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-
-            let id = btn.dataset.id;
-form.action = '/users/' + id;
-            document.getElementById('methodField').value = 'PUT';
-
-            document.getElementById('modalTitle').innerText = 'Edit User';
-
-            document.getElementById('name').value = btn.dataset.name;
-            document.getElementById('dob').value = btn.dataset.dob;
-            document.getElementById('nic_number').value = btn.dataset.nic;
-            document.getElementById('role').value = btn.dataset.role;
-            document.getElementById('email').value = btn.dataset.email;
-            document.getElementById('phone').value = btn.dataset.phone;
-
+        // Create
+        document.getElementById('createUserBtn').addEventListener('click', function() {
+            form.action = "{{ route('users.store') }}";
+            document.getElementById('methodField').value = 'POST';
+            document.getElementById('modalTitle').innerText = 'Add User';
+            form.reset();
             modal.show();
         });
-    });
 
-});
+        // Edit
+        document.querySelectorAll('.editBtn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+
+                let id = btn.dataset.id;
+                form.action = '/users/' + id;
+                document.getElementById('methodField').value = 'PUT';
+
+                document.getElementById('modalTitle').innerText = 'Edit User';
+
+                document.getElementById('name').value = btn.dataset.name;
+                document.getElementById('dob').value = btn.dataset.dob;
+                document.getElementById('nic_number').value = btn.dataset.nic;
+                document.getElementById('role').value = btn.dataset.role;
+                document.getElementById('email').value = btn.dataset.email;
+                document.getElementById('phone').value = btn.dataset.phone;
+
+                modal.show();
+            });
+        });
+
+    });
 </script>
 @endsection

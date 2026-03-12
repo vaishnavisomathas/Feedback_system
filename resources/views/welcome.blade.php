@@ -318,10 +318,23 @@ TABLE SECTION
 
 <span>Latest Complaints</span>
 
-<a href="{{ route('admin.complain.index') }}" 
-class="btn btn-sm btn-primary">
-View All
-</a>
+@php $role = auth()->user()->role; @endphp
+
+@if($role == 'Administrative Officer')
+    <a href="{{ route('admin.ao.index') }}" class="btn btn-sm btn-primary">
+        View All
+    </a>
+
+@elseif($role == 'Commissioner')
+    <a href="{{ route('admin.commissioner.index') }}" class="btn btn-sm btn-primary">
+        View All
+    </a>
+
+@else
+    <a href="{{ route('admin.complain.index') }}" class="btn btn-sm btn-primary">
+        View All
+    </a>
+@endif
 
 </div>
 
