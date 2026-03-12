@@ -47,7 +47,7 @@ Commissioner Complaints - PDMT
 
 <div class="container mt-4">
 
-    <h3 class="mb-4">Commissioner Complaints</h3>
+    <h3>Commissioner Complaints</h3>
 
     <div class="card shadow border-0">
 

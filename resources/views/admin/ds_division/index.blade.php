@@ -29,7 +29,7 @@ DS Divisions QR- PDMT
 </style>
 @section('content')
 <div class="container">
-    <h2 class="mb-4">DS Divisions</h2>
+    <h2 class="mb-1">DS Divisions</h2>
 
     <!-- Search Form -->
     <form method="GET" action="" class="mb-3 row g-2">
@@ -57,10 +57,9 @@ DS Divisions QR- PDMT
         </div>
         <div class="col-auto d-flex gap-2">
 
-
-            <a href="{{ url()->current() }}" class="btn btn-sm btn-danger">
-                <i class="bi bi-arrow-clockwise"></i>
-            </a>
+<a href="{{ url()->current() }}" class="btn btn-sm btn-danger d-flex align-items-center justify-content-center">
+    <i class="bi bi-arrow-clockwise"></i>
+</a>
         </div>
     </form>
 

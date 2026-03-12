@@ -30,7 +30,7 @@ Service Quality - PDMT
 
 <div class="container">
 
-    <h3 class="mb-3">Service Quality Management</h3>
+    <h3 class="mb-1">Service Quality Management</h3>
 
     @if(session('success'))
     <div class="alert alert-success">

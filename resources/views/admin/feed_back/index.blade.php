@@ -29,7 +29,7 @@ Counters Feedbacks - PDMT
 
 <div class="container">
 
-    <h2 class="mb-4">Counters Feedbacks</h2>
+    <h2 class="mb-1">Counters Feedbacks</h2>
 
 
     {{-- FILTER FORM --}}

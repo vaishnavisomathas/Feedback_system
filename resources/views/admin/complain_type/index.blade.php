@@ -29,7 +29,7 @@ Complaint Types - PDMT
 
 <div class="container">
 
-    <h3 class="mb-3">Complaint Types Management</h3>
+    <h3 class="mb-0">Complaint Types Management</h3>
 
     @if(session('success'))
     <div class="alert alert-success">

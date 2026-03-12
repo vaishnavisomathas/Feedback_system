@@ -33,7 +33,7 @@ Division- PDMT
 
 <div class="container">
 
-    <h2 class="mb-4">Division List</h2>
+    <h2 class="mb-1">Division List</h2>
 
     @if(session('success'))
     <div class="alert alert-success">

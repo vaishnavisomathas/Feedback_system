@@ -46,7 +46,7 @@ Administrative Officer Complaints- PDMT
 @section('content')
 <div class="container">
 
-    <h2 class="mb-4">Administrative Officer Complaints</h2>
+    <h2 class="mb-0">Administrative Officer Complaints</h2>
 
     <div class="d-flex justify-content-end mb-2">
         <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#filterBox">
