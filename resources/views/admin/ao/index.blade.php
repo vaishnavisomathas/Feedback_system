@@ -47,7 +47,9 @@ Administrative Officer Complaints- PDMT
 <div class="container">
 
     <h2 class="mb-0">Administrative Officer Complaints</h2>
+<div class="card shadow border-0">
 
+        <div class="card-body">
     <div class="d-flex justify-content-end mb-2">
         <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#filterBox">
             <i class="bi bi-funnel"></i> Filters <span id="arrow">▼</span>
@@ -250,24 +252,19 @@ Administrative Officer Complaints- PDMT
             </table>
 
             {{-- ✅ FIXED PAGINATION --}}
-            <div class="d-flex justify-content-end">
-                <form method="GET">
+               <div class="d-flex justify-content-end align-items-center">
+                <div class="col-md-2 p-0">
+                    <form method="GET">
 
-                    <input type="hidden" name="active_tab" value="{{ request('active_tab','pending') }}">
-                    <input type="hidden" name="counter" value="{{ request('counter') }}">
-                    <input type="hidden" name="status" value="{{ request('status') }}">
-                    <input type="hidden" name="from" value="{{ request('from') }}">
-                    <input type="hidden" name="to" value="{{ request('to') }}">
-
-                    <select name="per_page" class="form-control" onchange="this.form.submit()">
-                        @foreach([10,20,50,100] as $size)
-                        <option value="{{ $size }}" {{ request('per_page')==$size?'selected':'' }}>
-                            Page {{ $size }}
-                        </option>
-                        @endforeach
-                    </select>
-
-                </form>
+                        <select name="per_page" class="form-control" onchange="this.form.submit()">
+                            @foreach([10, 20, 50, 100] as $size)
+                            <option value="{{ $size }}" {{ request('per_page') == $size ? 'selected' : '' }}>
+                                Page {{ $size }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </form>
+                </div>
             </div>
 
         </div>
@@ -355,6 +352,8 @@ Administrative Officer Complaints- PDMT
         </div>
 
     </div>
+</div>
+</div>
 </div>
 @endsection
 

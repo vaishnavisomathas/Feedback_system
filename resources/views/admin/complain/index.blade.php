@@ -51,7 +51,9 @@ Complaints - PDMT
 <div class="container">
 
     <h2 class="mb-0">Complaint Management</h2>
+<div class="card shadow border-0">
 
+        <div class="card-body">
     @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
     @endif
@@ -477,6 +479,8 @@ Complaints - PDMT
         </div>
 
     </div>
+</div>
+</div>
 </div>
 @endsection
 @section('script')

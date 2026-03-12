@@ -30,23 +30,25 @@
       z-index: 1000;
     }
 
-    .brand-logos {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 15px 12px;
-    }
+  .brand-logos{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:15px 12px;
+}
 
-    .sidebar-logo {
-      width: 45px;
-      height: auto;
-    }
+.sidebar-logo{
+  width:45px;
+  height:45px;
+  border-radius:50%;
+  object-fit:cover;
+}
 
-    .sidebar-title {
-      font-size: 18px;
-      font-weight: 600;
-      margin: 0;
-    }
+.sidebar-title{
+  font-size:16px;
+  font-weight:600;
+  color:#111827;
+}
 
     /* SCROLL */
     .scroll-sidebars {
@@ -292,7 +294,7 @@ MOBILE
       <!-- LOGO -->
       <div class="brand-logos">
         <img src="{{ asset('assets/images/npc_logo.png') }}" class="sidebar-logo">
-        <h6 class="sidebar-title">Feedback System</h6>
+        <h6 class="sidebar-title">Feedback System PDMT-NP</h6>
       </div>
 
       <nav class="scroll-sidebars">
@@ -466,6 +468,9 @@ MOBILE
 
       <!-- TITLE -->
       <div class="fw-semibold">
+               <a href="#" data-bs-toggle="dropdown">
+            <img src="{{ asset('assets/images/pdmt_logo.png') }}" width="35" class="rounded-circle">
+          </a>
         <span>Welcome to {{ auth()->user()->name }} Dashboard!</span>
       </div>
 
@@ -527,14 +532,16 @@ MOBILE
 
         <!-- 👤 PROFILE / LOGOUT -->
         <div class="dropdown">
-          <a href="#" data-bs-toggle="dropdown">
-            <img src="{{ asset('assets/images/pdmt_logo.png') }}" width="35" class="rounded-circle">
-          </a>
+<a href="#" data-bs-toggle="dropdown"
+   class="d-flex align-items-center justify-content-center rounded-circle"
+   style="width:45px;height:45px;background:#e7f1ff;">
+    <i class="ti ti-user" style="font-size:22px;color:#0d6efd;"></i>
+</a>
 
           <div class="dropdown-menu dropdown-menu-end">
-            <a class="dropdown-item fw-semibold">
-              {{ auth()->user()->name }}
-            </a>
+           <a href="{{ route('users.show', auth()->user()->id) }}" class="dropdown-item fw-semibold">
+    {{ auth()->user()->name }}
+</a>
 
             <form method="POST" action="{{ route('logout') }}">
               @csrf
