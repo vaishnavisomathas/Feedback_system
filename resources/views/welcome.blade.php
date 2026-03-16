@@ -419,7 +419,40 @@ No complaints found
 <div class="card table-card shadow-sm">
 
 <div class="card-header table-header">
+
+<div class="row align-items-center">
+
+<div class="col-md-9">
 Top DS Divisions (Average Rating)
+</div>
+<div class="col-md-3">
+<form method="GET" class="d-flex">
+
+<select name="period" class="form-select form-select-sm"
+onchange="this.form.submit()">
+
+<option value="today" {{ request('period')=='today'?'selected':'' }}>
+Today
+</option>
+
+<option value="week" {{ request('period')=='week'?'selected':'' }}>
+This Week
+</option>
+
+<option value="month" {{ request('period')=='month'?'selected':'' }}>
+This Month
+</option>
+
+<option value="year" {{ request('period')=='year'?'selected':'' }}>
+This Year
+</option>
+
+</select>
+
+</form>
+
+</div>
+</div>
 </div>
 
 <div class="table-responsive">

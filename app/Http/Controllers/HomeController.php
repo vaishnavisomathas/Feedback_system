@@ -68,15 +68,36 @@ $pending = \App\Models\Feedback::where('status', 'pending')
             ->count();    
             $ao = \App\Models\Feedback::where('status','ao')->count();
     $commissioner = \App\Models\Feedback::where('status','commissioner')->count();
- $topDivisions = Feedback::select(
-            'counter_id',
-            DB::raw('AVG(rating) as avg_rating')
-        )
-        ->with('counter')
-        ->groupBy('counter_id')
-        ->orderByDesc('avg_rating')
-        ->limit(5)
-        ->get();
+$period = request('period','today');
+
+$query = Feedback::query();
+
+if($period == 'today'){
+    $query->whereDate('created_at', today());
+}
+
+elseif($period == 'week'){
+    $query->whereBetween('created_at', [
+        now()->startOfWeek(),
+        now()->endOfWeek()
+    ]);
+}
+
+elseif($period == 'month'){
+    $query->whereMonth('created_at', now()->month);
+}
+
+elseif($period == 'year'){
+    $query->whereYear('created_at', now()->year);
+}
+
+$topDivisions = $query
+->selectRaw('counter_id, AVG(rating) as avg_rating')
+->groupBy('counter_id')
+->orderByDesc('avg_rating')
+->with('counter')
+->take(5)
+->get();
         return view('welcome', compact(
             'totalRatings',
             'todayRatings',
