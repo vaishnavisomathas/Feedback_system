@@ -20,6 +20,9 @@
     @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
     @endif
+    @if(session('warning'))
+    <div class="alert alert-warning">{{ session('warning') }}</div>
+    @endif
 
     <!-- Create / Edit Modal -->
     <div class="modal fade" id="userModal" tabindex="-1" aria-hidden="true">
@@ -71,10 +74,10 @@
                             <label>Phone</label>
                             <input type="text" name="phone" id="phone" class="form-control" required>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label>Password</label>
-                            <input type="password" name="password" id="password" class="form-control"
-                                placeholder="Enter password">
+                        <div class="col-md-12 mb-3">
+                            <div class="alert alert-info mb-0">
+                                Temporary password will be auto-generated as <strong>pdmt@001, pdmt@002, ...</strong> and emailed to the user.
+                            </div>
                         </div>
 
 
@@ -83,6 +86,30 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary" id="saveBtn">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Modal -->
+    <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="POST" id="deleteUserForm">
+                @csrf
+                @method('DELETE')
+
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirm Delete</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="mb-0">Are you sure you want to delete <strong id="deleteUserName">this user</strong>?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger">Delete</button>
                     </div>
                 </div>
             </form>
@@ -115,7 +142,17 @@
                         <td>{{ $user->name }}</td>
                         <td>{{ $user->dob }}</td>
                         <td>{{ $user->nic_number }}</td>
-                        <td>{{ ucfirst($user->role) }}</td>
+                        <td>
+                            @if(strtolower($user->role) === 'admin')
+                                <span class="badge bg-danger">{{ ucfirst($user->role) }}</span>
+                            @elseif(strtolower($user->role) === 'commissioner')
+                                <span class="badge bg-warning text-dark">{{ ucfirst($user->role) }}</span>
+                            @elseif(strtolower($user->role) === 'administrative officer')
+                                <span class="badge bg-info">{{ ucfirst($user->role) }}</span>
+                            @else
+                                <span class="badge bg-secondary">{{ ucfirst($user->role) }}</span>
+                            @endif
+                        </td>
                         <td>{{ $user->email }}</td>
                         <td>{{ $user->phone }}</td>
                         <td>
@@ -135,16 +172,12 @@
                                 <i class="bi bi-pencil-square"></i>
                             </button>
 
-                            <form action="{{ route('users.destroy', $user->id) }}"
-                                method="POST" class="d-inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit"
-                                    class="btn btn-sm btn-danger"
-                                    onclick="return confirm('Are you sure?')">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </form>
+                            <button type="button"
+                                class="btn btn-sm btn-danger deleteBtn"
+                                data-id="{{ $user->id }}"
+                                data-name="{{ $user->name }}">
+                                <i class="bi bi-trash"></i>
+                            </button>
                         </td>
 
                     </tr>
@@ -165,7 +198,9 @@
     document.addEventListener('DOMContentLoaded', function() {
 
         let modal = new bootstrap.Modal(document.getElementById('userModal'));
+        let deleteModal = new bootstrap.Modal(document.getElementById('deleteUserModal'));
         let form = document.getElementById('userForm');
+        let deleteForm = document.getElementById('deleteUserForm');
 
         // Create
         document.getElementById('createUserBtn').addEventListener('click', function() {
@@ -194,6 +229,18 @@
                 document.getElementById('phone').value = btn.dataset.phone;
 
                 modal.show();
+            });
+        });
+
+        // Delete
+        document.querySelectorAll('.deleteBtn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                let id = btn.dataset.id;
+                let name = btn.dataset.name;
+
+                deleteForm.action = '/users/' + id;
+                document.getElementById('deleteUserName').innerText = name;
+                deleteModal.show();
             });
         });
 

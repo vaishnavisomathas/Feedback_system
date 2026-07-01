@@ -5,14 +5,24 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
     public function index()
 {
-    $users = User::latest()->get();
-       $roles = Role::all();
+    $authRole = auth()->user()->role;
+    
+    // Admin sees all users, Commissioner doesn't see Admin users
+    if ($authRole === 'admin') {
+        $users = User::latest()->get();
+    } else {
+        $users = User::where('role', '!=', 'admin')->latest()->get();
+    }
+    
+    $roles = Role::all();
     return view('admin.user.index', compact('users','roles'));
 }
 
@@ -22,20 +32,46 @@ class UserController extends Controller
         'name' => 'required',
         'email' => 'required|email|unique:users',
         'role' => 'required|string',
-          'password' => 'required|string|min:6',
     ]);
 
-    User::create([
+    $nextPasswordCode = (User::max('temp_password_code') ?? 0) + 1;
+    $defaultPassword = 'pdmt@' . str_pad((string) $nextPasswordCode, 3, '0', STR_PAD_LEFT);
+
+    $user = User::create([
         'name' => $request->name,
         'email' => $request->email,
-'password' => Hash::make($request->password),
+        'password' => Hash::make($defaultPassword),
         'dob' => $request->dob,
         'nic_number' => $request->nic_number,
         'role' => $request->role,
         'phone' => $request->phone,
+        'must_change_password' => true,
+        'temp_password_code' => $nextPasswordCode,
     ]);
 
-    return back()->with('success', 'User created successfully');
+    try {
+        Mail::raw(
+            "Hello {$user->name},\n\n" .
+            "Your account has been created for PDMT Feedback System.\n" .
+            "Login Email: {$user->email}\n" .
+            "Temporary Password: {$defaultPassword}\n\n" .
+            "Please login and change your password immediately.",
+            function ($message) use ($user) {
+                $message->to($user->email)
+                    ->subject('PDMT Account Created - Temporary Password');
+            }
+        );
+    } catch (\Throwable $e) {
+        Log::error('User created but email send failed', [
+            'user_id' => $user->id,
+            'email' => $user->email,
+            'error' => $e->getMessage(),
+        ]);
+
+        return back()->with('warning', "User created successfully. Email could not be sent. Temporary password: {$defaultPassword}");
+    }
+
+    return back()->with('success', 'User created successfully and login details sent by email.');
 }
 public function show($id)
 {

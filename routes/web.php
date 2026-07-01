@@ -39,7 +39,7 @@ Route::get('/feedback/{division}/{counter}', [FeedbackController::class, 'show']
 Route::post('feedback/store', [FeedbackController::class, 'store'])->name('feedback.store');
 Route::view('/thank-you', 'thankyou')->name('feedback.thankyou');
 Route::view('/closed', 'closed')->name('feedback.closed');
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'force.password.change'])->group(function () {
     Route::post('/admin/feedback/forward/{id}', [FeedbackController::class, 'forwardFeedback'])->name('admin.feedback.forward');
 
     Route::post('/admin/feedback/{feedback}/forward', [FeedbackController::class, 'forwardFeedback'])
@@ -109,4 +109,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/service-quality', [ServiceQualityController::class, 'store'])->name('service.quality.store');
     Route::put('/service-quality/{id}', [ServiceQualityController::class, 'update'])->name('service.quality.update');
     Route::delete('/service-quality/{id}', [ServiceQualityController::class, 'destroy'])->name('service.quality.destroy');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/change-password', [AuthController::class, 'showChangePasswordForm'])
+        ->name('password.change.form');
+    Route::post('/change-password', [AuthController::class, 'updatePassword'])
+        ->name('password.change.update');
 });

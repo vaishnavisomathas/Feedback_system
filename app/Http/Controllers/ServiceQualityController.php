@@ -10,9 +10,10 @@ class ServiceQualityController extends Controller
     /**
      * Display a listing of the resource.
      */
-     public function index()
+     public function index(Request $request)
     {
-        $qualities = ServiceQuality::latest()->paginate(10);
+        $perPage = $request->get('per_page', 10);
+        $qualities = ServiceQuality::latest()->paginate($perPage);
         return view('admin.service_quality.index',compact('qualities'));
     }
 
