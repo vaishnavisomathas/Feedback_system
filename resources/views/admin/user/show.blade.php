@@ -30,6 +30,22 @@ font-size:14px;
 
         <div class="card-body">
 
+            @if(session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if($errors->any())
+                <div class="alert alert-danger">
+                    <ul class="mb-0 ps-3">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <div class="row mb-3">
                 <div class="col-md-6">
                     <strong>Name:</strong>
@@ -61,6 +77,51 @@ font-size:14px;
                     <p>{{ $user->phone }}</p>
                 </div>
             </div>
+
+            @if(auth()->id() === $user->id)
+                <hr>
+                <h5 class="mb-3">Change Password</h5>
+
+                <form method="POST" action="{{ route('users.change-password', $user->id) }}" class="row g-3 mb-3">
+                    @csrf
+                    <div class="col-md-6">
+                        <label for="current_password" class="form-label">Current Password</label>
+                        <input
+                            type="password"
+                            id="current_password"
+                            name="current_password"
+                            class="form-control @error('current_password') is-invalid @enderror"
+                            required
+                        >
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="password" class="form-label">New Password</label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            class="form-control @error('password') is-invalid @enderror"
+                            required
+                        >
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="password_confirmation" class="form-label">Confirm New Password</label>
+                        <input
+                            type="password"
+                            id="password_confirmation"
+                            name="password_confirmation"
+                            class="form-control"
+                            required
+                        >
+                    </div>
+
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">Update Password</button>
+                    </div>
+                </form>
+            @endif
 
             <a href="{{ route('users.index') }}" class="btn btn-secondary">
                 Back

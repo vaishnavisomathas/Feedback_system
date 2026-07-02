@@ -77,6 +77,8 @@ Route::middleware(['auth', 'force.password.change'])->group(function () {
 
 
     Route::resource('users', UserController::class);
+    Route::post('users/{id}/change-password', [UserController::class, 'changePassword'])
+        ->name('users.change-password');
 
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);

@@ -79,6 +79,26 @@ public function show($id)
     return view('admin.user.show', compact('user'));
 }
 
+public function changePassword(Request $request, $id)
+{
+    $user = User::findOrFail($id);
+
+    if ((int) auth()->id() !== (int) $user->id) {
+        abort(403, 'You can only change your own password.');
+    }
+
+    $request->validate([
+        'current_password' => ['required', 'current_password'],
+        'password' => ['required', 'string', 'min:8', 'confirmed', 'different:current_password'],
+    ]);
+
+    $user->password = Hash::make($request->password);
+    $user->must_change_password = false;
+    $user->save();
+
+    return back()->with('success', 'Password changed successfully.');
+}
+
 public function update(Request $request, $id)
 {
     $user = User::findOrFail($id);

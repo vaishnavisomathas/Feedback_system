@@ -59,7 +59,9 @@
                             <select name="role" id="role" class="form-control" required>
                                 <option value="" disabled selected>Select a role</option>
                                 @foreach($roles as $r)
+                                @if(!in_array(strtolower($r->name), ['admin']))
                                 <option value="{{ $r->name }}">{{ ucfirst($r->name) }}</option>
+                                @endif
                                 @endforeach
                             </select>
                         </div>
