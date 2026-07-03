@@ -180,6 +180,12 @@
 
             </div>
             <div class="mb-2">
+              <label>Email (Optional)</label>
+              <input type="email" class="form-control" name="complaint_email" placeholder="you@example.com" value="{{ old('complaint_email') }}">
+              <small class="text-muted">Ungaludaiya email kuduthaal, complaint thodarbaga ungalai thodarbu kollalaam.</small>
+              @error('complaint_email') <small class="text-danger">{{ $message }}</small> @enderror
+            </div>
+            <div class="mb-2">
               <label>Vehicle Number</label>
               <input type="text" class="form-control text-uppercase" name="vehicle_number" placeholder="CAH-9891/7-652" value="{{ old('vehicle_number') }}" maxlength="12" >
                           @error('vehicle_number') <small class="text-danger">{{ $message }}</small> @enderror
@@ -251,7 +257,9 @@ checkbox.addEventListener('change', function () {
 @endif
 
 
-@if($errors->has('phone') || $errors->has('vehicle_number') || $errors->has('note'))
+@if($errors->has('phone') || $errors->has('complaint_email') || $errors->has('vehicle_number') || $errors->has('note'))
+  complaintBox.style.display = 'block';
+  hiddenInput.value = 'yes';
     complaintBox.scrollIntoView({ behavior: 'smooth' });
 @endif
 

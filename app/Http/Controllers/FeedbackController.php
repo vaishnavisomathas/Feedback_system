@@ -64,28 +64,23 @@ $phone = $request->phone;
 if ($phone) {
     $phone = preg_replace('/[^0-9]/', '', $phone);
 
-    // If starts with 0 → convert to 94
-    if (str_starts_with($phone, '0')) {
-        $phone = '94' . substr($phone, 1);
+    // Keep local format (07XXXXXXXX) to match current DB size and form input.
+    if (!str_starts_with($phone, '0')) {
+        $phone = '0' . ltrim($phone, '0');
     }
 
-    elseif (str_starts_with($phone, '94')) {
-        // do nothing
-    }
-
-    else {
-        $phone = '94' . $phone;
-    }
-
-    $phone = substr($phone, 0, 11);
+    $phone = substr($phone, 0, 10);
 }
+
+$request->merge(['phone' => $phone]);
 
         $request->validate([
                   'counter_id'       => 'required|exists:counters,id',
             'rating'           => 'required|integer|min:1|max:5',
 // 'service_quality_id'  => 'required|exists:service_qualities,id',
             'has_complaint'    => 'required|in:yes,no',
-'phone' => 'nullable|required_if:has_complaint,yes|digits:10',
+'phone' => 'nullable|required_if:has_complaint,yes|regex:/^0[0-9]{9}$/',
+'complaint_email' => 'nullable|email|max:255',
 'vehicle_number' => 'nullable|string|max:12|required_if:has_complaint,yes',
 'note' => 'nullable|required_if:has_complaint,yes|max:500',
               
@@ -98,6 +93,7 @@ if ($phone) {
 'service_quality_id' => $request->service_quality_id,
             'has_complaint'   => $request->has_complaint,
 'phone'          => $phone,
+            'complaint_email' => $request->complaint_email,
             'vehicle_number'  => $request->vehicle_number,
             'note'            => $request->note,
             'user_id'         => auth()->id(),

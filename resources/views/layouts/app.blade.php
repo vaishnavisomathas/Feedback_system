@@ -312,10 +312,29 @@ MOBILE
             </a>
           </li>
           @auth
-          @php $role = auth()->user()->role; @endphp
+          @php
+          $role = trim((string) auth()->user()->role);
+          $roleLower = strtolower($role);
+
+          $isSuperAdmin = $roleLower === 'super admin';
+          $isAdmin = $roleLower === 'admin';
+          $isCommissioner = $roleLower === 'commissioner';
+          $isAdministrativeOfficer = $roleLower === 'administrative officer';
+          $isUser = $roleLower === 'user';
+
+          // Requested sidebar mapping by role.
+          $showDivisionList = true;
+          $showDivisionQr = true;
+          $showFeedback = true;
+          $showComplaintList = $isSuperAdmin || $isAdmin || $isUser;
+          $showManualComplaintEntry = $isSuperAdmin || $isAdmin || $isUser || $isAdministrativeOfficer;
+          $showAoManagement = $isSuperAdmin || $isAdmin || $isAdministrativeOfficer;
+          $showCommissioner = $isSuperAdmin || $isAdmin || $isCommissioner;
+          $showUsers = $isSuperAdmin || $isAdmin;
+          @endphp
 
           <!-- DS DIVISIONS -->
-          @if($role != 'Administrative Officer' && $role != 'User')
+          @if($showDivisionList)
 
           <li class="nav-small-cap">
             <span>DS Divisions</span>
@@ -329,6 +348,7 @@ MOBILE
           </li>
           @endif
           <!-- QR -->
+          @if($showDivisionQr)
           <li class="nav-small-cap">
             <span>DS Division QR</span>
           </li>
@@ -339,8 +359,10 @@ MOBILE
               <span>Division QR</span>
             </a>
           </li>
+          @endif
 
           <!-- FEEDBACK -->
+          @if($showFeedback)
           <li class="nav-small-cap">
             <span>Feedback</span>
           </li>
@@ -351,14 +373,18 @@ MOBILE
               <span>Feedback</span>
             </a>
           </li>
+          @endif
+
+      
 
 
           <!-- COMPLAINT -->
-          @if($role != 'Commissioner' && $role != 'Administrative Officer')
+          @if($showComplaintList || $showManualComplaintEntry)
           <li class="nav-small-cap">
             <span>Complaint</span>
           </li>
 
+          @if($showComplaintList)
           <li class="sidebar-item {{ request()->routeIs('admin.complain.*') ? 'active' : '' }}">
             <a class="sidebar-link" href="{{ route('admin.complain.index') }}">
               <i class="ti ti-alert-circle"></i>
@@ -367,8 +393,18 @@ MOBILE
           </li>
           @endif
 
+          @if($showManualComplaintEntry)
+          <li class="sidebar-item {{ request()->routeIs('admin.manual-complaints.*') ? 'active' : '' }}">
+            <a class="sidebar-link" href="{{ route('admin.manual-complaints.index') }}">
+              <i class="ti ti-file-description"></i>
+              <span>Manual Complaints</span>
+            </a>
+          </li>
+          @endif
+          @endif
+
           <!-- AO -->
-          @if($role != 'Commissioner' && $role != 'User')
+          @if($showAoManagement)
           <li class="nav-small-cap">
             <span>A/O</span>
           </li>
@@ -379,10 +415,17 @@ MOBILE
               <span>A/O Management</span>
             </a>
           </li>
+
+          <li class="sidebar-item {{ request()->routeIs('admin.manual-complaints.ao.*') ? 'active' : '' }}">
+            <a class="sidebar-link" href="{{ route('admin.manual-complaints.ao.index') }}">
+              <i class="ti ti-clipboard-check"></i>
+              <span>Manual A/O</span>
+            </a>
+          </li>
           @endif
 
           <!-- COMMISSIONER -->
-          @if($role != 'Administrative Officer' && $role != 'User')
+          @if($showCommissioner)
           <li class="nav-small-cap">
             <span>Commissioner</span>
           </li>
@@ -393,10 +436,17 @@ MOBILE
               <span>Commissioner</span>
             </a>
           </li>
+
+          <li class="sidebar-item {{ request()->routeIs('admin.manual-complaints.commissioner.*') ? 'active' : '' }}">
+            <a class="sidebar-link" href="{{ route('admin.manual-complaints.commissioner.index') }}">
+              <i class="ti ti-file-text"></i>
+              <span>Manual Commissioner</span>
+            </a>
+          </li>
           @endif
 
           <!-- USER MANAGEMENT -->
-          @if($role != 'Administrative Officer' && $role != 'User')
+          @if($showUsers)
           <li class="nav-small-cap">
             <span>User Management</span>
           </li>
@@ -408,7 +458,19 @@ MOBILE
             </a>
           </li>
 
+    <!-- REPORT -->
+          @if($showFeedback)
+          <li class="nav-small-cap">
+            <span>Report</span>
+          </li>
 
+          <li class="sidebar-item {{ request()->routeIs('reports.rating-points') ? 'active' : '' }}">
+            <a class="sidebar-link" href="{{ route('reports.rating-points') }}">
+              <i class="ti ti-chart-bar"></i>
+              <span>Rating Report</span>
+            </a>
+          </li>
+          @endif
 
           <!-- SETTINGS -->
           <li class="nav-small-cap">
@@ -428,8 +490,15 @@ MOBILE
               <span>Service Quality</span>
             </a>
           </li>
+
+          <li class="sidebar-item {{ request()->routeIs('manual-complaint-sources.*') ? 'active' : '' }}">
+            <a class="sidebar-link" href="{{ route('manual-complaint-sources.index') }}">
+              <i class="ti ti-adjustments"></i>
+              <span>Manual Source Settings</span>
+            </a>
+          </li>
           @endif
-          @if($role != 'Administrative Officer' && $role != 'User' && $role != 'Commissioner')
+          @if($isSuperAdmin)
           <li class="sidebar-item {{ request()->routeIs('roles.*') ? 'active' : '' }}">
             <a class="sidebar-link" href="{{ route('roles.index') }}">
               <i class="ti ti-user"></i>

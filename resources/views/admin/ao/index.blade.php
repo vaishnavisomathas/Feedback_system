@@ -160,6 +160,7 @@ Administrative Officer Complaints- PDMT
                         <th>Counter</th>
                         <th>Vehicle</th>
                         <th>Phone</th>
+                        <th>Email</th>
                         <th>Service Quality</th>
                         <th>Rating</th>
                         <th>Date</th>
@@ -179,6 +180,7 @@ Administrative Officer Complaints- PDMT
                         <td>{{ $rating->counter->counter_name ?? '-' }}</td>
                         <td>{{ $rating->vehicle_number }}</td>
                         <td>{{ $rating->phone }}</td>
+                        <td>{{ $rating->complaint_email ?? '-' }}</td>
                         <td>{{ $rating->serviceQuality->name ?? '-' }}</td>
                         <td>{{ ['','Bad','Poor','Average','Good','Excellent'][$rating->rating] ?? 'N/A' }}</td>
                         <td>{{ $rating->created_at->format('d M Y') }}</td>
@@ -193,7 +195,7 @@ Administrative Officer Complaints- PDMT
                     <tr class="collapse bg-light"
                         id="complaint{{ $rating->id }}"
                         data-bs-parent="#pendingaoAccordion">
-                        <td colspan="9">
+                        <td colspan="10">
 
                             <div class="card shadow-sm border-secondary mb-2">
                                 <div class="card-body p-2">
@@ -207,6 +209,10 @@ Administrative Officer Complaints- PDMT
                                         <div class="col-md-6 mb-2">
                                             <strong>Phone:</strong>
                                             <p>{{ $rating->phone }}</p>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <strong>Email:</strong>
+                                            <p>{{ $rating->complaint_email ?? '-' }}</p>
                                         </div>
                                         <div class="col-md-6 mb-2">
                                             <strong>Complaint:</strong>
@@ -245,7 +251,7 @@ Administrative Officer Complaints- PDMT
 
                     @empty
                     <tr>
-                        <td colspan="9" class="text-center">No complaints at Administrative Officer</td>
+                        <td colspan="10" class="text-center">No complaints at Administrative Officer</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -281,6 +287,7 @@ Administrative Officer Complaints- PDMT
                         <th>Counter</th>
                         <th>Vehicle</th>
                         <th>Phone</th>
+                        <th>Email</th>
                         <th>Service Quality</th>
                         <th>Rating</th>
                         <th>Date</th>
@@ -300,6 +307,7 @@ Administrative Officer Complaints- PDMT
                         <td>{{ $c->counter->counter_name ?? '-' }}</td>
                         <td>{{ $c->vehicle_number }}</td>
                         <td>{{ $c->phone }}</td>
+                        <td>{{ $c->complaint_email ?? '-' }}</td>
                         <td>{{ $c->serviceQuality->name ?? '-' }}</td>
                         <td>{{ ['','Bad','Poor','Average','Good','Excellent'][$c->rating] ?? 'N/A' }}</td>
                         <td>{{ $c->updated_at->format('d M Y') }}</td>
@@ -321,13 +329,14 @@ Administrative Officer Complaints- PDMT
                         id="closed{{ $c->id }}"
                         data-bs-parent="#closedaoAccordion">
 
-                        <td colspan="9">
+                        <td colspan="10">
 
                             <div class="card shadow-sm border-secondary mb-2">
                                 <div class="card-body p-2">
 
                                     <p><strong>Vehicle:</strong> {{ $c->vehicle_number }}</p>
                                     <p><strong>Phone:</strong> {{ $c->phone }}</p>
+                                        <p><strong>Email:</strong> {{ $c->complaint_email ?? '-' }}</p>
                                     <p><strong>Complaint:</strong> {{ $c->note }}</p>
                                     <p><strong>Complaint Type:</strong><span class="badge bg-warning text-dark">
                                             {{ $c->complainType->name ?? '-' }}</span></p>
@@ -343,7 +352,7 @@ Administrative Officer Complaints- PDMT
 
                     @empty
                     <tr>
-                        <td colspan="9" class="text-center">No completed complaints</td>
+                        <td colspan="10" class="text-center">No completed complaints</td>
                     </tr>
                     @endforelse
                 </tbody>

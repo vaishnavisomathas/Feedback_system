@@ -15,6 +15,7 @@ class Feedback extends Model
         'service_quality_id',
         'has_complaint',
         'phone',
+        'complaint_email',
         'vehicle_number',
         'note',
          'complain_type_id', 

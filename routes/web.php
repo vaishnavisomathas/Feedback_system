@@ -7,6 +7,8 @@ use App\Http\Controllers\CounterController;
 use App\Http\Controllers\DsDivisionController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ManualComplaintController;
+use App\Http\Controllers\ManualComplaintSourceController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PermissionGroupController;
@@ -48,6 +50,8 @@ Route::middleware(['auth', 'force.password.change'])->group(function () {
 
     Route::get('/dashboard', [HomeController::class, 'index'])
         ->name('dashboard');
+    Route::get('/reports/rating-points', [HomeController::class, 'ratingPointsReport'])
+        ->name('reports.rating-points');
     Route::get('counters/create', [CounterController::class, 'create'])->name('counters.create');
 
     Route::get('counters', [CounterController::class, 'index'])->name('counters.index');
@@ -100,6 +104,36 @@ Route::middleware(['auth', 'force.password.change'])->group(function () {
 
     Route::get('/commissioner/complaints', [ComplaintController::class, 'commissionerIndex'])->name('admin.commissioner.index');
     Route::post('/commissioner/close/{id}', [ComplaintController::class, 'commissionerClose'])->name('admin.commissioner.close');
+
+    Route::get('/admin/manual-complaints', [ManualComplaintController::class, 'index'])
+        ->name('admin.manual-complaints.index');
+    Route::post('/admin/manual-complaints', [ManualComplaintController::class, 'store'])
+        ->name('admin.manual-complaints.store');
+    Route::put('/admin/manual-complaints/{manualComplaint}', [ManualComplaintController::class, 'update'])
+        ->name('admin.manual-complaints.update');
+    Route::delete('/admin/manual-complaints/{manualComplaint}', [ManualComplaintController::class, 'destroy'])
+        ->name('admin.manual-complaints.destroy');
+    Route::post('/admin/manual-complaints/{manualComplaint}/forward-ao', [ManualComplaintController::class, 'forwardToAO'])
+        ->name('admin.manual-complaints.forward-ao');
+
+    Route::get('/admin/manual-ao-complaints', [ManualComplaintController::class, 'aoIndex'])
+        ->name('admin.manual-complaints.ao.index');
+    Route::post('/admin/manual-ao-complaints/{manualComplaint}/save', [ManualComplaintController::class, 'aoSave'])
+        ->name('admin.manual-complaints.ao.save');
+
+    Route::get('/admin/manual-commissioner-complaints', [ManualComplaintController::class, 'commissionerIndex'])
+        ->name('admin.manual-complaints.commissioner.index');
+    Route::post('/admin/manual-commissioner-complaints/{manualComplaint}/close', [ManualComplaintController::class, 'commissionerClose'])
+        ->name('admin.manual-complaints.commissioner.close');
+
+    Route::get('/manual-complaint-sources', [ManualComplaintSourceController::class, 'index'])
+        ->name('manual-complaint-sources.index');
+    Route::post('/manual-complaint-sources', [ManualComplaintSourceController::class, 'store'])
+        ->name('manual-complaint-sources.store');
+    Route::put('/manual-complaint-sources/{manualComplaintSource}', [ManualComplaintSourceController::class, 'update'])
+        ->name('manual-complaint-sources.update');
+    Route::delete('/manual-complaint-sources/{manualComplaintSource}', [ManualComplaintSourceController::class, 'destroy'])
+        ->name('manual-complaint-sources.destroy');
 
     //complain type
     Route::get('/complain-types', [ComplainTypeController::class, 'index'])->name('complain.types.index');

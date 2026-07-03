@@ -59,7 +59,7 @@
                             <select name="role" id="role" class="form-control" required>
                                 <option value="" disabled selected>Select a role</option>
                                 @foreach($roles as $r)
-                                @if(!in_array(strtolower($r->name), ['admin']))
+                                @if(!in_array(strtolower($r->name), ['super admin']))
                                 <option value="{{ $r->name }}">{{ ucfirst($r->name) }}</option>
                                 @endif
                                 @endforeach
@@ -78,7 +78,7 @@
                         </div>
                         <div class="col-md-12 mb-3">
                             <div class="alert alert-info mb-0">
-                                Temporary password will be auto-generated as <strong>pdmt@001, pdmt@002, ...</strong> and emailed to the user.
+                                Temporary password will be auto-generated as and emailed to the user.
                             </div>
                         </div>
 

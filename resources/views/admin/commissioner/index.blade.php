@@ -240,6 +240,7 @@ Commissioner Complaints - PDMT
                                 <th>Counter</th>
                                 <th>Vehicle</th>
                                 <th>Phone</th>
+                                <th>Email</th>
                                 <th>Service Quality</th>
                                 <th>Rating</th>
                                 <th>Date</th>
@@ -267,6 +268,8 @@ Commissioner Complaints - PDMT
                                 <td>{{ $c->vehicle_number }}</td>
 
                                 <td>{{ $c->phone }}</td>
+
+                                <td>{{ $c->complaint_email ?? '-' }}</td>
 
                                 <td>{{ $c->serviceQuality->name ?? '-' }}</td>
 
@@ -329,6 +332,12 @@ Commissioner Complaints - PDMT
 
                                                     <strong>Phone:-</strong>
                                                     {{ $c->phone }}
+
+                                                </div>
+                                                <div class="col-md-6 mb-2">
+
+                                                    <strong>Email:-</strong>
+                                                    {{ $c->complaint_email ?? '-' }}
 
                                                 </div>
                                                 <div class="col-md-6 mb-2">
@@ -398,7 +407,7 @@ Commissioner Complaints - PDMT
 
                             <tr>
 
-                                <td colspan="9"
+                                <td colspan="10"
                                     class="text-center">
 
                                     No complaints pending
@@ -445,6 +454,7 @@ Commissioner Complaints - PDMT
                                 <th>Counter</th>
                                 <th>Vehicle</th>
                                 <th>Phone</th>
+                                <th>Email</th>
                                 <th>Rating</th>
                                 <th>Date Closed</th>
                                 <th>Status</th>
@@ -471,6 +481,8 @@ Commissioner Complaints - PDMT
                                 <td>{{ $c->vehicle_number }}</td>
 
                                 <td>{{ $c->phone }}</td>
+
+                                <td>{{ $c->complaint_email ?? '-' }}</td>
 
                                 <td>
 
@@ -536,6 +548,12 @@ Commissioner Complaints - PDMT
                                                 </div>
                                                 <div class="col-md-6 mb-2">
 
+                                                    <strong>Email:-</strong>
+                                                    {{ $c->complaint_email ?? '-' }}
+
+                                                </div>
+                                                <div class="col-md-6 mb-2">
+
                                                     <strong>Complaint:</strong> {{ $c->note }}
 
 
@@ -587,7 +605,7 @@ Commissioner Complaints - PDMT
 
                             <tr>
 
-                                <td colspan="8"
+                                <td colspan="9"
                                     class="text-center">
 
                                     No completed complaints

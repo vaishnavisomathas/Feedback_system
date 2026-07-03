@@ -110,5 +110,79 @@ $topDivisions = $query
             'pending','ao','commissioner'
         ));
     }
+
+    public function ratingPointsReport(Request $request)
+    {
+        $period = $request->get('period', 'today');
+        $selectedMonth = $request->get('month', now()->format('Y-m'));
+        $selectedYear = (int) $request->get('year', now()->year);
+        $selectedDivision = $request->get('division');
+        $perPage = (int) $request->get('per_page', 20);
+
+        if (!in_array($perPage, [10, 20, 50, 100], true)) {
+            $perPage = 20;
+        }
+
+        $baseQuery = Feedback::query()->whereNotNull('counter_id');
+
+        if ($period === 'month') {
+            try {
+                $monthDate = Carbon::createFromFormat('Y-m', $selectedMonth);
+            } catch (\Throwable $e) {
+                $monthDate = now();
+                $selectedMonth = $monthDate->format('Y-m');
+            }
+
+            $baseQuery->whereYear('created_at', $monthDate->year)
+                ->whereMonth('created_at', $monthDate->month);
+        } elseif ($period === 'year') {
+            if ($selectedYear < 2000 || $selectedYear > 2100) {
+                $selectedYear = (int) now()->year;
+            }
+
+            $baseQuery->whereYear('created_at', $selectedYear);
+        } else {
+            $period = 'today';
+            $baseQuery->whereDate('created_at', now());
+        }
+
+        if (!empty($selectedDivision)) {
+            $baseQuery->whereHas('counter', function ($query) use ($selectedDivision) {
+                $query->where('division_name', $selectedDivision);
+            });
+        }
+
+        $rankingQuery = (clone $baseQuery)
+            ->select(
+                'counter_id',
+                DB::raw('COUNT(*) as total'),
+                DB::raw('AVG(rating) as avg_rating')
+            )
+            ->groupBy('counter_id')
+            ->with('counter')
+            ->orderByDesc('total');
+
+        $ranking = (clone $rankingQuery)
+            ->paginate($perPage)
+            ->appends($request->query());
+
+        $highest = (clone $rankingQuery)->first();
+        $divisions = Counter::select('division_name')
+            ->whereNotNull('division_name')
+            ->distinct()
+            ->orderBy('division_name')
+            ->pluck('division_name');
+
+        return view('reports.rating_points', compact(
+            'ranking',
+            'highest',
+            'period',
+            'selectedMonth',
+            'selectedYear',
+            'selectedDivision',
+            'perPage',
+            'divisions'
+        ));
     }
+}
 

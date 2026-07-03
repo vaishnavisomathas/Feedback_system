@@ -190,6 +190,7 @@ Complaints - PDMT
                         <th>Counter</th>
                         <th>Vehicle</th>
                         <th>Phone</th>
+                        <th>Email</th>
                         <th>Service Quality</th>
                         <th>Rating</th>
                         <th>Date</th>
@@ -213,6 +214,7 @@ Complaints - PDMT
                         <td> {{ $rating->counter->counter_name ?? '-' }}</td>
                         <td>{{ $rating->vehicle_number }}</td>
                         <td>{{ $rating->phone }}</td>
+                        <td>{{ $rating->complaint_email ?? '-' }}</td>
                         <td>{{ $rating->serviceQuality->name ?? '-' }}</td>
 
 
@@ -249,7 +251,7 @@ Complaints - PDMT
                     <tr class="collapse bg-light"
                         id="complaint{{ $rating->id }}"
                         data-bs-parent="#pendingAccordion">
-                        <td colspan="9">
+                        <td colspan="10">
                             <div class="card shadow-sm border-secondary mb-2">
                                 <div class="card-body p-3">
                                     <div class="row">
@@ -260,6 +262,10 @@ Complaints - PDMT
                                         <div class="col-md-6 mb-2">
                                             <strong>Phone:</strong>
                                             <p class="mb-0">{{ $rating->phone ?? '-' }}</p>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <strong>Email:</strong>
+                                            <p class="mb-0">{{ $rating->complaint_email ?? '-' }}</p>
                                         </div>
                                         <div class="col-md-6 mb-2">
                                             <strong>Complaint:</strong>
@@ -300,7 +306,7 @@ Complaints - PDMT
 
                     @empty
                     <tr>
-                        <td colspan="9" class="text-center">No complaints</td>
+                        <td colspan="10" class="text-center">No complaints</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -333,6 +339,7 @@ Complaints - PDMT
                         <th>Counter</th>
                         <th>Vehicle</th>
                         <th>Phone</th>
+                        <th>Email</th>
                         <th>Service Quality</th>
                         <th>Rating</th>
                         <th>Date</th>
@@ -357,6 +364,7 @@ Complaints - PDMT
                         <td> {{ $rating->counter->counter_name ?? '-' }}</td>
                         <td>{{ $rating->vehicle_number }}</td>
                         <td>{{ $rating->phone }}</td>
+                        <td>{{ $rating->complaint_email ?? '-' }}</td>
 
                         <td>{{ $rating->serviceQuality->name ?? '-' }}</td>
 
@@ -407,7 +415,7 @@ Complaints - PDMT
                     <tr class="collapse bg-light"
                         id="readComplaint{{ $rating->id }}"
                         data-bs-parent="#closedAccordion">
-                        <td colspan="9">
+                        <td colspan="10">
                             <div class="card card-sm shadow-sm border-secondary mb-2">
                                 <div class="card-body p-2">
                                     <div class="row">
@@ -418,6 +426,10 @@ Complaints - PDMT
                                         <div class="col-md-6 mb-2">
                                             <strong>Phone:</strong>
                                             <p class="mb-0">{{ $rating->phone ?? '-' }}</p>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <strong>Email:</strong>
+                                            <p class="mb-0">{{ $rating->complaint_email ?? '-' }}</p>
                                         </div>
                                         <div class="col-md-6 mb-2">
                                             <strong>Complaint:</strong>
@@ -455,7 +467,7 @@ Complaints - PDMT
 
                     @empty
                     <tr>
-                        <td colspan="9" class="text-center">No resolved complaints</td>
+                        <td colspan="10" class="text-center">No resolved complaints</td>
                     </tr>
                     @endforelse
                 </tbody>

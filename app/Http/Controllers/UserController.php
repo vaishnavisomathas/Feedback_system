@@ -13,16 +13,17 @@ class UserController extends Controller
 {
     public function index()
 {
-    $authRole = auth()->user()->role;
-    
-    // Admin sees all users, Commissioner doesn't see Admin users
-    if ($authRole === 'admin') {
-        $users = User::latest()->get();
-    } else {
-        $users = User::where('role', '!=', 'admin')->latest()->get();
-    }
-    
-    $roles = Role::all();
+    // Hide only Super Admin; keep other users visible even if role is null/trim issues.
+    $users = User::query()
+        ->where(function ($query) {
+            $query->whereNull('role')
+                ->orWhereRaw('LOWER(TRIM(role)) != ?', ['super admin']);
+        })
+        ->latest()
+        ->get();
+
+    // Keep Admin role visible, only exclude Super Admin from selection.
+    $roles = Role::whereRaw('LOWER(name) != ?', ['super admin'])->get();
     return view('admin.user.index', compact('users','roles'));
 }
 
@@ -34,6 +35,8 @@ class UserController extends Controller
         'role' => 'required|string',
     ]);
 
+    $normalizedRole = trim((string) $request->role);
+
     $nextPasswordCode = (User::max('temp_password_code') ?? 0) + 1;
     $defaultPassword = 'pdmt@' . str_pad((string) $nextPasswordCode, 3, '0', STR_PAD_LEFT);
 
@@ -43,7 +46,7 @@ class UserController extends Controller
         'password' => Hash::make($defaultPassword),
         'dob' => $request->dob,
         'nic_number' => $request->nic_number,
-        'role' => $request->role,
+        'role' => $normalizedRole,
         'phone' => $request->phone,
         'must_change_password' => true,
         'temp_password_code' => $nextPasswordCode,
@@ -109,11 +112,13 @@ public function update(Request $request, $id)
         'role' => 'required|string',
     ]);
 
+    $normalizedRole = trim((string) $request->role);
+
     $user->name = $request->name;
     $user->email = $request->email;
     $user->dob = $request->dob;
     $user->nic_number = $request->nic_number;
-    $user->role = $request->role;
+    $user->role = $normalizedRole;
     $user->phone = $request->phone;
 
     if ($request->password) {
