@@ -319,11 +319,11 @@ MOBILE
           $isSuperAdmin = $roleLower === 'super admin';
           $isAdmin = $roleLower === 'admin';
           $isCommissioner = $roleLower === 'commissioner';
-          $isAdministrativeOfficer = $roleLower === 'administrative officer';
+          $isAdministrativeOfficer = in_array($roleLower, ['administrative officer', 'a/o', 'ao'], true);
           $isUser = $roleLower === 'user';
 
           // Requested sidebar mapping by role.
-          $showDivisionList = true;
+          $showDivisionList = $isSuperAdmin || $isAdmin || $isCommissioner;
           $showDivisionQr = true;
           $showFeedback = true;
           $showComplaintList = $isSuperAdmin || $isAdmin || $isUser;

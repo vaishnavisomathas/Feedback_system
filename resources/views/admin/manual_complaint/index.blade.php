@@ -69,7 +69,7 @@ Manual Complaints - PDMT
             </div>
 
             <div class="table-responsive">
-                <table class="table table-striped table-hover align-middle">
+                <table class="table table-striped table-hover align-middle manual-complaints-table">
                     <thead class="table-dark">
                         <tr>
                             <th>#</th>
@@ -87,7 +87,7 @@ Manual Complaints - PDMT
                     </thead>
                     <tbody>
                         @forelse($manualComplaints as $index => $item)
-                        <tr>
+                        <tr class="manual-row" data-complaint-row="complaint-row-{{ $item->id }}" role="button" aria-expanded="false">
                             <td>{{ $manualComplaints->firstItem() + $index }}</td>
                             <td>{{ $item->sourceSetting->name ?? $item->source ?? '-' }}</td>
                             <td>{{ $item->complainant_name ?? '-' }}</td>
@@ -112,7 +112,7 @@ Manual Complaints - PDMT
                             <td>{{ $item->enteredByUser->name ?? '-' }}</td>
                             <td>
                                 <button
-                                    class="btn btn-sm btn-primary editBtn"
+                                    class="btn btn-sm btn-primary editBtn action-btn"
                                     data-id="{{ $item->id }}"
                                     data-source-id="{{ $item->source_id }}"
                                     data-name="{{ $item->complainant_name }}"
@@ -128,7 +128,7 @@ Manual Complaints - PDMT
                                 @if($item->status === 'pending')
                                 <form method="POST" action="{{ route('admin.manual-complaints.forward-ao', $item->id) }}" class="d-inline manual-forward-form" data-complainant="{{ $item->complainant_name ?? 'this complaint' }}" data-target="{{ in_array(strtolower(trim((string) auth()->user()->role)), ['administrative officer','a/o','ao']) ? 'Commissioner' : 'A/O' }}">
                                     @csrf
-                                    <button class="btn btn-sm btn-warning">
+                                    <button class="btn btn-sm btn-warning action-btn">
                                         <i class="bi bi-send"></i>
                                     </button>
                                 </form>
@@ -137,16 +137,16 @@ Manual Complaints - PDMT
                                 <form method="POST" action="{{ route('admin.manual-complaints.destroy', $item->id) }}" class="d-inline" onsubmit="return confirm('Delete this manual complaint?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="btn btn-sm btn-danger">
+                                    <button class="btn btn-sm btn-danger action-btn">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </form>
                             </td>
                         </tr>
-                        <tr>
+                        <tr id="complaint-row-{{ $item->id }}" class="complaint-row">
                             <td></td>
-                            <td colspan="10" class="bg-light">
-                                <strong>Complaint:</strong> {{ $item->complaint }}
+                            <td colspan="10" class="bg-light complaint-content-cell">
+                                <strong>Complaint:</strong> {{ $item->complaint ?: 'No complaint text available' }}
                             </td>
                         </tr>
                         @empty
@@ -260,6 +260,29 @@ Manual Complaints - PDMT
 @section('script')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
+<style>
+    .manual-complaints-table .manual-row {
+        cursor: pointer;
+        transition: background-color .2s ease;
+    }
+
+    .manual-complaints-table .manual-row:hover {
+        background-color: #f5f8ff;
+    }
+
+    .manual-complaints-table .complaint-row {
+        display: none;
+    }
+
+    .manual-complaints-table .complaint-row.open {
+        display: table-row;
+    }
+
+    .manual-complaints-table .complaint-content-cell {
+        border-left: 4px solid #0d6efd;
+    }
+</style>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const modalEl = document.getElementById('manualComplaintModal');
@@ -270,7 +293,40 @@ document.addEventListener('DOMContentLoaded', function () {
     const forwardConfirmText = document.getElementById('forwardConfirmText');
     const forwardConfirmTitle = document.getElementById('forwardConfirmTitle');
     const confirmForwardBtn = document.getElementById('confirmForwardBtn');
+    const manualRows = document.querySelectorAll('.manual-row');
     let selectedForwardForm = null;
+
+    manualRows.forEach(function (row) {
+        row.addEventListener('click', function (e) {
+            if (e.target.closest('.action-btn') || e.target.closest('form')) {
+                return;
+            }
+
+            const detailRowId = this.dataset.complaintRow;
+            const detailRow = document.getElementById(detailRowId);
+
+            if (!detailRow) {
+                return;
+            }
+
+            const isOpening = !detailRow.classList.contains('open');
+
+            document.querySelectorAll('.complaint-row.open').forEach(function (openedRow) {
+                openedRow.classList.remove('open');
+            });
+
+            document.querySelectorAll('.manual-row[aria-expanded="true"]').forEach(function (openedMainRow) {
+                openedMainRow.setAttribute('aria-expanded', 'false');
+            });
+
+            if (isOpening) {
+                detailRow.classList.add('open');
+                this.setAttribute('aria-expanded', 'true');
+            } else {
+                this.setAttribute('aria-expanded', 'false');
+            }
+        });
+    });
 
     document.querySelectorAll('.manual-forward-form').forEach(function (forwardForm) {
         forwardForm.addEventListener('submit', function (e) {
