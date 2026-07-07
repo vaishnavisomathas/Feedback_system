@@ -113,10 +113,18 @@ $topDivisions = $query
 
     public function ratingPointsReport(Request $request)
     {
+        $roleKey = strtolower(trim((string) auth()->user()->role));
+
+        if (!in_array($roleKey, ['super admin', 'admin', 'commissioner', 'commisioner'], true)) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $period = $request->get('period', 'today');
         $selectedMonth = $request->get('month', now()->format('Y-m'));
         $selectedYear = (int) $request->get('year', now()->year);
         $selectedDivision = $request->get('division');
+        $selectedFrom = $request->get('from');
+        $selectedTo = $request->get('to');
         $perPage = (int) $request->get('per_page', 20);
 
         if (!in_array($perPage, [10, 20, 50, 100], true)) {
@@ -125,7 +133,34 @@ $topDivisions = $query
 
         $baseQuery = Feedback::query()->whereNotNull('counter_id');
 
-        if ($period === 'month') {
+        if (!empty($selectedFrom) || !empty($selectedTo)) {
+            try {
+                $fromDate = !empty($selectedFrom) ? Carbon::parse($selectedFrom)->toDateString() : null;
+            } catch (\Throwable $e) {
+                $fromDate = null;
+                $selectedFrom = null;
+            }
+
+            try {
+                $toDate = !empty($selectedTo) ? Carbon::parse($selectedTo)->toDateString() : null;
+            } catch (\Throwable $e) {
+                $toDate = null;
+                $selectedTo = null;
+            }
+
+            if (!empty($fromDate) && !empty($toDate) && $fromDate > $toDate) {
+                [$fromDate, $toDate] = [$toDate, $fromDate];
+                [$selectedFrom, $selectedTo] = [$selectedTo, $selectedFrom];
+            }
+
+            if (!empty($fromDate)) {
+                $baseQuery->whereDate('created_at', '>=', $fromDate);
+            }
+
+            if (!empty($toDate)) {
+                $baseQuery->whereDate('created_at', '<=', $toDate);
+            }
+        } elseif ($period === 'month') {
             try {
                 $monthDate = Carbon::createFromFormat('Y-m', $selectedMonth);
             } catch (\Throwable $e) {
@@ -180,6 +215,8 @@ $topDivisions = $query
             'selectedMonth',
             'selectedYear',
             'selectedDivision',
+            'selectedFrom',
+            'selectedTo',
             'perPage',
             'divisions'
         ));

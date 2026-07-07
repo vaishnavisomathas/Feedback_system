@@ -84,14 +84,18 @@ Manual Complaint Sources - PDMT
                                     class="btn btn-sm btn-primary editSourceBtn"
                                     data-id="{{ $source->id }}"
                                     data-name="{{ $source->name }}"
-                                    data-active="{{ $source->is_active ? '1' : '0' }}">
-                                    Edit
+                                    data-active="{{ $source->is_active ? '1' : '0' }}"
+                                    title="Edit"
+                                    aria-label="Edit">
+                                    <i class="bi bi-pencil-square"></i>
                                 </button>
 
-                                <form method="POST" action="{{ route('manual-complaint-sources.destroy', $source->id) }}" class="d-inline" onsubmit="return confirm('Delete this source?')">
+                                <form method="POST" action="{{ route('manual-complaint-sources.destroy', $source->id) }}" class="d-inline deleteSourceForm" data-source-name="{{ $source->name }}">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="btn btn-sm btn-danger">Delete</button>
+                                    <button class="btn btn-sm btn-danger" title="Delete" aria-label="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
                                 </form>
                             </td>
                         </tr>
@@ -110,13 +114,45 @@ Manual Complaint Sources - PDMT
         {{ $sources->links() }}
     </div>
 </div>
+
+<div class="modal fade" id="deleteSourceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-body p-4">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:44px;height:44px;background:#ffe9ec;color:#c02424;">
+                        <i class="bi bi-trash"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">Delete Source</h5>
+                    </div>
+                </div>
+
+                <div class="bg-light rounded-3 p-3 mb-3">
+                    <div id="deleteSourceText" class="fw-semibold">Delete this source?</div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="confirmDeleteSourceBtn" class="btn btn-danger px-4">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('script')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const modal = new bootstrap.Modal(document.getElementById('sourceModal'));
     const form = document.getElementById('sourceForm');
+    const deleteSourceModal = new bootstrap.Modal(document.getElementById('deleteSourceModal'));
+    const deleteSourceText = document.getElementById('deleteSourceText');
+    const confirmDeleteSourceBtn = document.getElementById('confirmDeleteSourceBtn');
+    let selectedDeleteForm = null;
 
     document.getElementById('addSourceBtn').addEventListener('click', function () {
         form.action = "{{ route('manual-complaint-sources.store') }}";
@@ -137,6 +173,22 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('sourceActive').checked = this.dataset.active === '1';
             modal.show();
         });
+    });
+
+    document.querySelectorAll('.deleteSourceForm').forEach(function (deleteForm) {
+        deleteForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            selectedDeleteForm = this;
+            const sourceName = this.dataset.sourceName || 'this source';
+            deleteSourceText.innerText = 'Delete "' + sourceName + '" source?';
+            deleteSourceModal.show();
+        });
+    });
+
+    confirmDeleteSourceBtn.addEventListener('click', function () {
+        if (selectedDeleteForm) {
+            selectedDeleteForm.submit();
+        }
     });
 });
 </script>

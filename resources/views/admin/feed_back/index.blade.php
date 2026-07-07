@@ -5,6 +5,42 @@ Counters Feedbacks - PDMT
 @endsection
 
 <style>
+    .table-card {
+        border: 1px solid #dbe3ee;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .table-header {
+        background-color: #f8fafc;
+        color: #243b53;
+        border-bottom: 1px solid #dbe3ee;
+        font-weight: 600;
+    }
+
+    .dashboard-table {
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .dashboard-table thead th {
+        background-color: #f3f6fa;
+        color: #243b53;
+        border-bottom: 1px solid #d2dceb;
+        white-space: nowrap;
+        padding: 12px 14px;
+    }
+
+    .dashboard-table tbody td {
+        border-top: 1px solid #edf1f5;
+        color: #5f6c7b;
+        padding: 12px 14px;
+    }
+
+    .dashboard-table tbody tr:hover td {
+        background-color: #f8fafc;
+    }
+
     .table th,
     .table td {
         font-size: 14px;

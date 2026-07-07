@@ -153,21 +153,23 @@ Complaint Types - PDMT
                                     <button class="btn btn-sm btn-primary editBtn"
                                         data-id="{{ $type->id }}"
                                         data-name="{{ $type->name }}"
-                                        data-description="{{ $type->description }}">
-                                        Edit
+                                        data-description="{{ $type->description }}"
+                                        title="Edit"
+                                        aria-label="Edit">
+                                        <i class="bi bi-pencil-square"></i>
                                     </button>
 
 
                                     <form method="POST"
                                         action="{{ route('complain.types.destroy',$type->id) }}"
-                                        class="d-inline"
-                                        onsubmit="return confirm('Delete this complaint type?')">
+                                        class="d-inline deleteTypeForm"
+                                        data-type-name="{{ $type->name }}">
 
                                         @csrf
                                         @method('DELETE')
 
-                                        <button class="btn btn-sm btn-danger">
-                                            Delete
+                                        <button class="btn btn-sm btn-danger" title="Delete" aria-label="Delete">
+                                            <i class="bi bi-trash"></i>
                                         </button>
 
                                     </form>
@@ -231,11 +233,47 @@ Complaint Types - PDMT
 
 </div>
 
+<div class="modal fade" id="deleteTypeModal" tabindex="-1" aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content border-0 shadow-lg rounded-4">
+
+            <div class="modal-body p-4">
+
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:44px;height:44px;background:#ffe9ec;color:#c02424;">
+                        <i class="bi bi-trash"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">Delete Complaint Type</h5>
+                    </div>
+                </div>
+
+                <div class="bg-light rounded-3 p-3 mb-3">
+                    <div id="deleteTypeText" class="fw-semibold">Delete this complaint type?</div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="confirmDeleteTypeBtn" class="btn btn-danger px-4">Delete</button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
 @endsection
 
 
 
 @section('script')
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -251,6 +289,14 @@ Complaint Types - PDMT
         let nameInput = document.getElementById('name');
 
         let descInput = document.getElementById('description');
+
+        let deleteTypeModal = new bootstrap.Modal(document.getElementById('deleteTypeModal'));
+
+        let deleteTypeText = document.getElementById('deleteTypeText');
+
+        let confirmDeleteTypeBtn = document.getElementById('confirmDeleteTypeBtn');
+
+        let selectedDeleteForm = null;
 
 
         /* ADD BUTTON */
@@ -291,6 +337,32 @@ Complaint Types - PDMT
                 modal.show();
 
             });
+
+        });
+
+        document.querySelectorAll('.deleteTypeForm').forEach(function(deleteForm) {
+
+            deleteForm.addEventListener('submit', function(e) {
+
+                e.preventDefault();
+
+                selectedDeleteForm = this;
+
+                const typeName = this.dataset.typeName || 'this complaint type';
+
+                deleteTypeText.innerText = 'Delete "' + typeName + '" complaint type?';
+
+                deleteTypeModal.show();
+
+            });
+
+        });
+
+        confirmDeleteTypeBtn.addEventListener('click', function() {
+
+            if (selectedDeleteForm) {
+                selectedDeleteForm.submit();
+            }
 
         });
 

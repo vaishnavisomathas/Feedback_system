@@ -327,9 +327,10 @@ MOBILE
           $showDivisionQr = true;
           $showFeedback = true;
           $showComplaintList = $isSuperAdmin || $isAdmin || $isUser;
-          $showManualComplaintEntry = $isSuperAdmin || $isAdmin || $isUser || $isAdministrativeOfficer;
+          $showManualComplaintEntry = $isSuperAdmin || $isAdmin || $isUser || $isAdministrativeOfficer || $isCommissioner;
           $showAoManagement = $isSuperAdmin || $isAdmin || $isAdministrativeOfficer;
           $showCommissioner = $isSuperAdmin || $isAdmin || $isCommissioner;
+          $showRatingReport = $isSuperAdmin || $isAdmin || $isCommissioner;
           $showUsers = $isSuperAdmin || $isAdmin;
           @endphp
 
@@ -416,12 +417,6 @@ MOBILE
             </a>
           </li>
 
-          <li class="sidebar-item {{ request()->routeIs('admin.manual-complaints.ao.*') ? 'active' : '' }}">
-            <a class="sidebar-link" href="{{ route('admin.manual-complaints.ao.index') }}">
-              <i class="ti ti-clipboard-check"></i>
-              <span>Manual A/O</span>
-            </a>
-          </li>
           @endif
 
           <!-- COMMISSIONER -->
@@ -437,10 +432,18 @@ MOBILE
             </a>
           </li>
 
-          <li class="sidebar-item {{ request()->routeIs('admin.manual-complaints.commissioner.*') ? 'active' : '' }}">
-            <a class="sidebar-link" href="{{ route('admin.manual-complaints.commissioner.index') }}">
-              <i class="ti ti-file-text"></i>
-              <span>Manual Commissioner</span>
+          @endif
+
+          <!-- REPORT -->
+          @if($showRatingReport)
+          <li class="nav-small-cap">
+            <span>Report</span>
+          </li>
+
+          <li class="sidebar-item {{ request()->routeIs('reports.rating-points') ? 'active' : '' }}">
+            <a class="sidebar-link" href="{{ route('reports.rating-points') }}">
+              <i class="ti ti-chart-bar"></i>
+              <span>Rating Report</span>
             </a>
           </li>
           @endif
@@ -457,20 +460,6 @@ MOBILE
               <span>Users</span>
             </a>
           </li>
-
-    <!-- REPORT -->
-          @if($showFeedback)
-          <li class="nav-small-cap">
-            <span>Report</span>
-          </li>
-
-          <li class="sidebar-item {{ request()->routeIs('reports.rating-points') ? 'active' : '' }}">
-            <a class="sidebar-link" href="{{ route('reports.rating-points') }}">
-              <i class="ti ti-chart-bar"></i>
-              <span>Rating Report</span>
-            </a>
-          </li>
-          @endif
 
           <!-- SETTINGS -->
           <li class="nav-small-cap">
@@ -569,20 +558,38 @@ MOBILE
             <!-- LIST -->
             <div class="notif-body">
               @forelse($notificationList as $item)
-              <div class="notif-item">
+              @php
+                $roleKey = strtolower(trim((string) auth()->user()->role));
+                if (isset($item->complaint)) {
+                    $notificationUrl = route('admin.manual-complaints.index');
+                } elseif (in_array($roleKey, ['administrative officer', 'a/o', 'ao'], true)) {
+                    $notificationUrl = route('admin.ao.index');
+                } elseif (in_array($roleKey, ['commissioner', 'commisioner'], true)) {
+                    $notificationUrl = route('admin.commissioner.index');
+                } elseif ($roleKey === 'user') {
+                    $notificationUrl = route('admin.feedback.index');
+                } else {
+                    $notificationUrl = route('dashboard');
+                }
+              @endphp
+              <a href="{{ $notificationUrl }}" class="notif-item text-decoration-none text-reset">
                 <div class="notif-icon">
                   <i class="ti ti-message"></i>
                 </div>
 
                 <div class="notif-content">
                   <div class="notif-text">
-                    {{ \Illuminate\Support\Str::limit($item->note, 60) }}
+                    @if(isset($item->complaint))
+                      Manual Complaint: {{ \Illuminate\Support\Str::limit($item->complaint, 60) }}
+                    @else
+                      {{ \Illuminate\Support\Str::limit($item->note ?? '-', 60) }}
+                    @endif
                   </div>
                   <small class="text-muted">
                     {{ $item->created_at->diffForHumans() }}
                   </small>
                 </div>
-              </div>
+              </a>
               @empty
               <div class="text-center p-4 text-muted">
                 <i class="ti ti-bell-off fs-3 d-block mb-2"></i>

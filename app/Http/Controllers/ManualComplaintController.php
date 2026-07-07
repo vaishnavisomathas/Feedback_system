@@ -23,7 +23,12 @@ class ManualComplaintController extends Controller
 
     private function canManageManualEntry(): array
     {
-        return ['super admin', 'admin', 'user', 'administrative officer'];
+        return ['super admin', 'admin', 'user', 'administrative officer', 'commissioner'];
+    }
+
+    private function canAddManualComplaint(): array
+    {
+        return ['super admin', 'admin', 'user'];
     }
 
     private function canManageManualAO(): array
@@ -53,9 +58,25 @@ class ManualComplaintController extends Controller
             'search' => $request->search,
         ];
 
+        if ($this->isAdministrativeOfficer()) {
+            $allowedAoStatuses = ['pending', 'verified', 'commissioner', 'completed'];
+            if (!in_array((string) $filters['status'], $allowedAoStatuses, true)) {
+                $filters['status'] = null;
+            }
+        }
+
         $manualComplaints = ManualComplaint::with(['complainType', 'enteredByUser', 'sourceSetting'])
+            ->when($this->isAdministrativeOfficer(), fn($q) => $q->whereIn('status', ['pending', 'ao', 'verified', 'commissioner', 'completed']))
             ->when($filters['source_id'], fn($q) => $q->where('source_id', $filters['source_id']))
-            ->when($filters['status'], fn($q) => $q->where('status', $filters['status']))
+            ->when($filters['status'], function ($q) use ($filters) {
+                if ($filters['status'] === 'pending') {
+                    $q->whereIn('status', ['pending', 'ao']);
+
+                    return;
+                }
+
+                $q->where('status', $filters['status']);
+            })
             ->when($filters['from'], fn($q) => $q->whereDate('received_at', '>=', $filters['from']))
             ->when($filters['to'], fn($q) => $q->whereDate('received_at', '<=', $filters['to']))
             ->when($filters['search'], function ($q) use ($filters) {
@@ -68,7 +89,7 @@ class ManualComplaintController extends Controller
                         ->orWhere('complaint', 'like', '%' . $term . '%');
                 });
             })
-            ->latest()
+            ->orderByDesc('created_at')
             ->paginate($request->per_page ?? 10)
             ->appends($request->query());
 
@@ -80,7 +101,7 @@ class ManualComplaintController extends Controller
 
     public function store(Request $request)
     {
-        $this->authorizeRoles($this->canManageManualEntry());
+        $this->authorizeRoles($this->canAddManualComplaint());
 
         $data = $request->validate([
             'source_id' => 'required|exists:manual_complaint_sources,id',
@@ -161,6 +182,21 @@ class ManualComplaintController extends Controller
         return back()->with('success', 'Manual complaint forwarded to A/O successfully.');
     }
 
+    public function saveActionNote(Request $request, ManualComplaint $manualComplaint)
+    {
+        $this->authorizeRoles($this->canManageManualEntry());
+
+        $data = $request->validate([
+            'action_note' => 'required|string|max:1000',
+        ]);
+
+        $manualComplaint->update([
+            'action_note' => $data['action_note'],
+        ]);
+
+        return back()->with('success', 'Action note saved successfully.');
+    }
+
     public function aoIndex(Request $request)
     {
         $this->authorizeRoles($this->canManageManualAO());
@@ -217,15 +253,37 @@ class ManualComplaintController extends Controller
         $this->authorizeRoles($this->canManageManualAO());
 
         $data = $request->validate([
-            'ao_remarks' => 'required|string|max:1000',
-            'action' => 'required|in:forward,reject',
+            'ao_remarks' => 'nullable|string|max:1000',
+            'action' => 'required|in:verify,forward,reject',
         ]);
 
         $manualComplaint->ao_remarks = $data['ao_remarks'];
-        $manualComplaint->status = $data['action'] === 'forward' ? 'commissioner' : 'rejected';
+        if ($data['action'] === 'verify') {
+            $manualComplaint->status = 'verified';
+        } elseif ($data['action'] === 'forward') {
+            $manualComplaint->status = 'commissioner';
+        } else {
+            $manualComplaint->status = 'rejected';
+        }
         $manualComplaint->save();
 
         return back()->with('success', 'Manual complaint updated by A/O successfully.');
+    }
+
+    public function commissionerAction(Request $request, ManualComplaint $manualComplaint)
+    {
+        $this->authorizeRoles($this->canManageManualCommissioner());
+
+        $data = $request->validate([
+            'final_remarks' => 'nullable|string|max:1000',
+            'action' => 'required|in:complete,reject',
+        ]);
+
+        $manualComplaint->commissioner_remarks = $data['final_remarks'] ?? null;
+        $manualComplaint->status = $data['action'] === 'complete' ? 'completed' : 'rejected';
+        $manualComplaint->save();
+
+        return back()->with('success', 'Manual complaint finalized by Commissioner.');
     }
 
     public function commissionerIndex(Request $request)

@@ -6,6 +6,19 @@ Rating Points Report - PDMT
 
 @section('content')
 <style>
+    .table-card {
+        border: 1px solid #dbe3ee;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .table-header {
+        background-color: #f8fafc;
+        color: #243b53;
+        border-bottom: 1px solid #dbe3ee;
+        font-weight: 600;
+    }
+
     .report-card {
         border-radius: 12px;
     }
@@ -27,10 +40,17 @@ Rating Points Report - PDMT
     .report-table th {
         white-space: nowrap;
         font-size: 13px;
+        background-color: #f3f6fa;
+        color: #243b53;
+        border-bottom: 1px solid #d2dceb;
+        padding: 12px 14px;
     }
 
     .report-table td {
         vertical-align: middle;
+        border-top: 1px solid #edf1f5;
+        color: #5f6c7b;
+        padding: 12px 14px;
     }
 
     .filter-card {
@@ -39,6 +59,15 @@ Rating Points Report - PDMT
 
     .period-chip {
         text-transform: capitalize;
+    }
+
+    .report-table tbody tr:hover td {
+        background-color: #f8fafc;
+    }
+
+    .table th,
+    .table td {
+        font-size: 14px;
     }
 </style>
 
@@ -50,24 +79,7 @@ Rating Points Report - PDMT
     <div class="card filter-card border-0 shadow-sm mb-4">
         <div class="card-body">
             <form method="GET" class="row g-3 align-items-end">
-                <div class="col-md-3">
-                    <label class="form-label">Period</label>
-                    <select name="period" class="form-control" id="periodSelect">
-                        <option value="today" {{ $period === 'today' ? 'selected' : '' }}>Today</option>
-                        <option value="month" {{ $period === 'month' ? 'selected' : '' }}>Month Wise</option>
-                        <option value="year" {{ $period === 'year' ? 'selected' : '' }}>Year Wise</option>
-                    </select>
-                </div>
-
-                <div class="col-md-3 {{ $period === 'month' ? '' : 'd-none' }}" id="monthField">
-                    <label class="form-label">Month</label>
-                    <input type="month" name="month" class="form-control" value="{{ $selectedMonth }}">
-                </div>
-
-                <div class="col-md-2 {{ $period === 'year' ? '' : 'd-none' }}" id="yearField">
-                    <label class="form-label">Year</label>
-                    <input type="number" name="year" min="2000" max="2100" class="form-control" value="{{ $selectedYear }}">
-                </div>
+             
 
                 <div class="col-md-3">
                     <label class="form-label">Division</label>
@@ -77,6 +89,16 @@ Rating Points Report - PDMT
                         <option value="{{ $division }}" {{ $selectedDivision === $division ? 'selected' : '' }}>{{ $division }}</option>
                         @endforeach
                     </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">From</label>
+                    <input type="date" name="from" class="form-control" value="{{ $selectedFrom ?? '' }}">
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label">To</label>
+                    <input type="date" name="to" class="form-control" value="{{ $selectedTo ?? '' }}">
                 </div>
 
            
@@ -94,11 +116,11 @@ Rating Points Report - PDMT
 
 
 
-    <div class="card border-0 shadow-sm mb-3">
-        <div class="card-header bg-white fw-semibold">Rating Ranking</div>
+    <div class="card table-card shadow-sm mb-3">
+        <div class="card-header table-header d-flex justify-content-between align-items-center">Rating Ranking</div>
         <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle report-table mb-0">
-                <thead class="table-dark">
+            <table class="table report-table mb-0">
+                <thead>
                     <tr>
                         <th>#</th>
                         <th>Division</th>
@@ -133,6 +155,8 @@ Rating Points Report - PDMT
             <input type="hidden" name="month" value="{{ $selectedMonth }}">
             <input type="hidden" name="year" value="{{ $selectedYear }}">
             <input type="hidden" name="division" value="{{ $selectedDivision }}">
+            <input type="hidden" name="from" value="{{ $selectedFrom ?? '' }}">
+            <input type="hidden" name="to" value="{{ $selectedTo ?? '' }}">
 
             <small class="text-muted">Page Size</small>
             <select name="per_page" class="form-control form-control-sm" onchange="this.form.submit()" style="width: 90px;">
@@ -151,6 +175,10 @@ Rating Points Report - PDMT
         const periodSelect = document.getElementById('periodSelect');
         const monthField = document.getElementById('monthField');
         const yearField = document.getElementById('yearField');
+
+        if (!periodSelect || !monthField || !yearField) {
+            return;
+        }
 
         function syncPeriodFields() {
             const value = periodSelect.value;

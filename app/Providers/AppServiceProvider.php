@@ -3,9 +3,11 @@
 namespace App\Providers;
 
 use App\Models\Feedback;
+use App\Models\ManualComplaint;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Collection;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -28,12 +30,15 @@ public function boot()
         if (!auth()->check()) {
             $view->with('notificationCount', 0);
             $view->with('notificationList', []);
+                        $view->with('manualCommissionerCount', 0);
             return;
         }
 
-        $user = auth()->user();
+          $user = auth()->user();
+          $roleKey = strtolower(trim((string) $user->role));
+                    $manualCommissionerCount = 0;
 
-     if ($user->role == 'User') {
+      if (in_array($roleKey, ['user'], true)) {
     $notifications = Feedback::where(function ($q) {
                             $q->whereNull('status')
                               ->orWhere('status', 'pending');
@@ -52,12 +57,21 @@ public function boot()
                     ->where('note', '!=', '')
                     ->count();
 }
-                                  elseif ($user->role == 'Administrative Officer') {
+                                  elseif (in_array($roleKey, ['administrative officer', 'a/o', 'ao'], true)) {
             $notifications = Feedback::where('status', 'ao')->latest()->take(25)->get();
             $count = Feedback::where('status', 'ao')->count();
-        } elseif ($user->role == 'Commissioner') {
-            $notifications = Feedback::where('status', 'commissioner')->latest()->take(25)->get();
-            $count = Feedback::where('status', 'commissioner')->count();
+        } elseif (in_array($roleKey, ['commissioner', 'commisioner'], true)) {
+            $manualNotifications = ManualComplaint::where('status', 'commissioner')->latest()->get();
+            $feedbackNotifications = Feedback::where('status', 'commissioner')->latest()->get();
+
+            $notifications = $manualNotifications
+                ->concat($feedbackNotifications)
+                ->sortByDesc('created_at')
+                ->take(25)
+                ->values();
+
+            $manualCommissionerCount = $manualNotifications->count();
+            $count = $manualCommissionerCount + $feedbackNotifications->count();
         } else {
             $notifications = [];
             $count = 0;
@@ -65,5 +79,6 @@ public function boot()
 
         $view->with('notificationCount', $count);
         $view->with('notificationList', $notifications);
+        $view->with('manualCommissionerCount', $manualCommissionerCount);
     });
 }}

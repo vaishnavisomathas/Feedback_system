@@ -4,6 +4,20 @@
 Administrative Officer Complaints- PDMT
 @endsection
 <style>
+    .ao-table {
+        border: 1px solid #dbe3ee;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .ao-table .ao-table-head th {
+        background-color: #f3f6fa;
+        color: #243b53;
+        border-bottom: 1px solid #d2dceb;
+        white-space: nowrap;
+        padding: 12px 14px;
+    }
+
     .ao-table th {
         font-weight: 600;
         font-size: 14px;
@@ -11,14 +25,17 @@ Administrative Officer Complaints- PDMT
 
     .ao-table td {
         font-size: 14px;
+        border-top: 1px solid #edf1f5;
+        color: #5f6c7b;
+        padding: 12px 14px;
     }
 
     .ao-table tbody tr {
         cursor: pointer;
     }
 
-    .ao-table tbody tr:hover {
-        background-color: #f8f9fa;
+    .ao-table tbody tr:hover td {
+        background-color: #f8fafc;
     }
 
     .modal-content {
@@ -151,9 +168,9 @@ Administrative Officer Complaints- PDMT
 
         {{-- ================= PENDING ================= --}}
         <div class="tab-pane fade {{ request('active_tab','pending') == 'pending' ? 'show active' : '' }}" id="pending">
-            <table class="table table-striped table-hover align-middle ao-table">
+            <table class="table table-hover align-middle ao-table">
 
-                <thead class="table-dark">
+                <thead class="ao-table-head">
                     <tr>
                         <th>#</th>
                         <th>DS Division</th>
@@ -171,8 +188,14 @@ Administrative Officer Complaints- PDMT
                 <tbody id="pendingaoAccordion">
                     @forelse($pendingAO as $rating)
 
-                    <tr data-bs-toggle="collapse"
-                        data-bs-target="#complaint{{ $rating->id }}"
+                    <tr class="pending-ao-row"
+                        data-ao-save-route="{{ route('admin.ao.save', $rating->id) }}"
+                        data-vehicle="{{ $rating->vehicle_number ?? '-' }}"
+                        data-phone="{{ $rating->phone ?? '-' }}"
+                        data-email="{{ $rating->complaint_email ?? '-' }}"
+                        data-complaint="{{ $rating->note ?? '-' }}"
+                        data-complaint-type="{{ $rating->complainType->name ?? '-' }}"
+                        data-user-remarks="{{ $rating->user_remarks ?? '-' }}"
                         style="cursor:pointer">
 
                         <td>{{ $loop->iteration }}</td>
@@ -187,66 +210,8 @@ Administrative Officer Complaints- PDMT
 
                         <td>
                             <span class="badge bg-info">At Administrative Officer</span>
-                            <span class="float-end">▼</span>
                         </td>
 
-                    </tr>
-
-                    <tr class="collapse bg-light"
-                        id="complaint{{ $rating->id }}"
-                        data-bs-parent="#pendingaoAccordion">
-                        <td colspan="10">
-
-                            <div class="card shadow-sm border-secondary mb-2">
-                                <div class="card-body p-2">
-
-                                    <div class="row">
-
-                                        <div class="col-md-6 mb-2">
-                                            <strong>Vehicle:</strong>
-                                            <p>{{ $rating->vehicle_number }}</p>
-                                        </div>
-                                        <div class="col-md-6 mb-2">
-                                            <strong>Phone:</strong>
-                                            <p>{{ $rating->phone }}</p>
-                                        </div>
-                                        <div class="col-md-6 mb-2">
-                                            <strong>Email:</strong>
-                                            <p>{{ $rating->complaint_email ?? '-' }}</p>
-                                        </div>
-                                        <div class="col-md-6 mb-2">
-                                            <strong>Complaint:</strong>
-                                            <p>{{ $rating->note }}</p>
-                                        </div>
-
-                                        <div class="col-md-6 mb-2">
-                                            <strong>Complaint Type:</strong>
-                                            <p><span class="badge bg-warning text-dark">{{ $rating->complainType->name ?? '-' }}</span></p>
-                                        </div>
-
-                                        <div class="col-md-6 mb-2">
-                                            <strong>User Remarks:</strong>
-                                            <p>{{ $rating->user_remarks ?? '-' }}</p>
-                                        </div>
-
-                                        <div class="col-md-12 mb-2">
-                                            <form method="POST" action="{{ route('admin.ao.save', $rating->id) }}">
-                                                @csrf
-
-                                                <label><strong>AO Final Remarks</strong></label>
-                                                <textarea name="ao_remarks" class="form-control mb-2" required></textarea>
-
-                                                <button class="btn btn-danger btn-sm" name="action" value="reject">Reject</button>
-                                                <button class="btn btn-success btn-sm" name="action" value="forward">Forward</button>
-
-                                            </form>
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
-
-                        </td>
                     </tr>
 
                     @empty
@@ -278,9 +243,9 @@ Administrative Officer Complaints- PDMT
         {{-- ================= CLOSED ================= --}}
         <div class="tab-pane fade {{ request('active_tab') == 'closed' ? 'show active' : '' }}" id="closed">
 
-            <table class="table table-striped table-hover align-middle ao-table">
+            <table class="table table-hover align-middle ao-table">
 
-                <thead class="table-secondary">
+                <thead class="ao-table-head">
                     <tr>
                         <th>#</th>
                         <th>DS Division</th>
@@ -298,8 +263,15 @@ Administrative Officer Complaints- PDMT
                 <tbody id="closedaoAccordion">
                     @forelse($closedAO as $c)
 
-                    <tr data-bs-toggle="collapse"
-                        data-bs-target="#closed{{ $c->id }}"
+                    <tr class="closed-ao-row"
+                        data-vehicle="{{ $c->vehicle_number ?? '-' }}"
+                        data-phone="{{ $c->phone ?? '-' }}"
+                        data-email="{{ $c->complaint_email ?? '-' }}"
+                        data-complaint="{{ $c->note ?? '-' }}"
+                        data-complaint-type="{{ $c->complainType->name ?? '-' }}"
+                        data-user-remarks="{{ $c->user_remarks ?? '-' }}"
+                        data-ao-remarks="{{ $c->ao_remarks ?? '-' }}"
+                        data-commissioner-remarks="{{ $c->commissioner_remarks ?? '-' }}"
                         style="cursor:pointer">
 
                         <td>{{ $loop->iteration }}</td>
@@ -320,34 +292,9 @@ Administrative Officer Complaints- PDMT
                             @elseif($c->status == 'rejected')
                             <span class="badge bg-danger">Rejected</span>
                             @endif
-                            <span class="float-end">▼</span>
+                            <span class="float-end">i</span>
                         </td>
 
-                    </tr>
-
-                    <tr class="collapse bg-light"
-                        id="closed{{ $c->id }}"
-                        data-bs-parent="#closedaoAccordion">
-
-                        <td colspan="10">
-
-                            <div class="card shadow-sm border-secondary mb-2">
-                                <div class="card-body p-2">
-
-                                    <p><strong>Vehicle:</strong> {{ $c->vehicle_number }}</p>
-                                    <p><strong>Phone:</strong> {{ $c->phone }}</p>
-                                        <p><strong>Email:</strong> {{ $c->complaint_email ?? '-' }}</p>
-                                    <p><strong>Complaint:</strong> {{ $c->note }}</p>
-                                    <p><strong>Complaint Type:</strong><span class="badge bg-warning text-dark">
-                                            {{ $c->complainType->name ?? '-' }}</span></p>
-                                    <p><strong>User Remarks:</strong> {{ $c->user_remarks ?? '-' }}</p>
-                                    <p><strong>AO Remarks:</strong> {{ $c->ao_remarks }}</p>
-                                    <p><strong>Commissioner Remarks:</strong> {{ $c->commissioner_remarks }}</p>
-
-                                </div>
-                            </div>
-
-                        </td>
                     </tr>
 
                     @empty
@@ -363,6 +310,65 @@ Administrative Officer Complaints- PDMT
     </div>
 </div>
 </div>
+</div>
+
+<div class="modal fade" id="pendingAoDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Complaint Details - A/O</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-6"><strong>Vehicle:</strong> <span id="pendingAoVehicle">-</span></div>
+                    <div class="col-md-6"><strong>Phone:</strong> <span id="pendingAoPhone">-</span></div>
+                    <div class="col-md-6"><strong>Email:</strong> <span id="pendingAoEmail">-</span></div>
+                    <div class="col-md-6"><strong>Complaint Type:</strong> <span id="pendingAoType">-</span></div>
+                    <div class="col-md-6"><strong>User Remarks:</strong> <span id="pendingAoUserRemarks">-</span></div>
+                    <div class="col-12">
+                        <strong>Complaint:</strong>
+                        <div class="p-2 bg-light rounded border" id="pendingAoComplaint">-</div>
+                    </div>
+                    <div class="col-12">
+                        <form method="POST" id="pendingAoActionForm">
+                            @csrf
+                            <label><strong>AO Final Remarks</strong></label>
+                            <textarea name="ao_remarks" class="form-control mb-2"></textarea>
+                            <button class="btn btn-danger btn-sm" name="action" value="reject">Reject</button>
+                            <button class="btn btn-success btn-sm" name="action" value="forward">Forward</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="closedAoDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Complaint Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-6"><strong>Vehicle:</strong> <span id="closedAoVehicle">-</span></div>
+                    <div class="col-md-6"><strong>Phone:</strong> <span id="closedAoPhone">-</span></div>
+                    <div class="col-md-6"><strong>Email:</strong> <span id="closedAoEmail">-</span></div>
+                    <div class="col-md-6"><strong>Complaint Type:</strong> <span id="closedAoType">-</span></div>
+                    <div class="col-md-6"><strong>User Remarks:</strong> <span id="closedAoUserRemarks">-</span></div>
+                    <div class="col-md-6"><strong>AO Remarks:</strong> <span id="closedAoAoRemarks">-</span></div>
+                    <div class="col-md-6"><strong>Commissioner Remarks:</strong> <span id="closedAoCommissionerRemarks">-</span></div>
+                    <div class="col-12">
+                        <strong>Complaint:</strong>
+                        <div class="p-2 bg-light rounded border" id="closedAoComplaint">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 
@@ -389,9 +395,39 @@ Administrative Officer Complaints- PDMT
     document.addEventListener("DOMContentLoaded", function() {
         const filterBox = document.getElementById('filterBox');
         const arrow = document.getElementById('arrow');
+        const pendingAoModal = new bootstrap.Modal(document.getElementById('pendingAoDetailsModal'));
+        const closedAoModal = new bootstrap.Modal(document.getElementById('closedAoDetailsModal'));
+        const pendingAoActionForm = document.getElementById('pendingAoActionForm');
 
         filterBox.addEventListener('show.bs.collapse', () => arrow.innerHTML = '▲');
         filterBox.addEventListener('hide.bs.collapse', () => arrow.innerHTML = '▼');
+
+        document.querySelectorAll('.pending-ao-row').forEach(function(row) {
+            row.addEventListener('click', function() {
+                document.getElementById('pendingAoVehicle').innerText = this.dataset.vehicle || '-';
+                document.getElementById('pendingAoPhone').innerText = this.dataset.phone || '-';
+                document.getElementById('pendingAoEmail').innerText = this.dataset.email || '-';
+                document.getElementById('pendingAoType').innerText = this.dataset.complaintType || '-';
+                document.getElementById('pendingAoUserRemarks').innerText = this.dataset.userRemarks || '-';
+                document.getElementById('pendingAoComplaint').innerText = this.dataset.complaint || '-';
+                pendingAoActionForm.action = this.dataset.aoSaveRoute || '';
+                pendingAoModal.show();
+            });
+        });
+
+        document.querySelectorAll('.closed-ao-row').forEach(function(row) {
+            row.addEventListener('click', function() {
+                document.getElementById('closedAoVehicle').innerText = this.dataset.vehicle || '-';
+                document.getElementById('closedAoPhone').innerText = this.dataset.phone || '-';
+                document.getElementById('closedAoEmail').innerText = this.dataset.email || '-';
+                document.getElementById('closedAoType').innerText = this.dataset.complaintType || '-';
+                document.getElementById('closedAoUserRemarks').innerText = this.dataset.userRemarks || '-';
+                document.getElementById('closedAoAoRemarks').innerText = this.dataset.aoRemarks || '-';
+                document.getElementById('closedAoCommissionerRemarks').innerText = this.dataset.commissionerRemarks || '-';
+                document.getElementById('closedAoComplaint').innerText = this.dataset.complaint || '-';
+                closedAoModal.show();
+            });
+        });
     });
 </script>
 @endsection

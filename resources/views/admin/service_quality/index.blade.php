@@ -10,6 +10,10 @@ Service Quality - PDMT
         font-size: 14px;
     }
 
+    .delete-quality-dialog {
+        max-width: 560px;
+    }
+
     @media (max-width:768px) {
 
         h3 {
@@ -133,21 +137,25 @@ Service Quality - PDMT
 
                                     <button class="btn btn-primary btn-sm editBtn"
                                         data-id="{{ $q->id }}"
-                                        data-name="{{ $q->name }}">
-                                        Edit
+                                        data-name="{{ $q->name }}"
+                                        title="Edit"
+                                        aria-label="Edit">
+                                        <i class="bi bi-pencil-square"></i>
                                     </button>
 
 
                                     <form method="POST"
                                         action="{{ route('service.quality.destroy',$q->id) }}"
-                                        class="d-inline">
+                                        class="d-inline deleteQualityForm"
+                                        data-quality-name="{{ $q->name }}">
 
                                         @csrf
                                         @method('DELETE')
 
                                         <button class="btn btn-danger btn-sm"
-                                            onclick="return confirm('Delete this service quality?')">
-                                            Delete
+                                            title="Delete"
+                                            aria-label="Delete">
+                                            <i class="bi bi-trash"></i>
                                         </button>
 
                                     </form>
@@ -212,11 +220,47 @@ Service Quality - PDMT
 
 </div>
 
+<div class="modal fade" id="deleteQualityModal" tabindex="-1" aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered delete-quality-dialog">
+
+        <div class="modal-content border-0 shadow-lg rounded-4">
+
+            <div class="modal-body p-4">
+
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:44px;height:44px;background:#ffe9ec;color:#c02424;">
+                        <i class="bi bi-trash"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">Delete Service Quality</h5>
+                    </div>
+                </div>
+
+                <div class="bg-light rounded-3 p-3 mb-3">
+                    <div id="deleteQualityText" class="fw-semibold">Delete this service quality?</div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="confirmDeleteQualityBtn" class="btn btn-danger px-4">Delete</button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
 @endsection
 
 
 
 @section('script')
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -232,6 +276,14 @@ Service Quality - PDMT
         let modalTitle = document.getElementById('modalTitle');
 
         let nameInput = document.getElementById('name');
+
+        let deleteQualityModal = new bootstrap.Modal(document.getElementById('deleteQualityModal'));
+
+        let deleteQualityText = document.getElementById('deleteQualityText');
+
+        let confirmDeleteQualityBtn = document.getElementById('confirmDeleteQualityBtn');
+
+        let selectedDeleteForm = null;
 
 
         /* ADD */
@@ -268,6 +320,32 @@ Service Quality - PDMT
                 modal.show();
 
             });
+
+        });
+
+        document.querySelectorAll('.deleteQualityForm').forEach(function(deleteForm) {
+
+            deleteForm.addEventListener('submit', function(e) {
+
+                e.preventDefault();
+
+                selectedDeleteForm = this;
+
+                const qualityName = this.dataset.qualityName || 'this service quality';
+
+                deleteQualityText.innerText = 'Delete "' + qualityName + '" service quality?';
+
+                deleteQualityModal.show();
+
+            });
+
+        });
+
+        confirmDeleteQualityBtn.addEventListener('click', function() {
+
+            if (selectedDeleteForm) {
+                selectedDeleteForm.submit();
+            }
 
         });
 

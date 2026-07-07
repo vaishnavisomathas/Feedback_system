@@ -115,16 +115,13 @@ Route::middleware(['auth', 'force.password.change'])->group(function () {
         ->name('admin.manual-complaints.destroy');
     Route::post('/admin/manual-complaints/{manualComplaint}/forward-ao', [ManualComplaintController::class, 'forwardToAO'])
         ->name('admin.manual-complaints.forward-ao');
+    Route::post('/admin/manual-complaints/{manualComplaint}/action-note', [ManualComplaintController::class, 'saveActionNote'])
+        ->name('admin.manual-complaints.save-action-note');
+    Route::post('/admin/manual-complaints/{manualComplaint}/commissioner-action', [ManualComplaintController::class, 'commissionerAction'])
+        ->name('admin.manual-complaints.commissioner-action');
 
-    Route::get('/admin/manual-ao-complaints', [ManualComplaintController::class, 'aoIndex'])
-        ->name('admin.manual-complaints.ao.index');
     Route::post('/admin/manual-ao-complaints/{manualComplaint}/save', [ManualComplaintController::class, 'aoSave'])
         ->name('admin.manual-complaints.ao.save');
-
-    Route::get('/admin/manual-commissioner-complaints', [ManualComplaintController::class, 'commissionerIndex'])
-        ->name('admin.manual-complaints.commissioner.index');
-    Route::post('/admin/manual-commissioner-complaints/{manualComplaint}/close', [ManualComplaintController::class, 'commissionerClose'])
-        ->name('admin.manual-complaints.commissioner.close');
 
     Route::get('/manual-complaint-sources', [ManualComplaintSourceController::class, 'index'])
         ->name('manual-complaint-sources.index');

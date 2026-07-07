@@ -22,6 +22,7 @@ class ManualComplaint extends Model
         'vehicle_number',
         'complain_type_id',
         'complaint',
+        'action_note',
         'status',
         'ao_remarks',
         'commissioner_remarks',

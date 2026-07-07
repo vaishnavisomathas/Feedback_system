@@ -6,6 +6,13 @@ Manual Complaints - PDMT
 
 @section('content')
 <div class="container">
+    @php
+        $roleLower = strtolower(trim((string) auth()->user()->role));
+        $isAdministrativeOfficer = in_array($roleLower, ['administrative officer', 'a/o', 'ao'], true);
+        $isCommissioner = $roleLower === 'commissioner';
+        $showActionButtons = in_array($roleLower, ['super admin', 'admin', 'commissioner'], true);
+        $canAddManualComplaint = in_array($roleLower, ['super admin', 'admin', 'user'], true);
+    @endphp
     <input type="hidden" id="manualComplaintHasErrors" value="{{ $errors->any() ? '1' : '0' }}">
     <h2 class="mb-0">Manual Complaints</h2>
 
@@ -16,15 +23,19 @@ Manual Complaints - PDMT
             @endif
 
             <div class="d-flex justify-content-between align-items-center mb-3">
+                @if($canAddManualComplaint)
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#manualComplaintModal" id="addManualComplaintBtn">
                     Add Manual Complaint
                 </button>
+                @else
+                <div></div>
+                @endif
                 <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#filterBox">
                     <i class="bi bi-funnel"></i> Filters
                 </button>
             </div>
 
-            <div class="collapse {{ request()->hasAny(['source_id','status','from','to','search']) ? 'show' : '' }}" id="filterBox">
+            <div class="collapse" id="filterBox">
                 <div class="card card-body mb-3">
                     <form method="GET" class="row g-2">
                         <div class="col-md-2">
@@ -43,7 +54,7 @@ Manual Complaints - PDMT
                             <select class="form-control" name="status">
                                 <option value="">All</option>
                                 <option value="pending" {{ ($filters['status'] ?? '') === 'pending' ? 'selected' : '' }}>Pending</option>
-                                <option value="ao" {{ ($filters['status'] ?? '') === 'ao' ? 'selected' : '' }}>At A/O</option>
+                                <option value="verified" {{ ($filters['status'] ?? '') === 'verified' ? 'selected' : '' }}>Verified</option>
                                 <option value="commissioner" {{ ($filters['status'] ?? '') === 'commissioner' ? 'selected' : '' }}>At Commissioner</option>
                                 <option value="completed" {{ ($filters['status'] ?? '') === 'completed' ? 'selected' : '' }}>Completed</option>
                                 <option value="rejected" {{ ($filters['status'] ?? '') === 'rejected' ? 'selected' : '' }}>Rejected</option>
@@ -64,42 +75,61 @@ Manual Complaints - PDMT
                         <div class="col-md-1 d-flex align-items-end">
                             <button class="btn btn-primary w-100" type="submit"><i class="bi bi-search"></i></button>
                         </div>
+                        <div class="col-md-12 d-flex justify-content-end gap-2">
+                            <a href="{{ route('admin.manual-complaints.index') }}" class="btn btn-outline-secondary btn-sm">
+                               <i class="bi bi-arrow-clockwise me-1"></i>
+                            </a>
+                       
+                        </div>
                     </form>
                 </div>
             </div>
 
             <div class="table-responsive">
-                <table class="table table-striped table-hover align-middle manual-complaints-table">
-                    <thead class="table-dark">
+                <table class="table table-hover align-middle manual-complaints-table">
+                    <thead class="manual-table-head">
                         <tr>
                             <th>#</th>
                             <th>Source</th>
-                            <th>Name</th>
                             <th>Phone</th>
-                            <th>Email</th>
                             <th>Vehicle</th>
-                            <th>Type</th>
+                            <th>Date & Time</th>
                             <th>Status</th>
-                            <th>Date</th>
-                            <th>Entered By</th>
-                            <th width="130">Actions</th>
+                            @if($showActionButtons)
+                            <th width="170">Actions</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($manualComplaints as $index => $item)
-                        <tr class="manual-row" data-complaint-row="complaint-row-{{ $item->id }}" role="button" aria-expanded="false">
+                        <tr
+                            class="manual-row"
+                            role="button"
+                            data-note-route="{{ route('admin.manual-complaints.save-action-note', $item->id) }}"
+                            data-ao-save-route="{{ route('admin.manual-complaints.ao.save', $item->id) }}"
+                            data-complainant-name="{{ $item->complainant_name ?? '-' }}"
+                            data-complaint-email="{{ $item->complaint_email ?? '-' }}"
+                            data-complaint-type="{{ $item->complainType->name ?? '-' }}"
+                            data-entered-by="{{ $item->enteredByUser->name ?? '-' }}"
+                            data-received-date="{{ optional($item->received_at)->format('d M Y') ?: '-' }}"
+                            data-action-note="{{ $item->action_note ?? '' }}"
+                            data-ao-remarks="{{ $item->ao_remarks ?? '' }}"
+                            data-commissioner-remarks="{{ $item->commissioner_remarks ?? '' }}"
+                            data-status="{{ $item->status ?? 'pending' }}"
+                            data-commissioner-action-route="{{ route('admin.manual-complaints.commissioner-action', $item->id) }}"
+                            data-complaint-text="{{ $item->complaint ?: 'No complaint text available' }}">
                             <td>{{ $manualComplaints->firstItem() + $index }}</td>
                             <td>{{ $item->sourceSetting->name ?? $item->source ?? '-' }}</td>
-                            <td>{{ $item->complainant_name ?? '-' }}</td>
                             <td>{{ $item->phone ?? '-' }}</td>
-                            <td>{{ $item->complaint_email ?? '-' }}</td>
                             <td>{{ $item->vehicle_number ?? '-' }}</td>
-                            <td>{{ $item->complainType->name ?? '-' }}</td>
+                            <td>{{ optional($item->created_at)->format('d M Y, h:i A') }}</td>
                             <td>
                                 @if($item->status === 'pending')
                                 <span class="badge bg-warning text-dark">Pending</span>
                                 @elseif($item->status === 'ao')
-                                <span class="badge bg-info">At A/O</span>
+                                <span class="badge bg-warning text-dark">Pending</span>
+                                @elseif($item->status === 'verified')
+                                <span class="badge bg-secondary">Verified</span>
                                 @elseif($item->status === 'commissioner')
                                 <span class="badge bg-primary">At Commissioner</span>
                                 @elseif($item->status === 'completed')
@@ -108,8 +138,7 @@ Manual Complaints - PDMT
                                 <span class="badge bg-danger">Rejected</span>
                                 @endif
                             </td>
-                            <td>{{ optional($item->received_at)->format('d M Y') }}</td>
-                            <td>{{ $item->enteredByUser->name ?? '-' }}</td>
+                            @if($showActionButtons)
                             <td>
                                 <button
                                     class="btn btn-sm btn-primary editBtn action-btn"
@@ -125,16 +154,7 @@ Manual Complaints - PDMT
                                     <i class="bi bi-pencil-square"></i>
                                 </button>
 
-                                @if($item->status === 'pending')
-                                <form method="POST" action="{{ route('admin.manual-complaints.forward-ao', $item->id) }}" class="d-inline manual-forward-form" data-complainant="{{ $item->complainant_name ?? 'this complaint' }}" data-target="{{ in_array(strtolower(trim((string) auth()->user()->role)), ['administrative officer','a/o','ao']) ? 'Commissioner' : 'A/O' }}">
-                                    @csrf
-                                    <button class="btn btn-sm btn-warning action-btn">
-                                        <i class="bi bi-send"></i>
-                                    </button>
-                                </form>
-                                @endif
-
-                                <form method="POST" action="{{ route('admin.manual-complaints.destroy', $item->id) }}" class="d-inline" onsubmit="return confirm('Delete this manual complaint?')">
+                                <form method="POST" action="{{ route('admin.manual-complaints.destroy', $item->id) }}" class="d-inline manual-delete-form" data-complainant="{{ $item->complainant_name ?? 'this complaint' }}">
                                     @csrf
                                     @method('DELETE')
                                     <button class="btn btn-sm btn-danger action-btn">
@@ -142,24 +162,47 @@ Manual Complaints - PDMT
                                     </button>
                                 </form>
                             </td>
-                        </tr>
-                        <tr id="complaint-row-{{ $item->id }}" class="complaint-row">
-                            <td></td>
-                            <td colspan="10" class="bg-light complaint-content-cell">
-                                <strong>Complaint:</strong> {{ $item->complaint ?: 'No complaint text available' }}
-                            </td>
+                            @endif
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="11" class="text-center">No manual complaints found</td>
+                            <td colspan="{{ $showActionButtons ? 7 : 6 }}" class="text-center">No manual complaints found</td>
                         </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
 
-            <div class="d-flex justify-content-end">
-                {{ $manualComplaints->links() }}
+            <div class="d-flex justify-content-end align-items-center mt-3">
+                <div>
+                    {{ $manualComplaints->links('pagination::bootstrap-5') }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-body p-4">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:44px;height:44px;background:#ffe9ec;color:#c02424;">
+                        <i class="bi bi-trash"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">Delete Complaint</h5>
+                    </div>
+                </div>
+
+                <div class="bg-light rounded-3 p-3 mb-3">
+                    <div id="deleteConfirmText" class="fw-semibold">Delete this manual complaint?</div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="confirmDeleteBtn" class="btn btn-danger px-4">Delete</button>
+                </div>
             </div>
         </div>
     </div>
@@ -186,6 +229,93 @@ Manual Complaints - PDMT
                 <div class="d-flex justify-content-end gap-2">
                     <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" id="confirmForwardBtn" class="btn btn-info text-white px-4">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="manualComplaintDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Manual Complaint Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted mb-1">Name</label>
+                        <div id="detailsComplainantName" class="fw-semibold">-</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted mb-1">Email</label>
+                        <div id="detailsComplaintEmail" class="fw-semibold">-</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted mb-1">Type</label>
+                        <div id="detailsComplaintType" class="fw-semibold">-</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted mb-1">Entered By</label>
+                        <div id="detailsEnteredBy" class="fw-semibold">-</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted mb-1">Date</label>
+                        <div id="detailsReceivedDate" class="fw-semibold">-</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted mb-1">Action Note</label>
+                        <div id="detailsActionNoteView" class="fw-semibold">-</div>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label text-muted mb-1">Complaint</label>
+                        <div id="detailsComplaintText" class="p-3 bg-light rounded border">-</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted mb-1">A/O Remarks</label>
+                        <div id="detailsAoRemarks" class="p-2 bg-light rounded border">-</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted mb-1">Commissioner Remarks</label>
+                        <div id="detailsCommissionerRemarks" class="p-2 bg-light rounded border">-</div>
+                    </div>
+                    @if($isAdministrativeOfficer)
+                    <div class="col-12">
+                        <form method="POST" id="aoVerifyForwardForm">
+                            @csrf
+                            <label class="form-label text-muted mb-1">AO Remarks</label>
+                            <textarea class="form-control" id="aoRemarksField" name="ao_remarks" rows="3" placeholder="Enter AO remarks"></textarea>
+                            <div class="d-flex justify-content-end mt-2">
+                                <button type="submit" name="action" value="verify" class="btn btn-outline-secondary btn-sm me-2">Verified</button>
+                                <button type="submit" name="action" value="forward" class="btn btn-primary btn-sm">Finish & Forward To Commissioner</button>
+                            </div>
+                        </form>
+                    </div>
+                    @elseif($isCommissioner)
+                    <div class="col-12" id="commissionerActionSection">
+                        <form method="POST" id="commissionerActionForm">
+                            @csrf
+                            <label class="form-label text-muted mb-1">Commissioner Remarks (Optional)</label>
+                            <textarea class="form-control" id="commissionerRemarksField" name="final_remarks" rows="3" placeholder="Enter commissioner remarks (optional)"></textarea>
+                            <div class="d-flex justify-content-end mt-2 gap-2" id="commissionerActionButtons">
+                                <button type="submit" name="action" value="reject" class="btn btn-outline-danger btn-sm">Reject</button>
+                                <button type="submit" name="action" value="complete" class="btn btn-primary btn-sm">Complete</button>
+                            </div>
+                        </form>
+                    </div>
+                    @else
+                    <div class="col-12">
+                        <form method="POST" id="detailsActionNoteForm">
+                            @csrf
+                            <label class="form-label text-muted mb-1">Action Note</label>
+                            <textarea class="form-control" id="detailsActionNote" name="action_note" rows="3" placeholder="Enter action note" required></textarea>
+                            <div class="d-flex justify-content-end mt-2">
+                                <button type="submit" class="btn btn-primary btn-sm">Save Action</button>
+                            </div>
+                        </form>
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -261,25 +391,46 @@ Manual Complaints - PDMT
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
 <style>
+    .manual-complaints-table {
+        border: 1px solid #dbe3ee;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .manual-complaints-table .manual-table-head th {
+        background-color: #f3f6fa;
+        color: #243b53;
+        border-bottom: 1px solid #d2dceb;
+        font-weight: 600;
+        white-space: nowrap;
+        padding: 12px 14px;
+    }
+
     .manual-complaints-table .manual-row {
         cursor: pointer;
         transition: background-color .2s ease;
     }
 
+    .manual-complaints-table .manual-row td {
+        background-color: #ffffff;
+        border-top: 1px solid #edf1f5;
+        color: #5f6c7b;
+        padding: 12px 14px;
+    }
+
     .manual-complaints-table .manual-row:hover {
-        background-color: #f5f8ff;
+        background-color: #f8fafc;
     }
 
-    .manual-complaints-table .complaint-row {
-        display: none;
+    .manual-complaints-table .manual-row:hover td {
+        background-color: #f8fafc;
     }
 
-    .manual-complaints-table .complaint-row.open {
-        display: table-row;
-    }
-
-    .manual-complaints-table .complaint-content-cell {
-        border-left: 4px solid #0d6efd;
+    .manual-complaints-table .badge {
+        font-weight: 600;
+        font-size: 12px;
+        padding: 6px 10px;
+        border-radius: 6px;
     }
 </style>
 
@@ -293,8 +444,54 @@ document.addEventListener('DOMContentLoaded', function () {
     const forwardConfirmText = document.getElementById('forwardConfirmText');
     const forwardConfirmTitle = document.getElementById('forwardConfirmTitle');
     const confirmForwardBtn = document.getElementById('confirmForwardBtn');
+    const deleteConfirmModalEl = document.getElementById('deleteConfirmModal');
+    const deleteConfirmModal = new bootstrap.Modal(deleteConfirmModalEl);
+    const deleteConfirmText = document.getElementById('deleteConfirmText');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    const detailsModalEl = document.getElementById('manualComplaintDetailsModal');
+    const detailsModal = new bootstrap.Modal(detailsModalEl);
+    const detailsActionNoteForm = document.getElementById('detailsActionNoteForm');
+    const detailsActionNote = document.getElementById('detailsActionNote');
+    const aoVerifyForwardForm = document.getElementById('aoVerifyForwardForm');
+    const aoRemarksField = document.getElementById('aoRemarksField');
+    const commissionerActionForm = document.getElementById('commissionerActionForm');
+    const commissionerRemarksField = document.getElementById('commissionerRemarksField');
+    const commissionerActionButtons = document.getElementById('commissionerActionButtons');
+    const commissionerActionSection = document.getElementById('commissionerActionSection');
     const manualRows = document.querySelectorAll('.manual-row');
     let selectedForwardForm = null;
+    let selectedDeleteForm = null;
+
+    function openDetailsModal(rowElement) {
+        document.getElementById('detailsComplainantName').innerText = rowElement.dataset.complainantName || '-';
+        document.getElementById('detailsComplaintEmail').innerText = rowElement.dataset.complaintEmail || '-';
+        document.getElementById('detailsComplaintType').innerText = rowElement.dataset.complaintType || '-';
+        document.getElementById('detailsEnteredBy').innerText = rowElement.dataset.enteredBy || '-';
+        document.getElementById('detailsReceivedDate').innerText = rowElement.dataset.receivedDate || '-';
+        document.getElementById('detailsActionNoteView').innerText = rowElement.dataset.actionNote || '-';
+        document.getElementById('detailsComplaintText').innerText = rowElement.dataset.complaintText || '-';
+        document.getElementById('detailsAoRemarks').innerText = rowElement.dataset.aoRemarks || '-';
+        document.getElementById('detailsCommissionerRemarks').innerText = rowElement.dataset.commissionerRemarks || '-';
+        if (detailsActionNote && detailsActionNoteForm) {
+            detailsActionNote.value = rowElement.dataset.actionNote || '';
+            detailsActionNoteForm.action = rowElement.dataset.noteRoute || '';
+        }
+        if (aoRemarksField && aoVerifyForwardForm) {
+            aoRemarksField.value = rowElement.dataset.aoRemarks || '';
+            aoVerifyForwardForm.action = rowElement.dataset.aoSaveRoute || '';
+        }
+        if (commissionerRemarksField && commissionerActionForm) {
+            commissionerRemarksField.value = rowElement.dataset.commissionerRemarks || '';
+            commissionerActionForm.action = rowElement.dataset.commissionerActionRoute || '';
+            if (commissionerActionSection) {
+                commissionerActionSection.style.display = (rowElement.dataset.status || '') === 'commissioner' ? 'block' : 'none';
+            }
+            if (commissionerActionButtons) {
+                commissionerActionButtons.style.display = (rowElement.dataset.status || '') === 'commissioner' ? 'flex' : 'none';
+            }
+        }
+        detailsModal.show();
+    }
 
     manualRows.forEach(function (row) {
         row.addEventListener('click', function (e) {
@@ -302,29 +499,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            const detailRowId = this.dataset.complaintRow;
-            const detailRow = document.getElementById(detailRowId);
-
-            if (!detailRow) {
-                return;
-            }
-
-            const isOpening = !detailRow.classList.contains('open');
-
-            document.querySelectorAll('.complaint-row.open').forEach(function (openedRow) {
-                openedRow.classList.remove('open');
-            });
-
-            document.querySelectorAll('.manual-row[aria-expanded="true"]').forEach(function (openedMainRow) {
-                openedMainRow.setAttribute('aria-expanded', 'false');
-            });
-
-            if (isOpening) {
-                detailRow.classList.add('open');
-                this.setAttribute('aria-expanded', 'true');
-            } else {
-                this.setAttribute('aria-expanded', 'false');
-            }
+            openDetailsModal(this);
         });
     });
 
@@ -346,14 +521,33 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    document.getElementById('addManualComplaintBtn').addEventListener('click', function () {
-        form.action = "{{ route('admin.manual-complaints.store') }}";
-        document.getElementById('manualMethod').value = 'POST';
-        document.getElementById('manualModalTitle').innerText = 'Add Manual Complaint';
-        form.reset();
-        document.getElementById('source_id').selectedIndex = 0;
-        document.getElementById('received_at').value = "{{ now()->toDateString() }}";
+    document.querySelectorAll('.manual-delete-form').forEach(function (deleteForm) {
+        deleteForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            selectedDeleteForm = this;
+            const complainant = this.dataset.complainant || 'this complaint';
+            deleteConfirmText.innerText = 'Delete "' + complainant + '" complaint?';
+            deleteConfirmModal.show();
+        });
     });
+
+    confirmDeleteBtn.addEventListener('click', function () {
+        if (selectedDeleteForm) {
+            selectedDeleteForm.submit();
+        }
+    });
+
+    const addManualComplaintBtn = document.getElementById('addManualComplaintBtn');
+    if (addManualComplaintBtn) {
+        addManualComplaintBtn.addEventListener('click', function () {
+            form.action = "{{ route('admin.manual-complaints.store') }}";
+            document.getElementById('manualMethod').value = 'POST';
+            document.getElementById('manualModalTitle').innerText = 'Add Manual Complaint';
+            form.reset();
+            document.getElementById('source_id').selectedIndex = 0;
+            document.getElementById('received_at').value = "{{ now()->toDateString() }}";
+        });
+    }
 
     document.querySelectorAll('.editBtn').forEach(function (btn) {
         btn.addEventListener('click', function () {

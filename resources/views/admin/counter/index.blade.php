@@ -162,17 +162,20 @@ Division- PDMT
                                         data-id="{{ $counter->id }}"
                                         data-district="{{ $counter->district }}"
                                         data-division="{{ $counter->division_name }}"
-                                        data-counter="{{ $counter->counter_name }}">
-                                        Edit
+                                        data-counter="{{ $counter->counter_name }}"
+                                        title="Edit"
+                                        aria-label="Edit">
+                                        <i class="bi bi-pencil-square"></i>
                                     </button>
 
-                                    <form action="{{ route('counters.destroy',$counter->id) }}" method="POST" class="d-inline">
+                                    <form action="{{ route('counters.destroy',$counter->id) }}" method="POST" class="d-inline deleteCounterForm" data-counter-name="{{ $counter->counter_name }}">
                                         @csrf
                                         @method('DELETE')
 
                                         <button class="btn btn-sm btn-danger"
-                                            onclick="return confirm('Delete?')">
-                                            Delete
+                                            title="Delete"
+                                            aria-label="Delete">
+                                            <i class="bi bi-trash"></i>
                                         </button>
 
                                     </form>
@@ -231,10 +234,38 @@ Division- PDMT
 
 </div>
 
+<div class="modal fade" id="deleteCounterModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-body p-4">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:44px;height:44px;background:#ffe9ec;color:#c02424;">
+                        <i class="bi bi-trash"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">Delete Counter</h5>
+                    </div>
+                </div>
+
+                <div class="bg-light rounded-3 p-3 mb-3">
+                    <div id="deleteCounterText" class="fw-semibold">Delete this counter?</div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="confirmDeleteCounterBtn" class="btn btn-danger px-4">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 
 @section('script')
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -246,6 +277,14 @@ Division- PDMT
         const districtSelect = document.getElementById('district');
 
         const divisionSelect = document.getElementById('division_name');
+
+        const deleteCounterModal = new bootstrap.Modal(document.getElementById('deleteCounterModal'));
+
+        const deleteCounterText = document.getElementById('deleteCounterText');
+
+        const confirmDeleteCounterBtn = document.getElementById('confirmDeleteCounterBtn');
+
+        let selectedDeleteForm = null;
 
 
         /* DS DIVISION DATA */
@@ -343,6 +382,32 @@ Division- PDMT
                 modal.show();
 
             });
+
+        });
+
+        document.querySelectorAll('.deleteCounterForm').forEach(function(deleteForm) {
+
+            deleteForm.addEventListener('submit', function(e) {
+
+                e.preventDefault();
+
+                selectedDeleteForm = this;
+
+                const counterName = this.dataset.counterName || 'this counter';
+
+                deleteCounterText.innerText = 'Delete "' + counterName + '" counter?';
+
+                deleteCounterModal.show();
+
+            });
+
+        });
+
+        confirmDeleteCounterBtn.addEventListener('click', function() {
+
+            if (selectedDeleteForm) {
+                selectedDeleteForm.submit();
+            }
 
         });
 

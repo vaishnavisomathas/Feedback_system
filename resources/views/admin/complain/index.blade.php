@@ -4,6 +4,20 @@
 Complaints - PDMT
 @endsection
 <style>
+    .complaint-table {
+        border: 1px solid #dbe3ee;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .complaint-table .complaint-table-head th {
+        background-color: #f3f6fa;
+        color: #243b53;
+        border-bottom: 1px solid #d2dceb;
+        white-space: nowrap;
+        padding: 12px 14px;
+    }
+
     .complaint-table th {
         font-weight: 600;
         font-size: 14px;
@@ -11,14 +25,17 @@ Complaints - PDMT
 
     .complaint-table td {
         font-size: 14px;
+        border-top: 1px solid #edf1f5;
+        color: #5f6c7b;
+        padding: 12px 14px;
     }
 
     .complaint-table tbody tr {
         cursor: pointer;
     }
 
-    .complaint-table tbody tr:hover {
-        background-color: #f8f9fa;
+    .complaint-table tbody tr:hover td {
+        background-color: #f8fafc;
     }
 
     .card-sm {
@@ -182,8 +199,8 @@ Complaints - PDMT
         {{-- ================= ALL COMPLAINTS ================= --}}
         <div class="tab-pane fade {{ request('active_tab','pending') == 'pending' ? 'show active' : '' }}" id="pending">
 
-            <table class="table table-striped table-hover align-middle complaint-table">
-                <thead class="table-dark">
+            <table class="table table-hover align-middle complaint-table">
+                <thead class="complaint-table-head">
                     <tr>
                         <th>#</th>
                         <th>DS Division</th>
@@ -201,8 +218,14 @@ Complaints - PDMT
                 <tbody id="pendingAccordion">
                     @forelse($allRatings as $index => $rating)
 
-                    <tr data-bs-toggle="collapse"
-                        data-bs-target="#complaint{{ $rating->id }}"
+                    <tr class="pending-complaint-row"
+                        data-remarks-route="{{ route('admin.complain.remarks', $rating->id) }}"
+                        data-vehicle="{{ $rating->vehicle_number ?? '-' }}"
+                        data-phone="{{ $rating->phone ?? '-' }}"
+                        data-email="{{ $rating->complaint_email ?? '-' }}"
+                        data-complaint="{{ $rating->note ?? 'No complaint provided' }}"
+                        data-selected-type="{{ $rating->complain_type_id ?? '' }}"
+                        data-user-remarks="{{ $rating->remarks ?? '' }}"
                         style="cursor:pointer">
 
                         <td>{{ $allRatings->firstItem() + $index }}</td>
@@ -240,68 +263,9 @@ Complaints - PDMT
                             @else
                             <span class="badge bg-secondary">Unknown</span>
                             @endif
-                            &nbsp;&nbsp;<span class="float-end">▼</span>
-
                         </td>
 
 
-                    </tr>
-
-                    {{-- DETAILS --}}
-                    <tr class="collapse bg-light"
-                        id="complaint{{ $rating->id }}"
-                        data-bs-parent="#pendingAccordion">
-                        <td colspan="10">
-                            <div class="card shadow-sm border-secondary mb-2">
-                                <div class="card-body p-3">
-                                    <div class="row">
-                                        <div class="col-md-6 mb-2">
-                                            <strong>Vehicle:</strong>
-                                            <p class="mb-0">{{ $rating->vehicle_number ?? '-' }}</p>
-                                        </div>
-                                        <div class="col-md-6 mb-2">
-                                            <strong>Phone:</strong>
-                                            <p class="mb-0">{{ $rating->phone ?? '-' }}</p>
-                                        </div>
-                                        <div class="col-md-6 mb-2">
-                                            <strong>Email:</strong>
-                                            <p class="mb-0">{{ $rating->complaint_email ?? '-' }}</p>
-                                        </div>
-                                        <div class="col-md-6 mb-2">
-                                            <strong>Complaint:</strong>
-                                            <p class="mb-0">{{ $rating->note ?? 'No complaint provided' }}</p>
-                                        </div>
-
-                                        <div class="col-md-6 mb-2">
-                                            <form method="POST" action="{{ route('admin.complain.remarks', $rating->id) }}">
-                                                @csrf
-                                                <div class="mb-2">
-                                                    <label><strong>Complaint Type:</strong></label>
-                                                    <select name="complain_type_id" class="form-control">
-                                                        <option value="">-- Select Type --</option>
-                                                        @foreach($types as $type)
-                                                        <option value="{{ $type->id }}"
-                                                            {{ $rating->complain_type_id == $type->id ? 'selected' : '' }}>
-                                                            {{ $type->name }}
-                                                        </option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-
-                                                <div class="mb-2">
-                                                    <label><strong>Remarks:</strong></label>
-                                                    <textarea name="user_remarks" class="form-control" rows="3">{{ $rating->remarks }}</textarea>
-                                                </div>
-
-                                                <button class="btn btn-danger btn-sm">
-                                                    Forward to Administrative Officer
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
                     </tr>
 
                     @empty
@@ -331,8 +295,8 @@ Complaints - PDMT
         {{-- ================= All COMPLAINTS ================= --}}
         <div class="tab-pane fade {{ request('active_tab') == 'closed' ? 'show active' : '' }}" id="closed">
 
-            <table class="table table-striped table-hover align-middle complaint-table">
-                <thead class="table-secondary">
+            <table class="table table-hover align-middle complaint-table">
+                <thead class="complaint-table-head">
                     <tr>
                         <th>#</th>
                         <th>DS Division</th>
@@ -351,8 +315,16 @@ Complaints - PDMT
 
                     @forelse($readRatings as $index => $rating)
 
-                    <tr data-bs-toggle="collapse"
-                        data-bs-target="#readComplaint{{ $rating->id }}"
+                    <tr class="closed-complaint-row"
+                        data-vehicle="{{ $rating->vehicle_number ?? '-' }}"
+                        data-phone="{{ $rating->phone ?? '-' }}"
+                        data-email="{{ $rating->complaint_email ?? '-' }}"
+                        data-complaint="{{ $rating->note ?? '-' }}"
+                        data-complaint-type="{{ $rating->complainType->name ?? 'Not specified' }}"
+                        data-user-remarks="{{ $rating->user_remarks ?? '-' }}"
+                        data-ao-remarks="{{ $rating->ao_remarks ?? '-' }}"
+                        data-commissioner-remarks="{{ $rating->commissioner_remarks ?? '-' }}"
+                        data-status="{{ $rating->status ?? 'pending' }}"
                         style="cursor:pointer">
 
                         <td>{{ $readRatings->firstItem() + $index }}</td>
@@ -404,64 +376,9 @@ Complaints - PDMT
                             @break
 
                             @default
-                            <span class="badge bg-dark">Unknown</span>
+                            <span class="badge bg-secondary">Unknown</span>
 
                             @endswitch
-                            &nbsp;&nbsp;<span class="float-end">▼</span>
-
-                        </td>
-                    </tr>
-
-                    <tr class="collapse bg-light"
-                        id="readComplaint{{ $rating->id }}"
-                        data-bs-parent="#closedAccordion">
-                        <td colspan="10">
-                            <div class="card card-sm shadow-sm border-secondary mb-2">
-                                <div class="card-body p-2">
-                                    <div class="row">
-                                        <div class="col-md-6 mb-2">
-                                            <strong>Vehicle:</strong>
-                                            <p class="mb-0">{{ $rating->vehicle_number ?? '-' }}</p>
-                                        </div>
-                                        <div class="col-md-6 mb-2">
-                                            <strong>Phone:</strong>
-                                            <p class="mb-0">{{ $rating->phone ?? '-' }}</p>
-                                        </div>
-                                        <div class="col-md-6 mb-2">
-                                            <strong>Email:</strong>
-                                            <p class="mb-0">{{ $rating->complaint_email ?? '-' }}</p>
-                                        </div>
-                                        <div class="col-md-6 mb-2">
-                                            <strong>Complaint:</strong>
-                                            <p class="mb-0">{{ $rating->note }}</p>
-                                        </div>
-                                        <div class="col-md-6 mb-2">
-                                            <strong>Complaint Type:</strong>
-                                            <p class="mb-0"><span class="badge bg-warning text-dark">{{ $rating->complainType->name ?? 'Not specified' }}</span></p>
-                                        </div>
-                                        <div class="col-md-6 mb-2">
-                                            <strong>User Remarks:</strong>
-                                            <p class="mb-0">{{ $rating->user_remarks ?? '-' }}</p>
-                                        </div>
-                                        @if($rating->status == 'completed')
-                                        <div class="col-md-6 mb-2">
-                                            <strong>AO Remarks:</strong>
-                                            <p class="mb-0">{{ $rating->ao_remarks ?? '-' }}</p>
-                                        </div>
-                                        <div class="col-md-6 mb-2">
-                                            <strong>Final Commissioner Decision:</strong>
-                                            <p class="mb-0">{{ $rating->commissioner_remarks ?? '-' }}</p>
-                                        </div>
-                                        @endif
-                                        @if($rating->status == 'commissioner')
-                                        <div class="col-md-6 mb-2">
-                                            <strong>AO Remarks:</strong>
-                                            <p class="mb-0">{{ $rating->ao_remarks ?? '-' }}</p>
-                                        </div>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
                         </td>
                     </tr>
 
@@ -494,18 +411,108 @@ Complaints - PDMT
 </div>
 </div>
 </div>
+
+<div class="modal fade" id="pendingComplaintModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Complaint Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted mb-1">Vehicle</label>
+                        <div id="pendingDetailsVehicle" class="fw-semibold">-</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted mb-1">Phone</label>
+                        <div id="pendingDetailsPhone" class="fw-semibold">-</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted mb-1">Email</label>
+                        <div id="pendingDetailsEmail" class="fw-semibold">-</div>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label text-muted mb-1">Complaint</label>
+                        <div id="pendingDetailsComplaint" class="p-3 bg-light rounded border">-</div>
+                    </div>
+                    <div class="col-12">
+                        <form method="POST" id="pendingComplaintForm">
+                            @csrf
+                            <div class="mb-3">
+                                <label><strong>Complaint Type:</strong></label>
+                                <select name="complain_type_id" id="pendingComplaintType" class="form-control">
+                                    <option value="">-- Select Type --</option>
+                                    @foreach($types as $type)
+                                    <option value="{{ $type->id }}">{{ $type->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label><strong>Remarks:</strong></label>
+                                <textarea name="user_remarks" id="pendingComplaintRemarks" class="form-control" rows="3"></textarea>
+                            </div>
+                            <button class="btn btn-danger btn-sm">Forward to Administrative Officer</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="closedComplaintModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Complaint Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-muted mb-1">Vehicle</label>
+                        <div id="closedDetailsVehicle" class="fw-semibold">-</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted mb-1">Phone</label>
+                        <div id="closedDetailsPhone" class="fw-semibold">-</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted mb-1">Email</label>
+                        <div id="closedDetailsEmail" class="fw-semibold">-</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted mb-1">Complaint Type</label>
+                        <div id="closedDetailsType" class="fw-semibold">-</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted mb-1">User Remarks</label>
+                        <div id="closedDetailsUserRemarks" class="p-2 bg-light rounded border">-</div>
+                    </div>
+                    <div class="col-md-6" id="closedDetailsAoWrap">
+                        <label class="form-label text-muted mb-1">AO Remarks</label>
+                        <div id="closedDetailsAoRemarks" class="p-2 bg-light rounded border">-</div>
+                    </div>
+                    <div class="col-md-6" id="closedDetailsCommissionerWrap">
+                        <label class="form-label text-muted mb-1">Final Commissioner Decision</label>
+                        <div id="closedDetailsCommissionerRemarks" class="p-2 bg-light rounded border">-</div>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label text-muted mb-1">Complaint</label>
+                        <div id="closedDetailsComplaint" class="p-3 bg-light rounded border">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 @section('script')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
 <style>
-    tr[aria-expanded="true"] span {
-        transform: rotate(180deg);
-    }
-
-    span {
-        transition: 0.2s;
-    }
 </style>
 
 <script>
@@ -517,9 +524,41 @@ Complaints - PDMT
     document.addEventListener("DOMContentLoaded", function() {
         const filterBox = document.getElementById('filterBox');
         const arrow = document.getElementById('arrow');
+        const pendingComplaintModal = new bootstrap.Modal(document.getElementById('pendingComplaintModal'));
+        const closedComplaintModal = new bootstrap.Modal(document.getElementById('closedComplaintModal'));
 
         filterBox.addEventListener('show.bs.collapse', () => arrow.innerHTML = '▲');
         filterBox.addEventListener('hide.bs.collapse', () => arrow.innerHTML = '▼');
+
+        document.querySelectorAll('.pending-complaint-row').forEach(function(row) {
+            row.addEventListener('click', function() {
+                document.getElementById('pendingDetailsVehicle').innerText = row.dataset.vehicle || '-';
+                document.getElementById('pendingDetailsPhone').innerText = row.dataset.phone || '-';
+                document.getElementById('pendingDetailsEmail').innerText = row.dataset.email || '-';
+                document.getElementById('pendingDetailsComplaint').innerText = row.dataset.complaint || '-';
+                document.getElementById('pendingComplaintForm').action = row.dataset.remarksRoute || '';
+                document.getElementById('pendingComplaintType').value = row.dataset.selectedType || '';
+                document.getElementById('pendingComplaintRemarks').value = row.dataset.userRemarks || '';
+                pendingComplaintModal.show();
+            });
+        });
+
+        document.querySelectorAll('.closed-complaint-row').forEach(function(row) {
+            row.addEventListener('click', function() {
+                document.getElementById('closedDetailsVehicle').innerText = row.dataset.vehicle || '-';
+                document.getElementById('closedDetailsPhone').innerText = row.dataset.phone || '-';
+                document.getElementById('closedDetailsEmail').innerText = row.dataset.email || '-';
+                document.getElementById('closedDetailsComplaint').innerText = row.dataset.complaint || '-';
+                document.getElementById('closedDetailsType').innerText = row.dataset.complaintType || '-';
+                document.getElementById('closedDetailsUserRemarks').innerText = row.dataset.userRemarks || '-';
+                document.getElementById('closedDetailsAoRemarks').innerText = row.dataset.aoRemarks || '-';
+                document.getElementById('closedDetailsCommissionerRemarks').innerText = row.dataset.commissionerRemarks || '-';
+
+                document.getElementById('closedDetailsAoWrap').style.display = ['commissioner', 'completed'].includes(row.dataset.status || '') ? 'block' : 'none';
+                document.getElementById('closedDetailsCommissionerWrap').style.display = (row.dataset.status || '') === 'completed' ? 'block' : 'none';
+                closedComplaintModal.show();
+            });
+        });
     });
 </script>
 

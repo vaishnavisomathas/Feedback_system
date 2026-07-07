@@ -192,7 +192,7 @@ $status = $statusMap[$filters['status'] ?? ''] ?? null;
     });
 })
 ->when($filters['complain_type'], fn($q) => $q->where('complain_type_id', $filters['complain_type']))
-        ->latest()
+        ->orderByDesc('id')
         ->paginate($request->per_page ?? 10, ['*'], 'pending');
 
     $closedAO = Feedback::with(['counter','complainType','serviceQuality'])
@@ -214,7 +214,7 @@ $status = $statusMap[$filters['status'] ?? ''] ?? null;
     });
 })
 ->when($filters['complain_type'], fn($q) => $q->where('complain_type_id', $filters['complain_type']))
-        ->latest()
+        ->orderByDesc('id')
         ->paginate($request->per_page ?? 10, ['*'], 'closed');
 
     return view('admin.ao.index', compact('pendingAO','closedAO','serviceQualities','filters','counters','complainTypes'));

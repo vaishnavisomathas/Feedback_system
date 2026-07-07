@@ -3,6 +3,10 @@
 @section('content')
 <div class="container">
     <style>
+        .delete-user-dialog {
+            max-width: 560px;
+        }
+
         @media (max-width:768px) {
 
             h5 {
@@ -96,22 +100,30 @@
 
     <!-- Delete Modal -->
     <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered delete-user-dialog">
             <form method="POST" id="deleteUserForm">
                 @csrf
                 @method('DELETE')
 
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Confirm Delete</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p class="mb-0">Are you sure you want to delete <strong id="deleteUserName">this user</strong>?</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-danger">Delete</button>
+                <div class="modal-content border-0 shadow-lg rounded-4">
+                    <div class="modal-body p-4">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:44px;height:44px;background:#ffe9ec;color:#c02424;">
+                                <i class="bi bi-trash"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-0">Delete User</h5>
+                            </div>
+                        </div>
+
+                        <div class="bg-light rounded-3 p-3 mb-3">
+                            <div class="fw-semibold">Delete <span id="deleteUserName">this user</span>?</div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-danger px-4">Delete</button>
+                        </div>
                     </div>
                 </div>
             </form>

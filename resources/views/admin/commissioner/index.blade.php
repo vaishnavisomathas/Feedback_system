@@ -4,6 +4,20 @@
 Commissioner Complaints - PDMT
 @endsection
 <style>
+    .commissioner-table {
+        border: 1px solid #dbe3ee;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .commissioner-table .commissioner-table-head th {
+        background-color: #f3f6fa;
+        color: #243b53;
+        border-bottom: 1px solid #d2dceb;
+        white-space: nowrap;
+        padding: 12px 14px;
+    }
+
     .commissioner-table th {
         font-weight: 600;
         font-size: 14px;
@@ -11,14 +25,17 @@ Commissioner Complaints - PDMT
 
     .commissioner-table td {
         font-size: 14px;
+        border-top: 1px solid #edf1f5;
+        color: #5f6c7b;
+        padding: 12px 14px;
     }
 
     .commissioner-table tbody tr {
         cursor: pointer;
     }
 
-    .commissioner-table tbody tr:hover {
-        background-color: #f8f9fa;
+    .commissioner-table tbody tr:hover td {
+        background-color: #f8fafc;
     }
 
     .modal-content {
@@ -229,9 +246,9 @@ Commissioner Complaints - PDMT
 
                 <div class="tab-pane fade {{ request('active_tab','pending')=='pending'?'show active':'' }}" id="pending">
 
-                    <table class="table table-striped table-hover align-middle commissioner-table">
+                    <table class="table table-hover align-middle commissioner-table">
 
-                        <thead class="table-dark">
+                        <thead class="commissioner-table-head">
 
                             <tr>
 
@@ -443,9 +460,9 @@ Commissioner Complaints - PDMT
 
                 <div class="tab-pane fade {{ request('active_tab')=='closed'?'show active':'' }}" id="closed">
 
-                    <table class="table table-striped table-hover align-middle commissioner-table">
+                    <table class="table table-hover align-middle commissioner-table">
 
-                        <thead class="table-secondary">
+                        <thead class="commissioner-table-head">
 
                             <tr>
 
