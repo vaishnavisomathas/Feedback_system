@@ -65,7 +65,7 @@ class HomeController extends Controller
 $pending = \App\Models\Feedback::where('status', 'pending')
             ->whereNotNull('note')
             ->where('note', '!=', '')
-            ->count();    
+            ->count();
             $ao = \App\Models\Feedback::where('status','ao')->count();
     $commissioner = \App\Models\Feedback::where('status','commissioner')->count();
 $period = request('period','today');
@@ -221,5 +221,97 @@ $topDivisions = $query
             'divisions'
         ));
     }
-}
 
+    public function ratingPointsReportPdf(Request $request)
+    {
+        $roleKey = strtolower(trim((string) auth()->user()->role));
+
+        if (!in_array($roleKey, ['super admin', 'admin', 'commissioner', 'commisioner'], true)) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $period = $request->get('period', 'today');
+        $selectedMonth = $request->get('month', now()->format('Y-m'));
+        $selectedYear = (int) $request->get('year', now()->year);
+        $selectedDivision = $request->get('division');
+        $selectedFrom = $request->get('from');
+        $selectedTo = $request->get('to');
+
+        $baseQuery = Feedback::query()->whereNotNull('counter_id');
+
+        if (!empty($selectedFrom) || !empty($selectedTo)) {
+            try {
+                $fromDate = !empty($selectedFrom) ? Carbon::parse($selectedFrom)->toDateString() : null;
+            } catch (\Throwable $e) {
+                $fromDate = null;
+            }
+
+            try {
+                $toDate = !empty($selectedTo) ? Carbon::parse($selectedTo)->toDateString() : null;
+            } catch (\Throwable $e) {
+                $toDate = null;
+            }
+
+            if (!empty($fromDate) && !empty($toDate) && $fromDate > $toDate) {
+                [$fromDate, $toDate] = [$toDate, $fromDate];
+            }
+
+            if (!empty($fromDate)) {
+                $baseQuery->whereDate('created_at', '>=', $fromDate);
+            }
+
+            if (!empty($toDate)) {
+                $baseQuery->whereDate('created_at', '<=', $toDate);
+            }
+        } elseif ($period === 'month') {
+            try {
+                $monthDate = Carbon::createFromFormat('Y-m', $selectedMonth);
+            } catch (\Throwable $e) {
+                $monthDate = now();
+            }
+
+            $baseQuery->whereYear('created_at', $monthDate->year)
+                ->whereMonth('created_at', $monthDate->month);
+        } elseif ($period === 'year') {
+            if ($selectedYear < 2000 || $selectedYear > 2100) {
+                $selectedYear = (int) now()->year;
+            }
+
+            $baseQuery->whereYear('created_at', $selectedYear);
+        } else {
+            $baseQuery->whereDate('created_at', now());
+        }
+
+        if (!empty($selectedDivision)) {
+            $baseQuery->whereHas('counter', function ($query) use ($selectedDivision) {
+                $query->where('division_name', $selectedDivision);
+            });
+        }
+
+        $ranking = $baseQuery
+            ->select(
+                'counter_id',
+                DB::raw('COUNT(*) as total'),
+                DB::raw('AVG(rating) as avg_rating')
+            )
+            ->groupBy('counter_id')
+            ->with('counter')
+            ->orderByDesc('total')
+            ->get();
+
+        $html = view('reports.rating_points_pdf', compact(
+            'ranking',
+            'period',
+            'selectedMonth',
+            'selectedYear',
+            'selectedDivision',
+            'selectedFrom',
+            'selectedTo'
+        ))->render();
+
+        $pdf = app('dompdf.wrapper')->loadHTML($html);
+
+        return $pdf->download('Rating_Points_Report_' . now()->format('Y-m-d_H-i-s') . '.pdf');
+    }
+
+}

@@ -77,7 +77,7 @@ font-size:14px;
 class="img-fluid login-logo"
 alt="PDMT">
 
-<h5 class="fw-bold mt-3 login-title">
+<h5 class="fw-bold mt-3 login-title" style="font-size: 18px;">
 Provincial Department of Motor Traffic
 </h5>
 

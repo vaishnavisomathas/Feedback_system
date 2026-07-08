@@ -10,7 +10,7 @@ Manual Complaints - PDMT
         $roleLower = strtolower(trim((string) auth()->user()->role));
         $isAdministrativeOfficer = in_array($roleLower, ['administrative officer', 'a/o', 'ao'], true);
         $isCommissioner = $roleLower === 'commissioner';
-        $showActionButtons = in_array($roleLower, ['super admin', 'admin', 'commissioner'], true);
+        $showActionButtons = $roleLower === 'super admin';
         $canAddManualComplaint = in_array($roleLower, ['super admin', 'admin', 'user'], true);
     @endphp
     <input type="hidden" id="manualComplaintHasErrors" value="{{ $errors->any() ? '1' : '0' }}">
@@ -55,9 +55,6 @@ Manual Complaints - PDMT
                                 <option value="">All</option>
                                 <option value="pending" {{ ($filters['status'] ?? '') === 'pending' ? 'selected' : '' }}>Pending</option>
                                 <option value="verified" {{ ($filters['status'] ?? '') === 'verified' ? 'selected' : '' }}>Verified</option>
-                                <option value="commissioner" {{ ($filters['status'] ?? '') === 'commissioner' ? 'selected' : '' }}>At Commissioner</option>
-                                <option value="completed" {{ ($filters['status'] ?? '') === 'completed' ? 'selected' : '' }}>Completed</option>
-                                <option value="rejected" {{ ($filters['status'] ?? '') === 'rejected' ? 'selected' : '' }}>Rejected</option>
                             </select>
                         </div>
                         <div class="col-md-2">
@@ -79,7 +76,7 @@ Manual Complaints - PDMT
                             <a href="{{ route('admin.manual-complaints.index') }}" class="btn btn-outline-secondary btn-sm">
                                <i class="bi bi-arrow-clockwise me-1"></i>
                             </a>
-                       
+
                         </div>
                     </form>
                 </div>
@@ -105,15 +102,18 @@ Manual Complaints - PDMT
                         <tr
                             class="manual-row"
                             role="button"
+                            data-id="{{ $item->id }}"
                             data-note-route="{{ route('admin.manual-complaints.save-action-note', $item->id) }}"
                             data-ao-save-route="{{ route('admin.manual-complaints.ao.save', $item->id) }}"
+                            data-source="{{ $item->sourceSetting->name ?? $item->source ?? '-' }}"
+                            data-phone="{{ $item->phone ?? '-' }}"
+                            data-vehicle-number="{{ $item->vehicle_number ?? '-' }}"
                             data-complainant-name="{{ $item->complainant_name ?? '-' }}"
                             data-complaint-email="{{ $item->complaint_email ?? '-' }}"
                             data-complaint-type="{{ $item->complainType->name ?? '-' }}"
                             data-entered-by="{{ $item->enteredByUser->name ?? '-' }}"
                             data-received-date="{{ optional($item->received_at)->format('d M Y') ?: '-' }}"
                             data-action-note="{{ $item->action_note ?? '' }}"
-                            data-ao-remarks="{{ $item->ao_remarks ?? '' }}"
                             data-commissioner-remarks="{{ $item->commissioner_remarks ?? '' }}"
                             data-status="{{ $item->status ?? 'pending' }}"
                             data-commissioner-action-route="{{ route('admin.manual-complaints.commissioner-action', $item->id) }}"
@@ -249,11 +249,23 @@ Manual Complaints - PDMT
                         <div id="detailsComplainantName" class="fw-semibold">-</div>
                     </div>
                     <div class="col-md-6">
+                        <label class="form-label text-muted mb-1">Source</label>
+                        <div id="detailsSource" class="fw-semibold">-</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted mb-1">Phone</label>
+                        <div id="detailsPhone" class="fw-semibold">-</div>
+                    </div>
+                    <div class="col-md-6">
                         <label class="form-label text-muted mb-1">Email</label>
                         <div id="detailsComplaintEmail" class="fw-semibold">-</div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label text-muted mb-1">Type</label>
+                        <label class="form-label text-muted mb-1">Vehicle Number</label>
+                        <div id="detailsVehicleNumber" class="fw-semibold">-</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted mb-1">Complaint Type</label>
                         <div id="detailsComplaintType" class="fw-semibold">-</div>
                     </div>
                     <div class="col-md-6">
@@ -264,54 +276,21 @@ Manual Complaints - PDMT
                         <label class="form-label text-muted mb-1">Date</label>
                         <div id="detailsReceivedDate" class="fw-semibold">-</div>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label text-muted mb-1">Action Note</label>
-                        <div id="detailsActionNoteView" class="fw-semibold">-</div>
-                    </div>
+
                     <div class="col-12">
                         <label class="form-label text-muted mb-1">Complaint</label>
                         <div id="detailsComplaintText" class="p-3 bg-light rounded border">-</div>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label text-muted mb-1">A/O Remarks</label>
-                        <div id="detailsAoRemarks" class="p-2 bg-light rounded border">-</div>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label text-muted mb-1">Commissioner Remarks</label>
-                        <div id="detailsCommissionerRemarks" class="p-2 bg-light rounded border">-</div>
+                       <div class="col-md-12">
+                        <label class="form-label text-muted mb-1">Action Note</label>
+                        <div id="detailsActionNoteView" class="p-3 bg-light rounded border">-</div>
                     </div>
                     @if($isAdministrativeOfficer)
                     <div class="col-12">
                         <form method="POST" id="aoVerifyForwardForm">
                             @csrf
-                            <label class="form-label text-muted mb-1">AO Remarks</label>
-                            <textarea class="form-control" id="aoRemarksField" name="ao_remarks" rows="3" placeholder="Enter AO remarks"></textarea>
                             <div class="d-flex justify-content-end mt-2">
-                                <button type="submit" name="action" value="verify" class="btn btn-outline-secondary btn-sm me-2">Verified</button>
-                                <button type="submit" name="action" value="forward" class="btn btn-primary btn-sm">Finish & Forward To Commissioner</button>
-                            </div>
-                        </form>
-                    </div>
-                    @elseif($isCommissioner)
-                    <div class="col-12" id="commissionerActionSection">
-                        <form method="POST" id="commissionerActionForm">
-                            @csrf
-                            <label class="form-label text-muted mb-1">Commissioner Remarks (Optional)</label>
-                            <textarea class="form-control" id="commissionerRemarksField" name="final_remarks" rows="3" placeholder="Enter commissioner remarks (optional)"></textarea>
-                            <div class="d-flex justify-content-end mt-2 gap-2" id="commissionerActionButtons">
-                                <button type="submit" name="action" value="reject" class="btn btn-outline-danger btn-sm">Reject</button>
-                                <button type="submit" name="action" value="complete" class="btn btn-primary btn-sm">Complete</button>
-                            </div>
-                        </form>
-                    </div>
-                    @else
-                    <div class="col-12">
-                        <form method="POST" id="detailsActionNoteForm">
-                            @csrf
-                            <label class="form-label text-muted mb-1">Action Note</label>
-                            <textarea class="form-control" id="detailsActionNote" name="action_note" rows="3" placeholder="Enter action note" required></textarea>
-                            <div class="d-flex justify-content-end mt-2">
-                                <button type="submit" class="btn btn-primary btn-sm">Save Action</button>
+                                <button type="submit" name="action" value="verify" class="btn btn-outline-secondary btn-sm">Verified</button>
                             </div>
                         </form>
                     </div>
@@ -345,11 +324,11 @@ Manual Complaints - PDMT
                     </div>
                     <div class="col-md-4 mb-3">
                         <label>Name</label>
-                        <input type="text" class="form-control" name="complainant_name" id="complainant_name">
+                        <input type="text" class="form-control" name="complainant_name" id="complainant_name" required>
                     </div>
                     <div class="col-md-4 mb-3">
                         <label>Phone</label>
-                        <input type="text" class="form-control" name="phone" id="phone" maxlength="20">
+                        <input type="text" class="form-control" name="phone" id="phone" maxlength="20" required>
                     </div>
                     <div class="col-md-4 mb-3">
                         <label>Email</label>
@@ -357,11 +336,11 @@ Manual Complaints - PDMT
                     </div>
                     <div class="col-md-4 mb-3">
                         <label>Vehicle Number</label>
-                        <input type="text" class="form-control text-uppercase" name="vehicle_number" id="vehicle_number" maxlength="20">
+                        <input type="text" class="form-control text-uppercase" name="vehicle_number" id="vehicle_number" maxlength="20" required>
                     </div>
                     <div class="col-md-4 mb-3">
                         <label>Complaint Type</label>
-                        <select class="form-control" name="complain_type_id" id="complain_type_id">
+                        <select class="form-control" name="complain_type_id" id="complain_type_id" required>
                             <option value="">-- Select Type --</option>
                             @foreach($types as $type)
                             <option value="{{ $type->id }}">{{ $type->name }}</option>
@@ -372,9 +351,16 @@ Manual Complaints - PDMT
                         <label>Received Date</label>
                         <input type="date" class="form-control" name="received_at" id="received_at" value="{{ now()->toDateString() }}">
                     </div>
+
                     <div class="col-md-12 mb-3">
                         <label>Complaint</label>
                         <textarea class="form-control" name="complaint" id="complaint" rows="4" required></textarea>
+                    </div>
+                  <div class="col-md-12 mb-3">
+                            <label class="form-label text-muted mb-1">Action Note</label>
+                            <textarea class="form-control" name="action_note" rows="3" placeholder="Enter action note" required></textarea>
+
+
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -453,42 +439,27 @@ document.addEventListener('DOMContentLoaded', function () {
     const detailsActionNoteForm = document.getElementById('detailsActionNoteForm');
     const detailsActionNote = document.getElementById('detailsActionNote');
     const aoVerifyForwardForm = document.getElementById('aoVerifyForwardForm');
-    const aoRemarksField = document.getElementById('aoRemarksField');
-    const commissionerActionForm = document.getElementById('commissionerActionForm');
-    const commissionerRemarksField = document.getElementById('commissionerRemarksField');
-    const commissionerActionButtons = document.getElementById('commissionerActionButtons');
-    const commissionerActionSection = document.getElementById('commissionerActionSection');
     const manualRows = document.querySelectorAll('.manual-row');
     let selectedForwardForm = null;
     let selectedDeleteForm = null;
 
     function openDetailsModal(rowElement) {
         document.getElementById('detailsComplainantName').innerText = rowElement.dataset.complainantName || '-';
+        document.getElementById('detailsSource').innerText = rowElement.dataset.source || '-';
+        document.getElementById('detailsPhone').innerText = rowElement.dataset.phone || '-';
         document.getElementById('detailsComplaintEmail').innerText = rowElement.dataset.complaintEmail || '-';
+        document.getElementById('detailsVehicleNumber').innerText = rowElement.dataset.vehicleNumber || '-';
         document.getElementById('detailsComplaintType').innerText = rowElement.dataset.complaintType || '-';
         document.getElementById('detailsEnteredBy').innerText = rowElement.dataset.enteredBy || '-';
         document.getElementById('detailsReceivedDate').innerText = rowElement.dataset.receivedDate || '-';
         document.getElementById('detailsActionNoteView').innerText = rowElement.dataset.actionNote || '-';
         document.getElementById('detailsComplaintText').innerText = rowElement.dataset.complaintText || '-';
-        document.getElementById('detailsAoRemarks').innerText = rowElement.dataset.aoRemarks || '-';
-        document.getElementById('detailsCommissionerRemarks').innerText = rowElement.dataset.commissionerRemarks || '-';
         if (detailsActionNote && detailsActionNoteForm) {
             detailsActionNote.value = rowElement.dataset.actionNote || '';
             detailsActionNoteForm.action = rowElement.dataset.noteRoute || '';
         }
-        if (aoRemarksField && aoVerifyForwardForm) {
-            aoRemarksField.value = rowElement.dataset.aoRemarks || '';
+        if (aoVerifyForwardForm) {
             aoVerifyForwardForm.action = rowElement.dataset.aoSaveRoute || '';
-        }
-        if (commissionerRemarksField && commissionerActionForm) {
-            commissionerRemarksField.value = rowElement.dataset.commissionerRemarks || '';
-            commissionerActionForm.action = rowElement.dataset.commissionerActionRoute || '';
-            if (commissionerActionSection) {
-                commissionerActionSection.style.display = (rowElement.dataset.status || '') === 'commissioner' ? 'block' : 'none';
-            }
-            if (commissionerActionButtons) {
-                commissionerActionButtons.style.display = (rowElement.dataset.status || '') === 'commissioner' ? 'flex' : 'none';
-            }
         }
         detailsModal.show();
     }

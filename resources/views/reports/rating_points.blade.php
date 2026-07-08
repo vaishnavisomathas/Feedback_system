@@ -69,17 +69,55 @@ Rating Points Report - PDMT
     .table td {
         font-size: 14px;
     }
+
+    @media print {
+        .filter-card,
+        .d-flex.flex-wrap.justify-content-between,
+        .d-flex.flex-wrap.justify-content-end,
+        .btn,
+        form {
+            display: none !important;
+        }
+
+        body {
+            background: white;
+            margin: 0;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0;
+        }
+
+        .table-card {
+            page-break-inside: avoid;
+            box-shadow: none;
+            border: 1px solid #ccc;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    }
 </style>
 
 <div class="container">
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
         <h2 class="mb-0">Rating Points Report</h2>
+        <div class="d-flex gap-2">
+           
+            <a href="{{ route('reports.rating-points.pdf') }}?period={{ $period }}&month={{ $selectedMonth }}&year={{ $selectedYear }}&division={{ $selectedDivision }}&from={{ $selectedFrom }}&to={{ $selectedTo }}" class="btn btn-danger btn-sm">
+                <i class="ti ti-file-pdf"></i> Export PDF
+            </a>
+        </div>
     </div>
 
     <div class="card filter-card border-0 shadow-sm mb-4">
         <div class="card-body">
             <form method="GET" class="row g-3 align-items-end">
-             
+
 
                 <div class="col-md-3">
                     <label class="form-label">Division</label>
@@ -101,7 +139,7 @@ Rating Points Report - PDMT
                     <input type="date" name="to" class="form-control" value="{{ $selectedTo ?? '' }}">
                 </div>
 
-           
+
 
                 <div class="col-md-1 d-grid">
                     <button class="btn btn-primary" type="submit">Go</button>

@@ -45,7 +45,7 @@
 }
 
 .sidebar-title{
-  font-size:16px;
+  font-size:14px;
   font-weight:600;
   color:#111827;
 }
@@ -294,7 +294,7 @@ MOBILE
       <!-- LOGO -->
       <div class="brand-logos">
         <img src="{{ asset('assets/images/npc_logo.png') }}" class="sidebar-logo">
-        <h6 class="sidebar-title">Feedback System PDMT-NP</h6>
+        <h6 class="sidebar-title">Department of Motor Traffic Northern Province</h6>
       </div>
 
       <nav class="scroll-sidebars">
@@ -330,7 +330,7 @@ MOBILE
           $showManualComplaintEntry = $isSuperAdmin || $isAdmin || $isUser || $isAdministrativeOfficer || $isCommissioner;
           $showAoManagement = $isSuperAdmin || $isAdmin || $isAdministrativeOfficer;
           $showCommissioner = $isSuperAdmin || $isAdmin || $isCommissioner;
-          $showRatingReport = $isSuperAdmin || $isAdmin || $isCommissioner;
+          $showRatingReport = $isSuperAdmin || $isAdmin || $isUser || $isAdministrativeOfficer || $isCommissioner;
           $showUsers = $isSuperAdmin || $isAdmin;
           @endphp
 
@@ -348,19 +348,6 @@ MOBILE
             </a>
           </li>
           @endif
-          <!-- QR -->
-          @if($showDivisionQr)
-          <li class="nav-small-cap">
-            <span>DS Division QR</span>
-          </li>
-
-          <li class="sidebar-item {{ request()->routeIs('ds-divisions.*') ? 'active' : '' }}">
-            <a class="sidebar-link" href="{{ route('ds-divisions.index') }}">
-              <i class="ti ti-qrcode"></i>
-              <span>Division QR</span>
-            </a>
-          </li>
-          @endif
 
           <!-- FEEDBACK -->
           @if($showFeedback)
@@ -375,9 +362,6 @@ MOBILE
             </a>
           </li>
           @endif
-
-      
-
 
           <!-- COMPLAINT -->
           @if($showComplaintList || $showManualComplaintEntry)
@@ -402,6 +386,20 @@ MOBILE
             </a>
           </li>
           @endif
+          @endif
+
+                    <!-- QR -->
+          @if($showDivisionQr)
+          <li class="nav-small-cap">
+            <span>DS Division QR</span>
+          </li>
+
+          <li class="sidebar-item {{ request()->routeIs('ds-divisions.*') ? 'active' : '' }}">
+            <a class="sidebar-link" href="{{ route('ds-divisions.index') }}">
+              <i class="ti ti-qrcode"></i>
+              <span>Division QR</span>
+            </a>
+          </li>
           @endif
 
           <!-- AO -->
@@ -525,17 +523,19 @@ MOBILE
       </button>
 
       <!-- TITLE -->
-      <div class="fw-semibold">
+      <div class="fw-semibold" align="center">
                <a href="#" data-bs-toggle="dropdown">
-            <img src="{{ asset('assets/images/pdmt_logo.png') }}" width="35" class="rounded-circle">
+            <img src="{{ asset('assets/images/pdmt_logo.png') }}" width="45" class="rounded-circle">
           </a>
-        <span>Welcome to {{ auth()->user()->name }} Dashboard!</span>
+        {{-- <span>Welcome to {{ auth()->user()->name }} Dashboard!</span> --}}
+        <span>Smart Feedback Management System</span>
+
       </div>
 
       <!-- RIGHT -->
       <!-- RIGHT -->
       <div class="d-flex align-items-center gap-3">
-
+        <span>{{ auth()->user()->name }} Dashboard</span>
         <!-- 🔔 NOTIFICATION -->
         <div class="dropdown">
           <a class="nav-link position-relative" href="#" data-bs-toggle="dropdown">

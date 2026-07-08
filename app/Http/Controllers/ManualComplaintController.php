@@ -111,6 +111,8 @@ class ManualComplaintController extends Controller
             'vehicle_number' => 'nullable|string|max:20',
             'complain_type_id' => 'nullable|exists:complain_types,id',
             'complaint' => 'required|string|max:2000',
+                        'action_note' => 'required|string|max:2000',
+
             'received_at' => 'nullable|date',
         ]);
 
@@ -138,6 +140,7 @@ class ManualComplaintController extends Controller
             'vehicle_number' => 'nullable|string|max:20',
             'complain_type_id' => 'nullable|exists:complain_types,id',
             'complaint' => 'required|string|max:2000',
+            'action_note' => 'required|string|max:2000',
             'received_at' => 'nullable|date',
         ]);
 
@@ -253,11 +256,9 @@ class ManualComplaintController extends Controller
         $this->authorizeRoles($this->canManageManualAO());
 
         $data = $request->validate([
-            'ao_remarks' => 'nullable|string|max:1000',
             'action' => 'required|in:verify,forward,reject',
         ]);
 
-        $manualComplaint->ao_remarks = $data['ao_remarks'];
         if ($data['action'] === 'verify') {
             $manualComplaint->status = 'verified';
         } elseif ($data['action'] === 'forward') {

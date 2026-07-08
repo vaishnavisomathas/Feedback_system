@@ -52,6 +52,8 @@ Route::middleware(['auth', 'force.password.change'])->group(function () {
         ->name('dashboard');
     Route::get('/reports/rating-points', [HomeController::class, 'ratingPointsReport'])
         ->name('reports.rating-points');
+    Route::get('/reports/rating-points/pdf', [HomeController::class, 'ratingPointsReportPdf'])
+        ->name('reports.rating-points.pdf');
     Route::get('counters/create', [CounterController::class, 'create'])->name('counters.create');
 
     Route::get('counters', [CounterController::class, 'index'])->name('counters.index');

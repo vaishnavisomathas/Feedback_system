@@ -28,6 +28,8 @@ class ManualComplaint extends Model
         'commissioner_remarks',
         'received_at',
         'entered_by',
+            'action_note',
+
     ];
 
     public function complainType()
