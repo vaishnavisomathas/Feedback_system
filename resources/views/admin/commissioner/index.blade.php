@@ -94,11 +94,6 @@ Commissioner Complaints - PDMT
 
                     <form method="GET">
 
-                        <input type="hidden"
-                            name="active_tab"
-                            id="active_tab"
-                            value="{{ request('active_tab','pending') }}">
-
                         <div class="row g-3">
 
                             <div class="col-md-3">
@@ -132,10 +127,10 @@ Commissioner Complaints - PDMT
                                 <select name="status" class="form-control">
 
                                     <option value="">All</option>
-                                    <option value="pending">Pending</option>
-                                    <option value="ao">Forwarded AO</option>
-                                    <option value="commissioner">Commissioner</option>
-                                    <option value="completed">Completed</option>
+                                    <option value="pending" {{ request('status')=='pending' ? 'selected' : '' }}>Pending</option>
+                                    <option value="ao" {{ request('status')=='ao' ? 'selected' : '' }}>Forwarded to A/O</option>
+                                    <option value="verified" {{ request('status')=='verified' ? 'selected' : '' }}>Verified</option>
+                                    <option value="commissioner" {{ request('status')=='commissioner' ? 'selected' : '' }}>Informed by Commissioner</option>
 
                                 </select>
 
@@ -207,68 +202,29 @@ Commissioner Complaints - PDMT
 
             </div>
 
+            <table class="table table-hover align-middle commissioner-table">
 
-            {{-- TABS --}}
+                <thead class="commissioner-table-head">
 
-            <ul class="nav nav-tabs mb-3">
+                    <tr>
 
-                <li class="nav-item">
+                        <th>#</th>
+                        <th>Division</th>
+                        <th>Counter</th>
+                        <th>Vehicle</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>Service Quality</th>
+                        <th>Rating</th>
+                        <th>Date</th>
+                        <th>Status</th>
 
-                    <button class="nav-link {{ request('active_tab','pending')=='pending'?'active':'' }}"
-                        data-bs-toggle="tab"
-                        data-bs-target="#pending">
+                    </tr>
 
-                        Pending at Commissioner
-
-                    </button>
-
-                </li>
-
-                <li class="nav-item">
-
-                    <button class="nav-link {{ request('active_tab')=='closed'?'active':'' }}"
-                        data-bs-toggle="tab"
-                        data-bs-target="#closed">
-
-                        Completed Complaints
-
-                    </button>
-
-                </li>
-
-            </ul>
+                </thead>
 
 
-            <div class="tab-content">
-
-
-                {{-- ================= PENDING ================= --}}
-
-                <div class="tab-pane fade {{ request('active_tab','pending')=='pending'?'show active':'' }}" id="pending">
-
-                    <table class="table table-hover align-middle commissioner-table">
-
-                        <thead class="commissioner-table-head">
-
-                            <tr>
-
-                                <th>#</th>
-                                <th>Division</th>
-                                <th>Counter</th>
-                                <th>Vehicle</th>
-                                <th>Phone</th>
-                                <th>Email</th>
-                                <th>Service Quality</th>
-                                <th>Rating</th>
-                                <th>Date</th>
-                                <th>Status</th>
-
-                            </tr>
-
-                        </thead>
-
-
-                        <tbody>
+                <tbody>
 
                             @forelse($pendingCommissioner as $c)
 
@@ -276,8 +232,7 @@ Commissioner Complaints - PDMT
                                 data-bs-toggle="modal"
                                 data-bs-target="#pendingModal{{ $c->id }}">
 
-                                <td>{{ $loop->iteration }}</td>
-
+<td>{{ $pendingCommissioner->firstItem() + $loop->index }}</td>
                                 <td>{{ $c->counter->division_name ?? '-' }}</td>
 
                                 <td>{{ $c->counter->counter_name ?? '-' }}</td>
@@ -303,12 +258,17 @@ Commissioner Complaints - PDMT
 
 
                                 <td>
-
-                                    <span class="badge bg-primary">
-
-                                        Waiting Commissioner Decision
-
-                                    </span>
+                                    @if(in_array($c->status, [null, 'pending'], true))
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                    @elseif($c->status === 'ao')
+                                    <span class="badge bg-info">Forwarded to A/O</span>
+                                    @elseif($c->status === 'verified')
+                                    <span class="badge bg-success">Verified</span>
+                                    @elseif($c->status === 'commissioner')
+                                    <span class="badge bg-danger">Informed by Commissioner</span>
+                                    @else
+                                    <span class="badge bg-secondary">{{ ucfirst($c->status ?? '-') }}</span>
+                                    @endif
 
                                 </td>
 
@@ -335,6 +295,12 @@ Commissioner Complaints - PDMT
                                         </div>
                                         <div class="modal-body">
 
+                                            @if($c->status === 'commissioner')
+                                            <div class="alert alert-danger py-2 mb-3" role="alert">
+                                                <strong>Important:</strong> Informed by Commissioner.
+                                            </div>
+                                            @endif
+
                                             <div class="row">
 
                                                 <div class="col-md-6 mb-2">
@@ -389,27 +355,6 @@ Commissioner Complaints - PDMT
                                                 </div>
 
                                             </div>
-
-                                            <hr>
-
-                                            <form method="POST"
-                                                action="{{ route('admin.commissioner.close',$c->id) }}">
-
-                                                @csrf
-
-                                                <label><strong>Final Decision / Action</strong></label>
-
-                                                <textarea name="final_remarks"
-                                                    class="form-control mb-3"
-                                                    rows="3"></textarea>
-
-                                                <button class="btn btn-success">
-
-                                                    Completed
-
-                                                </button>
-
-                                            </form>
 
                                         </div>
 
@@ -427,7 +372,7 @@ Commissioner Complaints - PDMT
                                 <td colspan="10"
                                     class="text-center">
 
-                                    No complaints pending
+                                    No complaints found
 
                                 </td>
 
@@ -435,225 +380,37 @@ Commissioner Complaints - PDMT
 
                             @endforelse
 
-                        </tbody>
-
-                    </table>
-
-                    <div class="d-flex justify-content-end align-items-center">
-                        <div class="col-md-2 p-0">
-                            <form method="GET">
-
-                                <select name="per_page" class="form-control" onchange="this.form.submit()">
-                                    @foreach([10, 20, 50, 100] as $size)
-                                    <option value="{{ $size }}" {{ request('per_page') == $size ? 'selected' : '' }}>
-                                        Page {{ $size }}
-                                    </option>
-                                    @endforeach
-                                </select>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-
-                {{-- ================= COMPLETED ================= --}}
-
-                <div class="tab-pane fade {{ request('active_tab')=='closed'?'show active':'' }}" id="closed">
-
-                    <table class="table table-hover align-middle commissioner-table">
-
-                        <thead class="commissioner-table-head">
-
-                            <tr>
-
-                                <th>#</th>
-                                <th>Division</th>
-                                <th>Counter</th>
-                                <th>Vehicle</th>
-                                <th>Phone</th>
-                                <th>Email</th>
-                                <th>Rating</th>
-                                <th>Date Closed</th>
-                                <th>Status</th>
-
-                            </tr>
-
-                        </thead>
-
-
-                        <tbody>
-
-                            @forelse($closedCommissioner as $c)
-
-                            <tr style="cursor:pointer"
-                                data-bs-toggle="modal"
-                                data-bs-target="#completedModal{{ $c->id }}">
-
-                                <td>{{ $loop->iteration }}</td>
-
-                                <td>{{ $c->counter->division_name ?? '-' }}</td>
-
-                                <td>{{ $c->counter->counter_name ?? '-' }}</td>
-
-                                <td>{{ $c->vehicle_number }}</td>
-
-                                <td>{{ $c->phone }}</td>
-
-                                <td>{{ $c->complaint_email ?? '-' }}</td>
-
-                                <td>
-
-
-                                    {{ ['','Bad','Poor','Average','Good','Excellent'][$c->rating] }}
-
-
-
-                                </td>
-
-                                <td>{{ $c->updated_at->format('d M Y') }}</td>
-
-
-                                <td>
-
-                                    <span class="badge bg-success">
-
-                                        Completed
-
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                            {{-- COMPLETED MODAL --}}
-
-                            <div class="modal fade" id="completedModal{{ $c->id }}">
-
-                                <div class="modal-dialog modal-lg modal-dialog-centered">
-
-                                    <div class="modal-content rounded-0">
-                                        <div class="modal-header">
-
-                                            <h5 class="modal-title">
-                                                Completed Complaint Details</h5>
-
-                                            <button type="button"
-                                                class="btn-close"
-                                                data-bs-dismiss="modal"></button>
-
-                                        </div>
-
-
-                                        <div class="modal-body">
-
-                                            <div class="row">
-
-                                                <div class="col-md-6 mb-2">
-
-                                                    <strong>Vehicle:-</strong>
-
-                                                    {{ $c->vehicle_number }}
-
-                                                </div>
-
-                                                <div class="col-md-6 mb-2">
-
-                                                    <strong>Phone:-</strong>
-                                                    {{ $c->phone }}
-
-                                                </div>
-                                                <div class="col-md-6 mb-2">
-
-                                                    <strong>Email:-</strong>
-                                                    {{ $c->complaint_email ?? '-' }}
-
-                                                </div>
-                                                <div class="col-md-6 mb-2">
-
-                                                    <strong>Complaint:</strong> {{ $c->note }}
-
-
-                                                </div>
-                                                <div class="col-md-6 mb-2">
-
-                                                    <strong>Complaint Type</strong>
-
-                                                    <span class="badge bg-warning text-dark">
-                                                        {{ $c->complainType->name ?? 'N/A' }}
-                                                    </span>
-                                                </div>
-
-
-
-                                                <div class="col-md-6 mb-2">
-
-                                                    <strong>User Remarks:-</strong>
-                                                    {{ $c->user_remarks ?? '-' }}
-
-                                                </div>
-
-                                                <div class="col-md-6 mb-2">
-
-                                                    <strong>AO Remarks:-</strong>
-                                                    {{ $c->ao_remarks ?? '-' }}
-
-                                                </div>
-                                                <div class="col-md-6 mb-2">
-
-                                                    <strong>Final Commissioner Decision:-</strong>
-                                                    {{ $c->commissioner_remarks ?? '-' }}
-                                                </div>
-                                            </div>
-
-
-
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-
-                            @empty
-
-                            <tr>
-
-                                <td colspan="9"
-                                    class="text-center">
-
-                                    No completed complaints
-
-                                </td>
-
-                            </tr>
-
-                            @endforelse
-
-                        </tbody>
-
-                    </table>
-                    <div class="d-flex justify-content-end align-items-center">
-                        <div class="col-md-2 p-0">
-                            <form method="GET">
-
-                                <select name="per_page" class="form-control" onchange="this.form.submit()">
-                                    @foreach([10, 20, 50, 100] as $size)
-                                    <option value="{{ $size }}" {{ request('per_page') == $size ? 'selected' : '' }}>
-                                        Page {{ $size }}
-                                    </option>
-                                    @endforeach
-                                </select>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-
-            </div>
+                </tbody>
+
+            </table>
+
+           <div class="d-flex justify-content-between align-items-center flex-wrap mt-3">
+
+    <form method="GET" class="d-flex align-items-center mb-2">
+        @foreach(request()->except('per_page','page') as $key => $value)
+            @if(is_array($value))
+                @foreach($value as $v)
+                    <input type="hidden" name="{{ $key }}[]" value="{{ $v }}">
+                @endforeach
+            @else
+                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+            @endif
+        @endforeach
+
+        <select name="per_page" class="form-control" onchange="this.form.submit()">
+            @foreach([10,20,50,100] as $size)
+                <option value="{{ $size }}" {{ request('per_page',10)==$size ? 'selected' : '' }}>
+                    Show {{ $size }}
+                </option>
+            @endforeach
+        </select>
+    </form>
+
+    <div class="mb-2">
+        {{ $pendingCommissioner->appends(request()->query())->links('pagination::bootstrap-5') }}
+    </div>
+
+</div>
 
         </div>
 
@@ -668,18 +425,5 @@ Commissioner Complaints - PDMT
 
 <link rel="stylesheet"
     href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-
-<script>
-    document.querySelectorAll('.nav-link[data-bs-toggle="tab"]').forEach(link => {
-
-        link.addEventListener('shown.bs.tab', function(e) {
-
-            document.getElementById('active_tab').value =
-                e.target.dataset.bsTarget.substring(1);
-
-        });
-
-    });
-</script>
 
 @endsection

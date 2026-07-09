@@ -17,8 +17,7 @@ public function index()
     'pending' => null,
     'ao' => 'ao',
     'commissioner' => 'commissioner',
-    'completed' => 'completed',
-    'rejected' => 'rejected',
+    'verified' => 'verified',
 ];
 
 $status = $statusMap[$filters['status'] ?? ''] ?? null;
@@ -163,9 +162,9 @@ public function aoIndex(Request $request)
     $statusMap = [
     'pending' => null,
     'ao' => 'ao',
+    'verified' => 'verified',
     'commissioner' => 'commissioner',
-    'completed' => 'completed',
-    'rejected' => 'rejected',
+ 
 ];
 
 $status = $statusMap[$filters['status'] ?? ''] ?? null;
@@ -174,6 +173,7 @@ $status = $statusMap[$filters['status'] ?? ''] ?? null;
         ->orderBy('counter_name')
         ->get();
     $pendingAO = Feedback::with(['counter','complainType','serviceQuality'])
+ 
         ->where('status','ao')
             ->when($status === null && ($filters['status'] ?? '') === 'pending', fn($q) => $q->whereNull('status'))
             ->when($status && $status !== 'pending', fn($q) => $q->where('status', $status))
@@ -192,11 +192,12 @@ $status = $statusMap[$filters['status'] ?? ''] ?? null;
     });
 })
 ->when($filters['complain_type'], fn($q) => $q->where('complain_type_id', $filters['complain_type']))
-        ->orderByDesc('id')
-        ->paginate($request->per_page ?? 10, ['*'], 'pending');
+         ->orderByDesc('id')
+    ->paginate($request->per_page ?? 10, ['*'], 'pending')
+    ->withQueryString();
 
     $closedAO = Feedback::with(['counter','complainType','serviceQuality'])
-        ->whereIn('status',['commissioner','completed','rejected'])
+        ->whereIn('status',['verified','commissioner','completed','rejected'])
                   ->when($status === null && ($filters['status'] ?? '') === 'pending', fn($q) => $q->whereNull('status'))
             ->when($status && $status !== 'pending', fn($q) => $q->where('status', $status))
        ->when($filters['counter'], fn($q) => $q->where('counter_id', $filters['counter']))
@@ -214,9 +215,9 @@ $status = $statusMap[$filters['status'] ?? ''] ?? null;
     });
 })
 ->when($filters['complain_type'], fn($q) => $q->where('complain_type_id', $filters['complain_type']))
-        ->orderByDesc('id')
-        ->paginate($request->per_page ?? 10, ['*'], 'closed');
-
+   ->orderByDesc('id')
+    ->paginate($request->per_page ?? 10, ['*'], 'closed')
+    ->withQueryString();
     return view('admin.ao.index', compact('pendingAO','closedAO','serviceQualities','filters','counters','complainTypes'));
 }
 
@@ -225,10 +226,12 @@ public function aoSave(Request $request, $id)
 {
     $feedback = Feedback::findOrFail($id);
 
-       $feedback->ao_remarks = $request->ao_remarks;
+    $feedback->ao_remarks = $request->ao_remarks;
 
-    if ($request->action === 'forward') {
+    if (in_array($request->action, ['inform_commissioner', 'forward'], true)) {
         $feedback->status = 'commissioner';
+    } elseif ($request->action === 'verify') {
+        $feedback->status = 'verified';
     } elseif ($request->action === 'reject') {
         $feedback->status = 'rejected';
     }
@@ -254,67 +257,56 @@ public function commissionerIndex(Request $request)
           'search' => $request->search,
     'complain_type' => $request->complain_type,
     ];
-       $statusMap = [
-    'pending' => null,
-    'ao' => 'ao',
-    'commissioner' => 'commissioner',
-    'completed' => 'completed',
-    'rejected' => 'rejected',
-];
-
-$status = $statusMap[$filters['status'] ?? ''] ?? null;
+    $status = $filters['status'] ?? null;
    $counters = Counter::orderBy('district')
         ->orderBy('division_name')
         ->orderBy('counter_name')
         ->get();
-    $pendingCommissioner = Feedback::with(['counter','complainType','serviceQuality'])
-        ->where('status','commissioner')
-              ->when($status === null && ($filters['status'] ?? '') === 'pending', fn($q) => $q->whereNull('status'))
-            ->when($status && $status !== 'pending', fn($q) => $q->where('status', $status))
-       ->when($filters['counter'], fn($q) => $q->where('counter_id', $filters['counter']))
-       ->when($filters['division'], fn($q) => 
-        $q->whereHas('counter', fn($q2) => $q2->where('division_name','like', "%{$filters['division']}%"))
-    )
-        ->when($filters['service_quality'], fn($q) => $q->where('service_quality_id', $filters['service_quality']))
-        ->when($filters['rating'], fn($q) => $q->where('rating', $filters['rating']))
-        ->when($filters['from'], fn($q) => $q->whereDate('created_at', '>=', $filters['from']))
-        ->when($filters['to'], fn($q) => $q->whereDate('created_at', '<=', $filters['to']))
-           ->when($filters['complain_type'], fn($q) => $q->where('complain_type_id', $filters['complain_type']))
-
-    ->when($filters['search'], function($q) use ($filters){
-        $q->where(function($sub) use ($filters){
-            $sub->where('vehicle_number','like','%'.$filters['search'].'%')
-                ->orWhere('phone','like','%'.$filters['search'].'%');
+    $perPage = $request->get('per_page', 10);
+$pendingCommissioner = Feedback::with(['counter','complainType','serviceQuality'])
+    ->whereNotNull('note')
+    ->where('note', '!=', '')
+    ->where(function ($query) {
+        $query->whereNull('status')
+              ->orWhereIn('status', [
+                  'pending',
+                  'ao',
+                  'verified',
+                  'commissioner',
+                 
+              ]);
+    })
+    ->when($status === 'pending', function ($query) {
+        $query->where(function ($q) {
+            $q->whereNull('status')
+              ->orWhere('status', 'pending');
         });
     })
-        ->latest()
-        ->paginate($request->per_page ?? 10, ['*'], 'pending');
-
-    $closedCommissioner = Feedback::with(['counter','complainType','serviceQuality'])
-        ->where('status','completed')
-              ->when($status === null && ($filters['status'] ?? '') === 'pending', fn($q) => $q->whereNull('status'))
-            ->when($status && $status !== 'pending', fn($q) => $q->where('status', $status))
-   ->when($filters['counter'], fn($q) => $q->where('counter_id', $filters['counter']))
-        ->when($filters['division'], fn($q) => 
-        $q->whereHas('counter', fn($q2) => $q2->where('division_name','like', "%{$filters['division']}%"))
+    ->when(in_array($status, ['ao', 'verified', 'commissioner']), function ($q) use ($status) {
+        $q->where('status', $status);
+    })
+    ->when($filters['counter'], fn($q) => $q->where('counter_id', $filters['counter']))
+    ->when($filters['division'], fn($q) =>
+        $q->whereHas('counter', fn($q2) =>
+            $q2->where('division_name', 'like', "%{$filters['division']}%")
+        )
     )
-        ->when($filters['service_quality'], fn($q) => $q->where('service_quality_id', $filters['service_quality']))
-        ->when($filters['rating'], fn($q) => $q->where('rating', $filters['rating']))
-        ->when($filters['from'], fn($q) => $q->whereDate('created_at', '>=', $filters['from']))
-        ->when($filters['to'], fn($q) => $q->whereDate('created_at', '<=', $filters['to']))
-           ->when($filters['complain_type'], fn($q) => $q->where('complain_type_id', $filters['complain_type']))
-
-    ->when($filters['search'], function($q) use ($filters){
-        $q->where(function($sub) use ($filters){
-            $sub->where('vehicle_number','like','%'.$filters['search'].'%')
-                ->orWhere('phone','like','%'.$filters['search'].'%');
+    ->when($filters['service_quality'], fn($q) => $q->where('service_quality_id', $filters['service_quality']))
+    ->when($filters['rating'], fn($q) => $q->where('rating', $filters['rating']))
+    ->when($filters['from'], fn($q) => $q->whereDate('created_at', '>=', $filters['from']))
+    ->when($filters['to'], fn($q) => $q->whereDate('created_at', '<=', $filters['to']))
+    ->when($filters['complain_type'], fn($q) => $q->where('complain_type_id', $filters['complain_type']))
+    ->when($filters['search'], function ($q) use ($filters) {
+        $q->where(function ($sub) use ($filters) {
+            $sub->where('vehicle_number', 'like', "%{$filters['search']}%")
+                ->orWhere('phone', 'like', "%{$filters['search']}%");
         });
     })
-        ->latest()
-        ->paginate($request->per_page ?? 10, ['*'], 'closed');
-
+    ->latest()
+    ->paginate($perPage)
+    ->withQueryString();
     return view('admin.commissioner.index', compact(
-        'pendingCommissioner','closedCommissioner','serviceQualities','filters','counters','complainTypes'
+        'pendingCommissioner','serviceQualities','filters','counters','complainTypes'
     ));
 }
 
@@ -328,5 +320,51 @@ public function commissionerClose(Request $request,$id)
     $feedback->save();
 
     return back()->with('success','Complaint marked as Completed');
+}
+public function commissionerInformed(Request $request)
+{
+    if (strtolower(trim(auth()->user()->role)) !== 'commissioner') {
+        abort(403);
+    }
+
+    $filters = [
+        'counter' => $request->counter,
+        'from' => $request->from,
+        'to' => $request->to,
+        'search' => $request->search,
+        'complain_type' => $request->complain_type,
+    ];
+
+    $counters = Counter::orderBy('district')
+        ->orderBy('division_name')
+        ->orderBy('counter_name')
+        ->get();
+
+    $complainTypes = ComplainType::all();
+
+    $informedComplaints = Feedback::with(['counter','complainType','serviceQuality'])
+        ->whereNotNull('note')
+        ->where('note', '!=', '')
+        ->where('status', 'commissioner')
+        ->when($filters['counter'], fn($q) => $q->where('counter_id', $filters['counter']))
+        ->when($filters['complain_type'], fn($q) => $q->where('complain_type_id', $filters['complain_type']))
+        ->when($filters['from'], fn($q) => $q->whereDate('created_at', '>=', $filters['from']))
+        ->when($filters['to'], fn($q) => $q->whereDate('created_at', '<=', $filters['to']))
+        ->when($filters['search'], function ($q) use ($filters) {
+            $q->where(function ($sub) use ($filters) {
+                $sub->where('vehicle_number', 'like', '%'.$filters['search'].'%')
+                    ->orWhere('phone', 'like', '%'.$filters['search'].'%');
+            });
+        })
+        ->latest()
+        ->paginate($request->per_page ?? 10)
+        ->withQueryString();
+
+    return view('admin.commissioner.informed', compact(
+        'informedComplaints',
+        'filters',
+        'counters',
+        'complainTypes'
+    ));
 }
 }

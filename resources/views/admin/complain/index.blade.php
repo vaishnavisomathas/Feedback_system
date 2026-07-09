@@ -105,9 +105,14 @@ Complaints - PDMT
                         <option value="">All</option>
                         <option value="pending" {{ request('status')=='pending'?'selected':'' }}>Pending</option>
                         <option value="ao" {{ request('status')=='ao'?'selected':'' }}>Fowarded A/O</option>
-                        <option value="commissioner" {{ request('status')=='commissioner'?'selected':'' }}>Commissioner</option>
-                        <option value="completed" {{ request('status')=='completed'?'selected':'' }}>Completed</option>
-                        <option value="rejected" {{ ($filters['status'] ?? '')=='rejected'?'selected':'' }}>Rejected</option>
+  <option value="verified"
+            {{ request('status') == 'verified' ? 'selected' : '' }}>
+            Verified
+        </option>                        
+  <option value="commissioner"
+            {{ request('status') == 'commissioner' ? 'selected' : '' }}>
+            Informed to Commissioner
+        </option>                       
 
                     </select>
                 </div>
@@ -220,6 +225,9 @@ Complaints - PDMT
 
                     <tr class="pending-complaint-row"
                         data-remarks-route="{{ route('admin.complain.remarks', $rating->id) }}"
+                        data-division-counter="{{ ($rating->counter->division_name ?? '-') . ' - ' . ($rating->counter->counter_name ?? '-') }}"
+                        data-service-quality="{{ $rating->serviceQuality->name ?? '-' }}"
+                        data-rating="{{ ['','Bad','Poor','Average','Good','Excellent'][$rating->rating] ?? 'N/A' }}"
                         data-vehicle="{{ $rating->vehicle_number ?? '-' }}"
                         data-phone="{{ $rating->phone ?? '-' }}"
                         data-email="{{ $rating->complaint_email ?? '-' }}"
@@ -254,14 +262,14 @@ Complaints - PDMT
                             @elseif($rating->status == 'ao')
                             <span class="badge bg-info">Sent to AO</span>
 
-                            @elseif($rating->status == 'commissioner')
-                            <span class="badge bg-primary">Sent to Commissioner</span>
+                       @elseif($rating->status == 'verified')
+    <span class="badge bg-success">Verified</span>
 
-                            @elseif($rating->status == 'completed')
-                            <span class="badge bg-success">Completed</span>
+@elseif($rating->status == 'commissioner')
+    <span class="badge bg-primary">Informed to Commissioner</span>
 
                             @else
-                            <span class="badge bg-secondary">Unknown</span>
+                            <span class="badge bg-secondary">-</span>
                             @endif
                         </td>
 
@@ -277,18 +285,25 @@ Complaints - PDMT
             </table>
 
             <div class="d-flex justify-content-end align-items-center">
-                <div class="col-md-2 p-0">
-                    <form method="GET">
+               <div class="d-flex justify-content-between align-items-center flex-wrap mt-3">
+    <form method="GET" class="mb-2">
+        <input type="hidden" name="active_tab" value="pending">
 
-                        <select name="per_page" class="form-control" onchange="this.form.submit()">
-                            @foreach([10, 20, 50, 100] as $size)
-                            <option value="{{ $size }}" {{ request('per_page') == $size ? 'selected' : '' }}>
-                                Page {{ $size }}
-                            </option>
-                            @endforeach
-                        </select>
-                    </form>
-                </div>
+        @foreach(request()->except('per_page','pending_page','all_page','active_tab') as $key => $value)
+            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+        @endforeach
+
+        <select name="per_page" class="form-control" onchange="this.form.submit()">
+            @foreach([10,20,50,100] as $size)
+                <option value="{{ $size }}" {{ request('per_page',10)==$size ? 'selected' : '' }}>
+                    Show {{ $size }}
+                </option>
+            @endforeach
+        </select>
+    </form>
+
+    {{ $allRatings->links('pagination::bootstrap-5') }}
+</div>
             </div>
         </div>
 
@@ -316,6 +331,9 @@ Complaints - PDMT
                     @forelse($readRatings as $index => $rating)
 
                     <tr class="closed-complaint-row"
+                        data-division-counter="{{ ($rating->counter->division_name ?? '-') . ' - ' . ($rating->counter->counter_name ?? '-') }}"
+                        data-service-quality="{{ $rating->serviceQuality->name ?? '-' }}"
+                        data-rating="{{ ['','Bad','Poor','Average','Good','Excellent'][$rating->rating] ?? 'N/A' }}"
                         data-vehicle="{{ $rating->vehicle_number ?? '-' }}"
                         data-phone="{{ $rating->phone ?? '-' }}"
                         data-email="{{ $rating->complaint_email ?? '-' }}"
@@ -359,24 +377,17 @@ Complaints - PDMT
                             <span class="badge bg-secondary">Fowarded A/O</span>
                             @break
 
-                            @case('ao')
-                            <span class="badge bg-info"></span>
-                            @break
+                          @case('verified')
+    <span class="badge bg-success">Verified</span>
+@break
 
-                            @case('commissioner')
-                            <span class="badge bg-primary">At Commissioner</span>
-                            @break
-
-                            @case('completed')
-                            <span class="badge bg-success">Completed</span>
-                            @break
-
-                            @case('rejected')
-                            <span class="badge bg-danger">Rejected</span>
-                            @break
+@case('commissioner')
+    <span class="badge bg-primary">Informed to Commissioner</span>
+@break
+                           
 
                             @default
-                            <span class="badge bg-secondary">Unknown</span>
+                            <span class="badge bg-secondary">-</span>
 
                             @endswitch
                         </td>
@@ -391,20 +402,25 @@ Complaints - PDMT
 
             </table>
 
-            <div class="d-flex justify-content-end align-items-center">
-                <div class="col-md-2 p-0">
-                    <form method="GET">
+                <div class="d-flex justify-content-between align-items-center flex-wrap mt-3">
+    <form method="GET" class="mb-2">
+        <input type="hidden" name="active_tab" value="closed">
 
-                        <select name="per_page" class="form-control" onchange="this.form.submit()">
-                            @foreach([10, 20, 50, 100] as $size)
-                            <option value="{{ $size }}" {{ request('per_page') == $size ? 'selected' : '' }}>
-                                Page {{ $size }}
-                            </option>
-                            @endforeach
-                        </select>
-                    </form>
-                </div>
-            </div>
+        @foreach(request()->except('per_page','pending_page','all_page','active_tab') as $key => $value)
+            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+        @endforeach
+
+        <select name="per_page" class="form-control" onchange="this.form.submit()">
+            @foreach([10,20,50,100] as $size)
+                <option value="{{ $size }}" {{ request('per_page',10)==$size ? 'selected' : '' }}>
+                    Show {{ $size }}
+                </option>
+            @endforeach
+        </select>
+    </form>
+
+    {{ $readRatings->links('pagination::bootstrap-5') }}
+</div>
         </div>
 
     </div>
@@ -432,6 +448,18 @@ Complaints - PDMT
                     <div class="col-md-6">
                         <label class="form-label text-muted mb-1">Email</label>
                         <div id="pendingDetailsEmail" class="fw-semibold">-</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted mb-1">DS Division - Counter</label>
+                        <div id="pendingDetailsDivisionCounter" class="fw-semibold">-</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted mb-1">Service Quality</label>
+                        <div id="pendingDetailsServiceQuality" class="fw-semibold">-</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-muted mb-1">Rating</label>
+                        <div id="pendingDetailsRating" class="fw-semibold">-</div>
                     </div>
                     <div class="col-12">
                         <label class="form-label text-muted mb-1">Complaint</label>
@@ -488,6 +516,18 @@ Complaints - PDMT
                         <div id="closedDetailsType" class="fw-semibold">-</div>
                     </div>
                     <div class="col-md-6">
+                        <label class="form-label text-muted mb-1">DS Division - Counter</label>
+                        <div id="closedDetailsDivisionCounter" class="fw-semibold">-</div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label text-muted mb-1">Service Quality</label>
+                        <div id="closedDetailsServiceQuality" class="fw-semibold">-</div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label text-muted mb-1">Rating</label>
+                        <div id="closedDetailsRating" class="fw-semibold">-</div>
+                    </div>
+                    <div class="col-md-6">
                         <label class="form-label text-muted mb-1">User Remarks</label>
                         <div id="closedDetailsUserRemarks" class="p-2 bg-light rounded border">-</div>
                     </div>
@@ -535,6 +575,9 @@ Complaints - PDMT
                 document.getElementById('pendingDetailsVehicle').innerText = row.dataset.vehicle || '-';
                 document.getElementById('pendingDetailsPhone').innerText = row.dataset.phone || '-';
                 document.getElementById('pendingDetailsEmail').innerText = row.dataset.email || '-';
+                document.getElementById('pendingDetailsDivisionCounter').innerText = row.dataset.divisionCounter || '-';
+                document.getElementById('pendingDetailsServiceQuality').innerText = row.dataset.serviceQuality || '-';
+                document.getElementById('pendingDetailsRating').innerText = row.dataset.rating || '-';
                 document.getElementById('pendingDetailsComplaint').innerText = row.dataset.complaint || '-';
                 document.getElementById('pendingComplaintForm').action = row.dataset.remarksRoute || '';
                 document.getElementById('pendingComplaintType').value = row.dataset.selectedType || '';
@@ -548,6 +591,9 @@ Complaints - PDMT
                 document.getElementById('closedDetailsVehicle').innerText = row.dataset.vehicle || '-';
                 document.getElementById('closedDetailsPhone').innerText = row.dataset.phone || '-';
                 document.getElementById('closedDetailsEmail').innerText = row.dataset.email || '-';
+                document.getElementById('closedDetailsDivisionCounter').innerText = row.dataset.divisionCounter || '-';
+                document.getElementById('closedDetailsServiceQuality').innerText = row.dataset.serviceQuality || '-';
+                document.getElementById('closedDetailsRating').innerText = row.dataset.rating || '-';
                 document.getElementById('closedDetailsComplaint').innerText = row.dataset.complaint || '-';
                 document.getElementById('closedDetailsType').innerText = row.dataset.complaintType || '-';
                 document.getElementById('closedDetailsUserRemarks').innerText = row.dataset.userRemarks || '-';

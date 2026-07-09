@@ -22,18 +22,27 @@ STAT CARDS
 ====================== */
 
 .stat-card{
-border-radius:10px;
-transition:0.25s;
-box-shadow:0 2px 6px rgba(0,0,0,0.06);
+border-radius:12px;
+transition:all 0.2s ease;
+border:1px solid #dbe3ee;
+box-shadow:0 2px 8px rgba(15, 23, 42, 0.06);
 }
 
 .stat-card:hover{
-transform:translateY(-3px);
-box-shadow:0 12px 25px rgba(0,0,0,0.10);
+transform:translateY(-2px);
+box-shadow:0 10px 22px rgba(15, 23, 42, 0.10);
 }
 
 .stat-icon{
-font-size:24px;
+font-size:20px;
+width:42px;
+height:42px;
+margin:0 auto;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:50%;
+background:rgba(255,255,255,0.78);
 }
 
 .stat-number{
@@ -45,13 +54,13 @@ margin-bottom:3px;
 /* GOVERNMENT STYLE COLORS */
 
 .bg-total{
-background:#e6f4ea;
-color:#1e7e34;
+background:linear-gradient(180deg, #eef8f1 0%, #e4f2e9 100%);
+color:#176a3d;
 }
 
 .bg-today{
-background:#e8f7fb;
-color:#0c5460;
+background:linear-gradient(180deg, #f0f7fc 0%, #e6f1f8 100%);
+color:#114d67;
 }
 
 .bg-month{
@@ -184,7 +193,7 @@ TOP PERFORMING COUNTERS
 
 <div class="row g-3">
 
-@foreach(['Today'=>$highestToday,'This Month'=>$highestMonth,'This Year'=>$highestYear] as $period=>$data)
+@foreach(['Today'=>$highestToday,'This Week'=>$highestWeek,'This Month'=>$highestMonth] as $period=>$data)
 
 <div class="col-lg-4 col-md-6">
 
@@ -233,67 +242,23 @@ STATISTICS
 
 <div class="row g-3">
 
-<div class="col-lg-2 col-md-4 col-6">
-<div class="card stat-card bg-total border-0">
+<div class="col-lg-6 col-md-6 col-12">
+<div class="card stat-card bg-total">
 <div class="card-body text-center">
 <div class="stat-icon mb-2"><i class="bi bi-star-fill"></i></div>
 <div class="stat-number">{{ $totalRatings ?? 0 }}</div>
-<div>Total Ratings</div>
+<div>Total Feedback</div>
 </div>
 </div>
 </div>
 
 
-<div class="col-lg-2 col-md-4 col-6">
-<div class="card stat-card bg-today border-0">
+<div class="col-lg-6 col-md-6 col-12">
+<div class="card stat-card bg-today">
 <div class="card-body text-center">
-<div class="stat-icon mb-2"><i class="bi bi-calendar-day"></i></div>
-<div class="stat-number">{{ $todayRatings ?? 0 }}</div>
-<div>Today's Feedback</div>
-</div>
-</div>
-</div>
-
-
-<div class="col-lg-2 col-md-4 col-6">
-<div class="card stat-card bg-month border-0">
-<div class="card-body text-center">
-<div class="stat-icon mb-2"><i class="bi bi-calendar-month"></i></div>
-<div class="stat-number">{{ $monthRatings ?? 0 }}</div>
-<div>This Month</div>
-</div>
-</div>
-</div>
-
-
-<div class="col-lg-2 col-md-4 col-6">
-<div class="card stat-card bg-pending border-0">
-<div class="card-body text-center">
-<div class="stat-icon mb-2"><i class="bi bi-hourglass-split"></i></div>
-<div class="stat-number">{{ $pending ?? 0 }}</div>
-<div>Pending</div>
-</div>
-</div>
-</div>
-
-
-<div class="col-lg-2 col-md-4 col-6">
-<div class="card stat-card bg-ao border-0">
-<div class="card-body text-center">
-<div class="stat-icon mb-2"><i class="bi bi-person-badge"></i></div>
-<div class="stat-number">{{ $ao ?? 0 }}</div>
-<div>At AO</div>
-</div>
-</div>
-</div>
-
-
-<div class="col-lg-2 col-md-4 col-6">
-<div class="card stat-card bg-commissioner border-0">
-<div class="card-body text-center">
-<div class="stat-icon mb-2"><i class="bi bi-person-workspace"></i></div>
-<div class="stat-number">{{ $commissioner ?? 0 }}</div>
-<div>Commissioner</div>
+<div class="stat-icon mb-2"><i class="bi bi-clipboard-check"></i></div>
+<div class="stat-number">{{ $totalManualFeedbackCount ?? 0 }}</div>
+<div>Total Manual Feedback Count</div>
 </div>
 </div>
 </div>

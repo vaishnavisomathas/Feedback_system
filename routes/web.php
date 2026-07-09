@@ -106,7 +106,9 @@ Route::middleware(['auth', 'force.password.change'])->group(function () {
 
     Route::get('/commissioner/complaints', [ComplaintController::class, 'commissionerIndex'])->name('admin.commissioner.index');
     Route::post('/commissioner/close/{id}', [ComplaintController::class, 'commissionerClose'])->name('admin.commissioner.close');
-
+Route::get('/admin/commissioner-informed', [ComplaintController::class, 'commissionerInformed'])
+    ->name('admin.commissioner.informed');
+    
     Route::get('/admin/manual-complaints', [ManualComplaintController::class, 'index'])
         ->name('admin.manual-complaints.index');
     Route::post('/admin/manual-complaints', [ManualComplaintController::class, 'store'])

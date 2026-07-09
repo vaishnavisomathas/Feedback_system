@@ -99,9 +99,15 @@ Administrative Officer Complaints- PDMT
                         <option value="">All</option>
                         <option value="pending" {{ request('status')=='pending'?'selected':'' }}>Pending</option>
                         <option value="ao" {{ request('status')=='ao'?'selected':'' }}>At A/O</option>
-                        <option value="commissioner" {{ request('status')=='commissioner'?'selected':'' }}>Sent to Commissioner</option>
-                        <option value="completed" {{ request('status')=='completed'?'selected':'' }}>Completed</option>
-                        <option value="rejected" {{ request('status')=='rejected'?'selected':'' }}>Rejected</option>
+                     <option value="verified"
+            {{ request('status') == 'verified' ? 'selected' : '' }}>
+            Verified
+        </option>
+
+        <option value="commissioner"
+            {{ request('status') == 'commissioner' ? 'selected' : '' }}>
+            Informed to Commissioner
+        </option>
                     </select>
                 </div>
 
@@ -159,7 +165,7 @@ Administrative Officer Complaints- PDMT
         <li class="nav-item">
             <button class="nav-link {{ request('active_tab') == 'closed' ? 'active' : '' }}"
                 data-bs-toggle="tab" data-bs-target="#closed">
-                Completed / Forwarded
+                Verified / Forwarded
             </button>
         </li>
     </ul>
@@ -190,6 +196,9 @@ Administrative Officer Complaints- PDMT
 
                     <tr class="pending-ao-row"
                         data-ao-save-route="{{ route('admin.ao.save', $rating->id) }}"
+                        data-division-counter="{{ ($rating->counter->division_name ?? '-') . ' - ' . ($rating->counter->counter_name ?? '-') }}"
+                        data-service-quality="{{ $rating->serviceQuality->name ?? '-' }}"
+                        data-rating="{{ ['','Bad','Poor','Average','Good','Excellent'][$rating->rating] ?? 'N/A' }}"
                         data-vehicle="{{ $rating->vehicle_number ?? '-' }}"
                         data-phone="{{ $rating->phone ?? '-' }}"
                         data-email="{{ $rating->complaint_email ?? '-' }}"
@@ -198,7 +207,7 @@ Administrative Officer Complaints- PDMT
                         data-user-remarks="{{ $rating->user_remarks ?? '-' }}"
                         style="cursor:pointer">
 
-                        <td>{{ $loop->iteration }}</td>
+<td>{{ $pendingAO->firstItem() + $loop->index }}</td>
                         <td>{{ $rating->counter->division_name ?? '-' }}</td>
                         <td>{{ $rating->counter->counter_name ?? '-' }}</td>
                         <td>{{ $rating->vehicle_number }}</td>
@@ -224,18 +233,25 @@ Administrative Officer Complaints- PDMT
 
             {{-- ✅ FIXED PAGINATION --}}
                <div class="d-flex justify-content-end align-items-center">
-                <div class="col-md-2 p-0">
-                    <form method="GET">
+                <div class="d-flex justify-content-between align-items-center flex-wrap mt-3">
+    <form method="GET" class="mb-2">
+        <input type="hidden" name="active_tab" value="pending">
 
-                        <select name="per_page" class="form-control" onchange="this.form.submit()">
-                            @foreach([10, 20, 50, 100] as $size)
-                            <option value="{{ $size }}" {{ request('per_page') == $size ? 'selected' : '' }}>
-                                Page {{ $size }}
-                            </option>
-                            @endforeach
-                        </select>
-                    </form>
-                </div>
+        @foreach(request()->except('per_page','page','pending','closed','active_tab') as $key => $value)
+            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+        @endforeach
+
+        <select name="per_page" class="form-control" onchange="this.form.submit()">
+            @foreach([10,20,50,100] as $size)
+                <option value="{{ $size }}" {{ request('per_page',10)==$size ? 'selected' : '' }}>
+                    Show {{ $size }}
+                </option>
+            @endforeach
+        </select>
+    </form>
+
+    {{ $pendingAO->appends(request()->query())->links('pagination::bootstrap-5') }}
+</div>
             </div>
 
         </div>
@@ -264,6 +280,9 @@ Administrative Officer Complaints- PDMT
                     @forelse($closedAO as $c)
 
                     <tr class="closed-ao-row"
+                        data-division-counter="{{ ($c->counter->division_name ?? '-') . ' - ' . ($c->counter->counter_name ?? '-') }}"
+                        data-service-quality="{{ $c->serviceQuality->name ?? '-' }}"
+                        data-rating="{{ ['','Bad','Poor','Average','Good','Excellent'][$c->rating] ?? 'N/A' }}"
                         data-vehicle="{{ $c->vehicle_number ?? '-' }}"
                         data-phone="{{ $c->phone ?? '-' }}"
                         data-email="{{ $c->complaint_email ?? '-' }}"
@@ -271,10 +290,9 @@ Administrative Officer Complaints- PDMT
                         data-complaint-type="{{ $c->complainType->name ?? '-' }}"
                         data-user-remarks="{{ $c->user_remarks ?? '-' }}"
                         data-ao-remarks="{{ $c->ao_remarks ?? '-' }}"
-                        data-commissioner-remarks="{{ $c->commissioner_remarks ?? '-' }}"
                         style="cursor:pointer">
 
-                        <td>{{ $loop->iteration }}</td>
+<td>{{ $closedAO->firstItem() + $loop->index }}</td>
                         <td>{{ $c->counter->division_name ?? '-' }}</td>
                         <td>{{ $c->counter->counter_name ?? '-' }}</td>
                         <td>{{ $c->vehicle_number }}</td>
@@ -285,14 +303,23 @@ Administrative Officer Complaints- PDMT
                         <td>{{ $c->updated_at->format('d M Y') }}</td>
 
                         <td>
-                            @if($c->status == 'commissioner')
-                            <span class="badge bg-primary">Sent to Commissioner</span>
-                            @elseif($c->status == 'completed')
-                            <span class="badge bg-success">Completed</span>
-                            @elseif($c->status == 'rejected')
-                            <span class="badge bg-danger">Rejected</span>
-                            @endif
-                            <span class="float-end">i</span>
+                         @if($c->status == 'pending' || is_null($c->status))
+    <span class="badge bg-warning text-dark">Pending</span>
+
+@elseif($c->status == 'ao')
+    <span class="badge bg-info">Forwarded to A/O</span>
+
+@elseif($c->status == 'verified')
+    <span class="badge bg-success">Verified</span>
+
+@elseif($c->status == 'commissioner')
+    <span class="badge bg-primary">Informed to Commissioner</span>
+
+
+
+@else
+    <span class="badge bg-secondary">-</span>
+@endif
                         </td>
 
                     </tr>
@@ -304,7 +331,25 @@ Administrative Officer Complaints- PDMT
                     @endforelse
                 </tbody>
             </table>
+<div class="d-flex justify-content-between align-items-center flex-wrap mt-3">
+    <form method="GET" class="mb-2">
+        <input type="hidden" name="active_tab" value="closed">
 
+        @foreach(request()->except('per_page','page','pending','closed','active_tab') as $key => $value)
+            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+        @endforeach
+
+        <select name="per_page" class="form-control" onchange="this.form.submit()">
+            @foreach([10,20,50,100] as $size)
+                <option value="{{ $size }}" {{ request('per_page',10)==$size ? 'selected' : '' }}>
+                    Show {{ $size }}
+                </option>
+            @endforeach
+        </select>
+    </form>
+
+    {{ $closedAO->appends(request()->query())->links('pagination::bootstrap-5') }}
+</div>
         </div>
 
     </div>
@@ -324,6 +369,9 @@ Administrative Officer Complaints- PDMT
                     <div class="col-md-6"><strong>Vehicle:</strong> <span id="pendingAoVehicle">-</span></div>
                     <div class="col-md-6"><strong>Phone:</strong> <span id="pendingAoPhone">-</span></div>
                     <div class="col-md-6"><strong>Email:</strong> <span id="pendingAoEmail">-</span></div>
+                    <div class="col-md-6"><strong>DS Division - Counter:</strong> <span id="pendingAoDivisionCounter">-</span></div>
+                    <div class="col-md-6"><strong>Service Quality:</strong> <span id="pendingAoServiceQuality">-</span></div>
+                    <div class="col-md-6"><strong>Rating:</strong> <span id="pendingAoRating">-</span></div>
                     <div class="col-md-6"><strong>Complaint Type:</strong> <span id="pendingAoType">-</span></div>
                     <div class="col-md-6"><strong>User Remarks:</strong> <span id="pendingAoUserRemarks">-</span></div>
                     <div class="col-12">
@@ -335,8 +383,8 @@ Administrative Officer Complaints- PDMT
                             @csrf
                             <label><strong>AO Final Remarks</strong></label>
                             <textarea name="ao_remarks" class="form-control mb-2"></textarea>
-                            <button class="btn btn-danger btn-sm" name="action" value="reject">Reject</button>
-                            <button class="btn btn-success btn-sm" name="action" value="forward">Forward</button>
+                            <button class="btn btn-success btn-sm" name="action" value="verify">Verified</button>
+                            <button class="btn btn-warning btn-sm text-dark" name="action" value="inform_commissioner">Inform By Commissioner</button>
                         </form>
                     </div>
                 </div>
@@ -357,10 +405,12 @@ Administrative Officer Complaints- PDMT
                     <div class="col-md-6"><strong>Vehicle:</strong> <span id="closedAoVehicle">-</span></div>
                     <div class="col-md-6"><strong>Phone:</strong> <span id="closedAoPhone">-</span></div>
                     <div class="col-md-6"><strong>Email:</strong> <span id="closedAoEmail">-</span></div>
+                    <div class="col-md-6"><strong>DS Division - Counter:</strong> <span id="closedAoDivisionCounter">-</span></div>
+                    <div class="col-md-6"><strong>Service Quality:</strong> <span id="closedAoServiceQuality">-</span></div>
+                    <div class="col-md-6"><strong>Rating:</strong> <span id="closedAoRating">-</span></div>
                     <div class="col-md-6"><strong>Complaint Type:</strong> <span id="closedAoType">-</span></div>
                     <div class="col-md-6"><strong>User Remarks:</strong> <span id="closedAoUserRemarks">-</span></div>
                     <div class="col-md-6"><strong>AO Remarks:</strong> <span id="closedAoAoRemarks">-</span></div>
-                    <div class="col-md-6"><strong>Commissioner Remarks:</strong> <span id="closedAoCommissionerRemarks">-</span></div>
                     <div class="col-12">
                         <strong>Complaint:</strong>
                         <div class="p-2 bg-light rounded border" id="closedAoComplaint">-</div>
@@ -407,6 +457,9 @@ Administrative Officer Complaints- PDMT
                 document.getElementById('pendingAoVehicle').innerText = this.dataset.vehicle || '-';
                 document.getElementById('pendingAoPhone').innerText = this.dataset.phone || '-';
                 document.getElementById('pendingAoEmail').innerText = this.dataset.email || '-';
+                document.getElementById('pendingAoDivisionCounter').innerText = this.dataset.divisionCounter || '-';
+                document.getElementById('pendingAoServiceQuality').innerText = this.dataset.serviceQuality || '-';
+                document.getElementById('pendingAoRating').innerText = this.dataset.rating || '-';
                 document.getElementById('pendingAoType').innerText = this.dataset.complaintType || '-';
                 document.getElementById('pendingAoUserRemarks').innerText = this.dataset.userRemarks || '-';
                 document.getElementById('pendingAoComplaint').innerText = this.dataset.complaint || '-';
@@ -420,10 +473,12 @@ Administrative Officer Complaints- PDMT
                 document.getElementById('closedAoVehicle').innerText = this.dataset.vehicle || '-';
                 document.getElementById('closedAoPhone').innerText = this.dataset.phone || '-';
                 document.getElementById('closedAoEmail').innerText = this.dataset.email || '-';
+                document.getElementById('closedAoDivisionCounter').innerText = this.dataset.divisionCounter || '-';
+                document.getElementById('closedAoServiceQuality').innerText = this.dataset.serviceQuality || '-';
+                document.getElementById('closedAoRating').innerText = this.dataset.rating || '-';
                 document.getElementById('closedAoType').innerText = this.dataset.complaintType || '-';
                 document.getElementById('closedAoUserRemarks').innerText = this.dataset.userRemarks || '-';
                 document.getElementById('closedAoAoRemarks').innerText = this.dataset.aoRemarks || '-';
-                document.getElementById('closedAoCommissionerRemarks').innerText = this.dataset.commissionerRemarks || '-';
                 document.getElementById('closedAoComplaint').innerText = this.dataset.complaint || '-';
                 closedAoModal.show();
             });

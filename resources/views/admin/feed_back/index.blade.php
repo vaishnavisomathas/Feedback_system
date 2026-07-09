@@ -202,9 +202,9 @@ Counters Feedbacks - PDMT
 
                             <tr>
 
-                                <td>
-                                    {{ ($ratings->currentPage() - 1) * $ratings->perPage() + $index + 1 }}
-                                </td>
+                               <td>
+    {{ $ratings->firstItem() + $loop->index }}
+</td>
 
                                 <td>
                                     {{ $rating->counter->division_name ?? '-' }}
@@ -255,35 +255,40 @@ Counters Feedbacks - PDMT
     </div>
 
 
+<div class="d-flex justify-content-between align-items-center flex-wrap mt-3">
 
-    <div class="d-flex justify-content-end align-items-center">
+    <form method="GET" class="d-flex align-items-center mb-2">
 
-        <div class="col-md-2 p-0">
+        @foreach(request()->except('per_page','page') as $key => $value)
+            @if(is_array($value))
+                @foreach($value as $v)
+                    <input type="hidden" name="{{ $key }}[]" value="{{ $v }}">
+                @endforeach
+            @else
+                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+            @endif
+        @endforeach
 
-            <form method="GET">
+        <select name="per_page"
+                class="form-control"
+                onchange="this.form.submit()">
 
-                <select name="per_page"
-                    class="form-control"
-                    onchange="this.form.submit()">
+            @foreach([10,20,50,100] as $size)
+                <option value="{{ $size }}"
+                    {{ request('per_page',10) == $size ? 'selected' : '' }}>
+                    Show {{ $size }}
+                </option>
+            @endforeach
 
-                    @foreach([10,20,50,100] as $size)
+        </select>
 
-                    <option value="{{ $size }}"
-                        {{ request('per_page') == $size ? 'selected' : '' }}>
+    </form>
 
-                        Page {{ $size }}
-
-                    </option>
-
-                    @endforeach
-
-                </select>
-
-            </form>
-
-        </div>
-
+    <div class="mb-2">
+        {{ $ratings->links('pagination::bootstrap-5') }}
     </div>
+
+</div>
 
 </div>
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Feedback;
 use App\Models\Counter;
+use App\Models\ManualComplaint;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -14,6 +15,7 @@ class HomeController extends Controller
     {
         // Total Ratings
         $totalRatings = Feedback::count();
+        $totalManualFeedbackCount = ManualComplaint::count();
 
     $todayRatings = Feedback::whereDate('created_at', now())->count();
 
@@ -46,13 +48,16 @@ class HomeController extends Controller
         ->orderByDesc('total')
         ->first();
 
-    // ================= YEAR =================
-    $highestYear = Feedback::select(
+    // ================= WEEK =================
+    $highestWeek = Feedback::select(
             'counter_id',
             DB::raw('COUNT(*) as total'),
             DB::raw('AVG(rating) as avg_rating')
         )
-        ->whereYear('created_at', now()->year)
+        ->whereBetween('created_at', [
+            now()->startOfWeek(),
+            now()->endOfWeek()
+        ])
         ->groupBy('counter_id')
         ->with('counter')
         ->orderByDesc('total')
@@ -100,11 +105,12 @@ $topDivisions = $query
 ->get();
         return view('welcome', compact(
             'totalRatings',
+            'totalManualFeedbackCount',
             'todayRatings',
             'monthRatings',
             'highestToday',
             'highestMonth',
-            'highestYear',
+            'highestWeek',
             'latestComplaints',
             'topDivisions',
             'pending','ao','commissioner'

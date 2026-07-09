@@ -30,25 +30,25 @@
       z-index: 1000;
     }
 
-  .brand-logos{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:15px 12px;
-}
+    .brand-logos {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 15px 12px;
+    }
 
-.sidebar-logo{
-  width:45px;
-  height:45px;
-  border-radius:50%;
-  object-fit:cover;
-}
+    .sidebar-logo {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
 
-.sidebar-title{
-  font-size:14px;
-  font-weight:600;
-  color:#111827;
-}
+    .sidebar-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #111827;
+    }
 
     /* SCROLL */
     .scroll-sidebars {
@@ -388,7 +388,7 @@ MOBILE
           @endif
           @endif
 
-                    <!-- QR -->
+          <!-- QR -->
           @if($showDivisionQr)
           <li class="nav-small-cap">
             <span>DS Division QR</span>
@@ -417,21 +417,27 @@ MOBILE
 
           @endif
 
-          <!-- COMMISSIONER -->
-          @if($showCommissioner)
-          <li class="nav-small-cap">
-            <span>Commissioner</span>
-          </li>
+        @if($showCommissioner)
 
-          <li class="sidebar-item {{ request()->routeIs('admin.commissioner.*') ? 'active' : '' }}">
-            <a class="sidebar-link" href="{{ route('admin.commissioner.index') }}">
-              <i class="ti ti-crown"></i>
-              <span>Commissioner</span>
-            </a>
-          </li>
+<li class="nav-small-cap">
+    <span>Commissioner</span>
+</li>
 
-          @endif
+<li class="sidebar-item {{ request()->routeIs('admin.commissioner.index') ? 'active' : '' }}">
+    <a class="sidebar-link" href="{{ route('admin.commissioner.index') }}">
+        <i class="ti ti-crown"></i>
+        <span>Commissioner Complaints</span>
+    </a>
+</li>
 
+<li class="sidebar-item {{ request()->routeIs('admin.commissioner.informed') ? 'active' : '' }}">
+    <a class="sidebar-link" href="{{ route('admin.commissioner.informed') }}">
+        <i class="ti ti-bell-ringing"></i>
+        <span>Informed Complaints</span>
+    </a>
+</li>
+
+@endif
           <!-- REPORT -->
           @if($showRatingReport)
           <li class="nav-small-cap">
@@ -524,9 +530,9 @@ MOBILE
 
       <!-- TITLE -->
       <div class="fw-semibold" align="center">
-               <a href="#" data-bs-toggle="dropdown">
-            <img src="{{ asset('assets/images/pdmt_logo.png') }}" width="45" class="rounded-circle">
-          </a>
+        <a href="#" data-bs-toggle="dropdown">
+          <img src="{{ asset('assets/images/pdmt_logo.png') }}" width="45" class="rounded-circle">
+        </a>
         {{-- <span>Welcome to {{ auth()->user()->name }} Dashboard!</span> --}}
         <span>Smart Feedback Management System</span>
 
@@ -559,18 +565,18 @@ MOBILE
             <div class="notif-body">
               @forelse($notificationList as $item)
               @php
-                $roleKey = strtolower(trim((string) auth()->user()->role));
-                if (isset($item->complaint)) {
-                    $notificationUrl = route('admin.manual-complaints.index');
-                } elseif (in_array($roleKey, ['administrative officer', 'a/o', 'ao'], true)) {
-                    $notificationUrl = route('admin.ao.index');
-                } elseif (in_array($roleKey, ['commissioner', 'commisioner'], true)) {
-                    $notificationUrl = route('admin.commissioner.index');
-                } elseif ($roleKey === 'user') {
-                    $notificationUrl = route('admin.feedback.index');
-                } else {
-                    $notificationUrl = route('dashboard');
-                }
+              $roleKey = strtolower(trim((string) auth()->user()->role));
+              if (isset($item->complaint)) {
+              $notificationUrl = route('admin.manual-complaints.index');
+              } elseif (in_array($roleKey, ['administrative officer', 'a/o', 'ao'], true)) {
+              $notificationUrl = route('admin.ao.index');
+              } elseif (in_array($roleKey, ['commissioner', 'commisioner'], true)) {
+              $notificationUrl = route('admin.commissioner.index');
+              } elseif ($roleKey === 'user') {
+              $notificationUrl = route('admin.feedback.index');
+              } else {
+              $notificationUrl = route('dashboard');
+              }
               @endphp
               <a href="{{ $notificationUrl }}" class="notif-item text-decoration-none text-reset">
                 <div class="notif-icon">
@@ -580,9 +586,9 @@ MOBILE
                 <div class="notif-content">
                   <div class="notif-text">
                     @if(isset($item->complaint))
-                      Manual Complaint: {{ \Illuminate\Support\Str::limit($item->complaint, 60) }}
+                    Manual Complaint: {{ \Illuminate\Support\Str::limit($item->complaint, 60) }}
                     @else
-                      {{ \Illuminate\Support\Str::limit($item->note ?? '-', 60) }}
+                    {{ \Illuminate\Support\Str::limit($item->note ?? '-', 60) }}
                     @endif
                   </div>
                   <small class="text-muted">
@@ -608,16 +614,16 @@ MOBILE
 
         <!-- 👤 PROFILE / LOGOUT -->
         <div class="dropdown">
-<a href="#" data-bs-toggle="dropdown"
-   class="d-flex align-items-center justify-content-center rounded-circle"
-   style="width:45px;height:45px;background:#e7f1ff;">
-    <i class="ti ti-user" style="font-size:22px;color:#0d6efd;"></i>
-</a>
+          <a href="#" data-bs-toggle="dropdown"
+            class="d-flex align-items-center justify-content-center rounded-circle"
+            style="width:45px;height:45px;background:#e7f1ff;">
+            <i class="ti ti-user" style="font-size:22px;color:#0d6efd;"></i>
+          </a>
 
           <div class="dropdown-menu dropdown-menu-end">
-           <a href="{{ route('users.show', auth()->user()->id) }}" class="dropdown-item fw-semibold">
-    {{ auth()->user()->name }}
-</a>
+            <a href="{{ route('users.show', auth()->user()->id) }}" class="dropdown-item fw-semibold">
+              {{ auth()->user()->name }}
+            </a>
 
             <form method="POST" action="{{ route('logout') }}">
               @csrf
