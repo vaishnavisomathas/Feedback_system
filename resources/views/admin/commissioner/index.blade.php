@@ -130,7 +130,7 @@ Commissioner Complaints - PDMT
                                     <option value="pending" {{ request('status')=='pending' ? 'selected' : '' }}>Pending</option>
                                     <option value="ao" {{ request('status')=='ao' ? 'selected' : '' }}>Forwarded to A/O</option>
                                     <option value="verified" {{ request('status')=='verified' ? 'selected' : '' }}>Verified</option>
-                                    <option value="commissioner" {{ request('status')=='commissioner' ? 'selected' : '' }}>Informed by Commissioner</option>
+                                    <option value="commissioner" {{ request('status')=='commissioner' ? 'selected' : '' }}> Informed to Commissioner</option>
 
                                 </select>
 
@@ -265,10 +265,11 @@ Commissioner Complaints - PDMT
                                     @elseif($c->status === 'verified')
                                     <span class="badge bg-success">Verified</span>
                                     @elseif($c->status === 'commissioner')
-                                    <span class="badge bg-danger">Informed by Commissioner</span>
-                                    @else
-                                    <span class="badge bg-secondary">{{ ucfirst($c->status ?? '-') }}</span>
-                                    @endif
+                                    <span class="badge bg-danger"> Informed to Commissioner</span>
+                                    
+@else
+    <span class="badge bg-secondary">-</span>
+@endif                                  
 
                                 </td>
 
@@ -297,7 +298,7 @@ Commissioner Complaints - PDMT
 
                                             @if($c->status === 'commissioner')
                                             <div class="alert alert-danger py-2 mb-3" role="alert">
-                                                <strong>Important:</strong> Informed by Commissioner.
+                                                <strong>Important:</strong>  Informed to Commissioner.
                                             </div>
                                             @endif
 

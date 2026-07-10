@@ -316,11 +316,10 @@
           {{-- SERVICE QUALITY --}}
           <div class="mb-3">
             <label class="section-label">Quality of Service</label>
-            <select class="form-select" name="service_quality_id">
+            <select class="form-select" name="service_quality_id"             id="service_quality_id">
               <option value="">-- Select --</option>
               @foreach($qualities as $quality)
                 <option value="{{ $quality->id }}"
-                  {{ old('service_quality_id', $feedback->service_quality_id ?? '') == $quality->id ? 'selected' : '' }}>
                   {{ $quality->name }}
                 </option>
               @endforeach
@@ -387,8 +386,11 @@
 @endif
 
 // PHONE FORMAT
+const qualities = @json($qualities);
+const oldServiceQualityId = @json(old('service_quality_id'));
 const phoneInput = document.querySelector('input[name="phone"]');
 
+const qualitySelect = document.getElementById('service_quality_id');
 if (phoneInput) {
     phoneInput.addEventListener('input', function(e) {
         let value = e.target.value.replace(/\D/g, '');
@@ -432,13 +434,60 @@ checkbox.addEventListener('change', function () {
   updateComplaintCard(true);
   complaintBox.scrollIntoView({ behavior: 'smooth' });
 @endif
+function loadServiceQualities(rating, selectedQualityId = null) {
+    let type = '';
 
+    if (parseInt(rating) === 5 || parseInt(rating) === 4) {
+        type = 'good';
+    } else if (parseInt(rating) === 3) {
+        type = 'average';
+    } else if (parseInt(rating) === 2 || parseInt(rating) === 1) {
+        type = 'bad';
+    }
+
+    qualitySelect.innerHTML = '<option value="">-- Select Quality --</option>';
+
+    const filteredQualities = qualities.filter(function (quality) {
+        return quality.type === type;
+    });
+
+    filteredQualities.forEach(function (quality) {
+        const option = document.createElement('option');
+
+        option.value = quality.id;
+        option.textContent = quality.name;
+
+        if (
+            selectedQualityId !== null &&
+            String(selectedQualityId) === String(quality.id)
+        ) {
+            option.selected = true;
+        }
+
+        qualitySelect.appendChild(option);
+    });
+
+    if (filteredQualities.length === 0) {
+        qualitySelect.innerHTML =
+            '<option value="">No service qualities available</option>';
+    }
+}
 
 function toggleRating(input) {
     document.querySelectorAll('.rating-button').forEach(btn => btn.classList.remove('active-rating'));
     input.closest('label').classList.add('active-rating');
+        loadServiceQualities(input.value);
 }
+const selectedRating = document.querySelector(
+    'input[name="rating"]:checked'
+);
 
+if (selectedRating) {
+    loadServiceQualities(
+        selectedRating.value,
+        oldServiceQualityId
+    );
+}
 
 window.addEventListener("pageshow", function (event) {
     if (event.persisted || performance.navigation.type === 2) {

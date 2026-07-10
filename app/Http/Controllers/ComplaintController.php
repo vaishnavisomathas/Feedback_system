@@ -273,7 +273,8 @@ $pendingCommissioner = Feedback::with(['counter','complainType','serviceQuality'
                   'ao',
                   'verified',
                   'commissioner',
-                 
+                         'completed',
+                'rejected',
               ]);
     })
     ->when($status === 'pending', function ($query) {
@@ -282,9 +283,14 @@ $pendingCommissioner = Feedback::with(['counter','complainType','serviceQuality'
               ->orWhere('status', 'pending');
         });
     })
-    ->when(in_array($status, ['ao', 'verified', 'commissioner']), function ($q) use ($status) {
-        $q->where('status', $status);
-    })
+      ->when(
+        in_array(
+            $status,
+            ['ao', 'verified', 'commissioner', 'completed', 'rejected'],
+            true
+        ),
+        fn ($query) => $query->where('status', $status)
+    )
     ->when($filters['counter'], fn($q) => $q->where('counter_id', $filters['counter']))
     ->when($filters['division'], fn($q) =>
         $q->whereHas('counter', fn($q2) =>

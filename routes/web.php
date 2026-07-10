@@ -54,6 +54,18 @@ Route::middleware(['auth', 'force.password.change'])->group(function () {
         ->name('reports.rating-points');
     Route::get('/reports/rating-points/pdf', [HomeController::class, 'ratingPointsReportPdf'])
         ->name('reports.rating-points.pdf');
+    Route::get('/reports/manual-complaints', [HomeController::class, 'manualComplaintReport'])
+        ->name('reports.manual-complaints');
+    Route::get('/reports/manual-complaints/pdf', [HomeController::class, 'manualComplaintReportPdf'])
+        ->name('reports.manual-complaints.pdf');
+    Route::get('/reports/qr-complaints', [HomeController::class, 'qrComplaintReport'])
+        ->name('reports.qr-complaints');
+    Route::get('/reports/qr-complaints/pdf', [HomeController::class, 'qrComplaintReportPdf'])
+        ->name('reports.qr-complaints.pdf');
+    Route::get('/reports/division-counter-totals', [HomeController::class, 'divisionCounterTotalReport'])
+        ->name('reports.division-counter-totals');
+    Route::get('/reports/division-counter-totals/pdf', [HomeController::class, 'divisionCounterTotalReportPdf'])
+        ->name('reports.division-counter-totals.pdf');
     Route::get('counters/create', [CounterController::class, 'create'])->name('counters.create');
 
     Route::get('counters', [CounterController::class, 'index'])->name('counters.index');

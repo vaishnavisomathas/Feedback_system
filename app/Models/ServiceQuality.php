@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class ServiceQuality extends Model
 {
     use HasFactory;
-      protected $fillable = ['name'];
+      protected $fillable = ['name',    'type'];
 
     public function feedbacks()
     {

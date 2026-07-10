@@ -21,6 +21,8 @@ class ServiceQualityController extends Controller
     {
         ServiceQuality::create($request->validate([
             'name'=>'required|max:100',
+                    'type'  => 'required|in:good,average,bad',
+
             'color'=>'nullable|max:20'
         ]));
 
@@ -33,6 +35,7 @@ class ServiceQualityController extends Controller
 
         $q->update($request->validate([
             'name'=>'required|max:100',
+                    'type'  => 'required|in:good,average,bad',
             'color'=>'nullable|max:20'
         ]));
 

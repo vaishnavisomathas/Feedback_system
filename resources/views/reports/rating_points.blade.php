@@ -187,27 +187,40 @@ Rating Points Report - PDMT
 
     </div>
 
-    <div class="d-flex flex-wrap justify-content-end align-items-center gap-2 mb-3">
-        <form method="GET" class="d-flex align-items-center gap-2">
-            <input type="hidden" name="period" value="{{ $period }}">
-            <input type="hidden" name="month" value="{{ $selectedMonth }}">
-            <input type="hidden" name="year" value="{{ $selectedYear }}">
-            <input type="hidden" name="division" value="{{ $selectedDivision }}">
-            <input type="hidden" name="from" value="{{ $selectedFrom ?? '' }}">
-            <input type="hidden" name="to" value="{{ $selectedTo ?? '' }}">
+  <div class="d-flex justify-content-between align-items-center flex-wrap mt-3">
 
-            <small class="text-muted">Page Size</small>
-            <select name="per_page" class="form-control form-control-sm" onchange="this.form.submit()" style="width: 90px;">
-                @foreach([10,20,50,100] as $size)
-                <option value="{{ $size }}" {{ (int) $perPage === $size ? 'selected' : '' }}>{{ $size }}</option>
+    <form method="GET" class="d-flex align-items-center mb-2">
+
+        @foreach(request()->except('per_page','page') as $key => $value)
+            @if(is_array($value))
+                @foreach($value as $v)
+                    <input type="hidden" name="{{ $key }}[]" value="{{ $v }}">
                 @endforeach
-            </select>
-        </form>
+            @else
+                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+            @endif
+        @endforeach
 
-        {{ $ranking->links() }}
+        <select name="per_page"
+                class="form-control"
+                onchange="this.form.submit()">
+
+            @foreach([10,20,50,100] as $size)
+                <option value="{{ $size }}"
+                    {{ request('per_page',10) == $size ? 'selected' : '' }}>
+                    Show {{ $size }}
+                </option>
+            @endforeach
+
+        </select>
+
+    </form>
+
+    <div>
+        {{ $ranking->onEachSide(1)->links('pagination::bootstrap-5') }}
     </div>
-</div>
 
+</div>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const periodSelect = document.getElementById('periodSelect');

@@ -71,7 +71,14 @@ Service Quality - PDMT
                             <label>Name</label>
                             <input type="text" name="name" id="name" class="form-control" required>
                         </div>
-
+<div class="mb-3">
+    <label>Type</label>
+    <select name="type" id="type" class="form-control" required>
+        <option value="good">Good</option>
+        <option value="average">Average</option>
+        <option value="bad">Bad</option>
+    </select>
+</div>
                     </div>
 
                     <div class="modal-footer">
@@ -112,6 +119,7 @@ Service Quality - PDMT
 
                                 <th>#</th>
                                 <th>Name</th>
+                                <th>Type</th>
                                 <th width="150">Action</th>
 
                             </tr>
@@ -128,7 +136,15 @@ Service Quality - PDMT
                                 <td>
                                     {{ ($qualities->currentPage() - 1) * $qualities->perPage() + $index + 1 }}
                                 </td>
-
+<td>
+    @if($q->type == 'good')
+        <span class="badge bg-success">Good</span>
+    @elseif($q->type == 'average')
+        <span class="badge bg-warning text-dark">Average</span>
+    @else
+        <span class="badge bg-danger">Bad</span>
+    @endif
+</td>
                                 <td>
                                     {{ $q->name }}
                                 </td>
@@ -138,6 +154,7 @@ Service Quality - PDMT
                                     <button class="btn btn-primary btn-sm editBtn"
                                         data-id="{{ $q->id }}"
                                         data-name="{{ $q->name }}"
+                                            data-type="{{ $q->type }}"
                                         title="Edit"
                                         aria-label="Edit">
                                         <i class="bi bi-pencil-square"></i>
@@ -271,6 +288,7 @@ Service Quality - PDMT
 
         let form = document.getElementById('qualityForm');
 
+let typeInput = document.getElementById('type');
         let methodField = document.getElementById('methodField');
 
         let modalTitle = document.getElementById('modalTitle');
@@ -297,7 +315,7 @@ Service Quality - PDMT
             modalTitle.innerText = 'Add Service Quality';
 
             form.reset();
-
+typeInput.value = 'good';
             modal.show();
 
         });
@@ -316,7 +334,7 @@ Service Quality - PDMT
                 modalTitle.innerText = 'Edit Service Quality';
 
                 nameInput.value = btn.dataset.name;
-
+typeInput.value = btn.dataset.type;
                 modal.show();
 
             });

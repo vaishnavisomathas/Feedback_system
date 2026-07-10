@@ -326,10 +326,10 @@ MOBILE
           $showDivisionList = $isSuperAdmin || $isAdmin || $isCommissioner;
           $showDivisionQr = true;
           $showFeedback = true;
-          $showComplaintList = $isSuperAdmin || $isAdmin || $isUser;
-          $showManualComplaintEntry = $isSuperAdmin || $isAdmin || $isUser || $isAdministrativeOfficer || $isCommissioner;
-          $showAoManagement = $isSuperAdmin || $isAdmin || $isAdministrativeOfficer;
-          $showCommissioner = $isSuperAdmin || $isAdmin || $isCommissioner;
+          $showComplaintList = $isSuperAdmin ||  $isUser;
+          $showManualComplaintEntry = $isSuperAdmin ||  $isUser || $isAdministrativeOfficer || $isCommissioner;
+          $showAoManagement = $isSuperAdmin ||  $isAdministrativeOfficer;
+          $showCommissioner = $isSuperAdmin ||  $isCommissioner;
           $showRatingReport = $isSuperAdmin || $isAdmin || $isUser || $isAdministrativeOfficer || $isCommissioner;
           $showUsers = $isSuperAdmin || $isAdmin;
           @endphp
@@ -348,7 +348,18 @@ MOBILE
             </a>
           </li>
           @endif
+    @if($showDivisionQr)
+          <li class="nav-small-cap">
+            <span>DS Division QR</span>
+          </li>
 
+          <li class="sidebar-item {{ request()->routeIs('ds-divisions.*') ? 'active' : '' }}">
+            <a class="sidebar-link" href="{{ route('ds-divisions.index') }}">
+              <i class="ti ti-qrcode"></i>
+              <span>Division QR</span>
+            </a>
+          </li>
+          @endif
           <!-- FEEDBACK -->
           @if($showFeedback)
           <li class="nav-small-cap">
@@ -389,18 +400,7 @@ MOBILE
           @endif
 
           <!-- QR -->
-          @if($showDivisionQr)
-          <li class="nav-small-cap">
-            <span>DS Division QR</span>
-          </li>
-
-          <li class="sidebar-item {{ request()->routeIs('ds-divisions.*') ? 'active' : '' }}">
-            <a class="sidebar-link" href="{{ route('ds-divisions.index') }}">
-              <i class="ti ti-qrcode"></i>
-              <span>Division QR</span>
-            </a>
-          </li>
-          @endif
+      
 
           <!-- AO -->
           @if($showAoManagement)
@@ -438,20 +438,7 @@ MOBILE
 </li>
 
 @endif
-          <!-- REPORT -->
-          @if($showRatingReport)
-          <li class="nav-small-cap">
-            <span>Report</span>
-          </li>
-
-          <li class="sidebar-item {{ request()->routeIs('reports.rating-points') ? 'active' : '' }}">
-            <a class="sidebar-link" href="{{ route('reports.rating-points') }}">
-              <i class="ti ti-chart-bar"></i>
-              <span>Rating Report</span>
-            </a>
-          </li>
-          @endif
-
+          
           <!-- USER MANAGEMENT -->
           @if($showUsers)
           <li class="nav-small-cap">
@@ -464,6 +451,40 @@ MOBILE
               <span>Users</span>
             </a>
           </li>
+<!-- REPORT -->
+          @if($showRatingReport)
+          <li class="nav-small-cap">
+            <span>Report</span>
+          </li>
+
+          <li class="sidebar-item {{ request()->routeIs('reports.rating-points') ? 'active' : '' }}">
+            <a class="sidebar-link" href="{{ route('reports.rating-points') }}">
+              <i class="ti ti-chart-bar"></i>
+              <span>Rating Report</span>
+            </a>
+          </li>
+
+          <li class="sidebar-item {{ request()->routeIs('reports.manual-complaints') ? 'active' : '' }}">
+            <a class="sidebar-link" href="{{ route('reports.manual-complaints') }}">
+              <i class="ti ti-file-description"></i>
+              <span>Manual Complaint Report</span>
+            </a>
+          </li>
+
+          <li class="sidebar-item {{ request()->routeIs('reports.qr-complaints') ? 'active' : '' }}">
+            <a class="sidebar-link" href="{{ route('reports.qr-complaints') }}">
+              <i class="ti ti-qrcode"></i>
+              <span>QR Complaint Report</span>
+            </a>
+          </li>
+
+          <li class="sidebar-item {{ request()->routeIs('reports.division-counter-totals') ? 'active' : '' }}">
+            <a class="sidebar-link" href="{{ route('reports.division-counter-totals') }}">
+              <i class="ti ti-building-community"></i>
+              <span>Division Counter Total</span>
+            </a>
+          </li>
+          @endif
 
           <!-- SETTINGS -->
           <li class="nav-small-cap">
@@ -491,6 +512,7 @@ MOBILE
             </a>
           </li>
           @endif
+
           @if($isSuperAdmin)
           <li class="sidebar-item {{ request()->routeIs('roles.*') ? 'active' : '' }}">
             <a class="sidebar-link" href="{{ route('roles.index') }}">

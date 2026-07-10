@@ -242,25 +242,40 @@ STATISTICS
 
 <div class="row g-3">
 
-<div class="col-lg-6 col-md-6 col-12">
-<div class="card stat-card bg-total">
+<div class="col-lg-4 col-md-6 col-12">
+<a href="{{ route('admin.feedback.index') }}" class="text-decoration-none text-reset d-block h-100">
+<div class="card stat-card bg-total h-100">
 <div class="card-body text-center">
 <div class="stat-icon mb-2"><i class="bi bi-star-fill"></i></div>
 <div class="stat-number">{{ $totalRatings ?? 0 }}</div>
 <div>Total Feedback</div>
 </div>
 </div>
+</a>
 </div>
 
+<div class="col-lg-4 col-md-6 col-12">
+<a href="{{ route('admin.complain.index') }}" class="text-decoration-none text-reset d-block h-100">
+<div class="card stat-card bg-today h-100">
+<div class="card-body text-center">
+<div class="stat-icon mb-2"><i class="bi bi-chat-left-text-fill"></i></div>
+<div class="stat-number">{{ $totalComplaints ?? 0 }}</div>
+<div>Total Complaints</div>
+</div>
+</div>
+</a>
+</div>
 
-<div class="col-lg-6 col-md-6 col-12">
-<div class="card stat-card bg-today">
+<div class="col-lg-4 col-md-6 col-12">
+<a href="{{ route('admin.manual-complaints.index') }}" class="text-decoration-none text-reset d-block h-100">
+<div class="card stat-card bg-today h-100">
 <div class="card-body text-center">
 <div class="stat-icon mb-2"><i class="bi bi-clipboard-check"></i></div>
 <div class="stat-number">{{ $totalManualFeedbackCount ?? 0 }}</div>
 <div>Total Manual Feedback Count</div>
 </div>
 </div>
+</a>
 </div>
 
 </div>

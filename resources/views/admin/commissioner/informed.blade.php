@@ -183,14 +183,14 @@ Informed Complaints - PDMT
                             <td>{{ ['','Bad','Poor','Average','Good','Excellent'][$c->rating] ?? '' }}</td>
                             <td>{{ $c->created_at->format('d M Y') }}</td>
                             <td>
-                                <span class="badge bg-danger">Informed by Commissioner</span>
+                                <span class="badge bg-danger"> Informed to Commissioner</span>
                             </td>
                         </tr>
 
                         {{-- MODAL --}}
                         <div class="modal fade" id="informedModal{{ $c->id }}">
-                            <div class="modal-dialog modal-lg modal-dialog-centered">
-                                <div class="modal-content rounded-0">
+<div class="modal-dialog modal-lg modal-dialog-centered informed-modal-dialog">
+                                    <div class="modal-content rounded-0">
 
                                     <div class="modal-header">
                                         <h5 class="modal-title">Complaint Details</h5>
@@ -202,7 +202,7 @@ Informed Complaints - PDMT
                                     <div class="modal-body">
 
                                         <div class="alert alert-danger py-2 mb-3">
-                                            <strong>Informed by Commissioner</strong>
+                                            <strong> Informed to Commissioner</strong>
                                         </div>
 
                                         <div class="row">
@@ -221,7 +221,10 @@ Informed Complaints - PDMT
                                                 <strong>Email:-</strong>
                                                 {{ $c->complaint_email ?? '-' }}
                                             </div>
-
+   <div class="col-md-6 mb-2">
+                                                <strong>Division:-</strong>
+                                                {{ $c->counter->division_name ?? '-' }}
+                                            </div>
                                             <div class="col-md-6 mb-2">
                                                 <strong>Complaint Type:-</strong>
                                                 <span class="badge bg-warning text-dark">
@@ -229,10 +232,7 @@ Informed Complaints - PDMT
                                                 </span>
                                             </div>
 
-                                            <div class="col-md-6 mb-2">
-                                                <strong>Division:-</strong>
-                                                {{ $c->counter->division_name ?? '-' }}
-                                            </div>
+                                         
 
                                             <div class="col-md-6 mb-2">
                                                 <strong>Counter:-</strong>

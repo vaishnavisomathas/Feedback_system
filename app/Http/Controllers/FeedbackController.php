@@ -42,7 +42,9 @@ class FeedbackController extends Controller
         ->firstOrFail();
 
  
- $qualities = ServiceQuality::orderBy('name')->get();
+    $qualities = ServiceQuality::select('id', 'name', 'type')
+        ->orderBy('name')
+        ->get();
         return view('feedback', [
             'counter' => $counter,
              'qualities' => $qualities,
@@ -85,8 +87,22 @@ $request->merge(['phone' => $phone]);
 'note' => 'nullable|required_if:has_complaint,yes|max:500',
               
         ]);
+$ratingType = match ((int) $request->rating) {
+    5, 4 => 'good',
+    3    => 'average',
+    2, 1 => 'bad',
+};
+$validQuality = ServiceQuality::where('id', $request->service_quality_id)
+    ->where('type', $ratingType)
+    ->exists();
 
-
+if (! $validQuality) {
+    return back()
+        ->withErrors([
+            'service_quality_id' => 'Selected service quality does not match the selected rating.',
+        ])
+        ->withInput();
+}
         Feedback::create([
             'counter_id'     => $request->counter_id,
             'rating'          => $request->rating,
