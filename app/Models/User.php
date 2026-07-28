@@ -53,8 +53,26 @@ class User extends Authenticatable
         'must_change_password' => 'boolean',
     ];
     public function hasRole($role)
-{
-    return $this->roles->pluck('name')->contains($role);
-}
+    {
+        $roleStr = is_string($role) ? strtolower(trim($role)) : '';
+        $userRoleStr = strtolower(trim((string) ($this->role ?? '')));
+
+        if ($userRoleStr !== '' && $userRoleStr === $roleStr) {
+            return true;
+        }
+
+        if ($this->roles && $this->roles->contains(function ($r) use ($roleStr) {
+            return strtolower(trim($r->name)) === $roleStr;
+        })) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return strtolower(trim((string) ($this->role ?? ''))) === 'super admin' || $this->hasRole('Super Admin');
+    }
 
 }

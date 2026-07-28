@@ -85,8 +85,10 @@ public function show($id)
 public function changePassword(Request $request, $id)
 {
     $user = User::findOrFail($id);
+    $currentUser = auth()->user();
+    $isSuperAdmin = $currentUser && (strtolower(trim((string) ($currentUser->role ?? ''))) === 'super admin' || (method_exists($currentUser, 'isSuperAdmin') && $currentUser->isSuperAdmin()));
 
-    if ((int) auth()->id() !== (int) $user->id) {
+    if (!$isSuperAdmin && (int) auth()->id() !== (int) $user->id) {
         abort(403, 'You can only change your own password.');
     }
 

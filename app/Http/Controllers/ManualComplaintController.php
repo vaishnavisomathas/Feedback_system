@@ -16,7 +16,15 @@ class ManualComplaintController extends Controller
 
     private function authorizeRoles(array $roles): void
     {
-        if (!in_array($this->roleKey(), $roles, true)) {
+        $user = auth()->user();
+        $role = $this->roleKey();
+        $isSuperAdmin = $role === 'super admin' || ($user && method_exists($user, 'isSuperAdmin') && $user->isSuperAdmin());
+
+        if ($isSuperAdmin) {
+            return;
+        }
+
+        if (!in_array($role, $roles, true)) {
             abort(403, 'Unauthorized action.');
         }
     }

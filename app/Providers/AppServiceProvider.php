@@ -60,7 +60,7 @@ public function boot()
                                   elseif (in_array($roleKey, ['administrative officer', 'a/o', 'ao'], true)) {
             $notifications = Feedback::where('status', 'ao')->latest()->take(25)->get();
             $count = Feedback::where('status', 'ao')->count();
-        } elseif (in_array($roleKey, ['commissioner', 'commisioner'], true)) {
+        } elseif ($roleKey === 'super admin' || (method_exists($user, 'isSuperAdmin') && $user->isSuperAdmin()) || in_array($roleKey, ['commissioner', 'commisioner'], true)) {
             $manualNotifications = ManualComplaint::where('status', 'commissioner')->latest()->get();
             $feedbackNotifications = Feedback::where('status', 'commissioner')->latest()->get();
 

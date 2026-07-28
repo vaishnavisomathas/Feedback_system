@@ -329,7 +329,11 @@ public function commissionerClose(Request $request,$id)
 }
 public function commissionerInformed(Request $request)
 {
-    if (strtolower(trim(auth()->user()->role)) !== 'commissioner') {
+    $user = auth()->user();
+    $roleKey = strtolower(trim((string) ($user->role ?? '')));
+    $isSuperAdmin = $roleKey === 'super admin' || ($user && method_exists($user, 'isSuperAdmin') && $user->isSuperAdmin());
+
+    if ($roleKey !== 'commissioner' && !$isSuperAdmin) {
         abort(403);
     }
 

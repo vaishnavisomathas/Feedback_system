@@ -588,11 +588,12 @@ MOBILE
               @forelse($notificationList as $item)
               @php
               $roleKey = strtolower(trim((string) auth()->user()->role));
+              $isSuperAdmin = $roleKey === 'super admin' || (auth()->user() && method_exists(auth()->user(), 'isSuperAdmin') && auth()->user()->isSuperAdmin());
               if (isset($item->complaint)) {
               $notificationUrl = route('admin.manual-complaints.index');
               } elseif (in_array($roleKey, ['administrative officer', 'a/o', 'ao'], true)) {
               $notificationUrl = route('admin.ao.index');
-              } elseif (in_array($roleKey, ['commissioner', 'commisioner'], true)) {
+              } elseif ($isSuperAdmin || in_array($roleKey, ['commissioner', 'commisioner'], true)) {
               $notificationUrl = route('admin.commissioner.index');
               } elseif ($roleKey === 'user') {
               $notificationUrl = route('admin.feedback.index');
