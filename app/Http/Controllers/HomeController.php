@@ -207,7 +207,7 @@ if (!in_array($perPage, [10, 20, 50, 100], true)) {
             )
             ->groupBy('counter_id')
             ->with('counter')
-            ->orderByDesc('total');
+            ->orderByDesc('avg_rating');
 $ranking = (clone $rankingQuery)
     ->paginate($perPage)
     ->withQueryString();
@@ -307,7 +307,7 @@ $ranking = (clone $rankingQuery)
             )
             ->groupBy('counter_id')
             ->with('counter')
-            ->orderByDesc('total')
+            ->orderByDesc('avg_rating')
             ->get();
 
         $html = view('reports.rating_points_pdf', compact(

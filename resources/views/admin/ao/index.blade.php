@@ -384,7 +384,7 @@ Administrative Officer Complaints- PDMT
                             <label><strong>AO Final Remarks</strong></label>
                             <textarea name="ao_remarks" class="form-control mb-2"></textarea>
                             <button class="btn btn-success btn-sm" name="action" value="verify">Verified</button>
-                            <button class="btn btn-warning btn-sm text-dark" name="action" value="inform_commissioner">Inform By Commissioner</button>
+                            <button class="btn btn-warning btn-sm text-dark" name="action" value="inform_commissioner">Inform to Commissioner</button>
                         </form>
                     </div>
                 </div>
