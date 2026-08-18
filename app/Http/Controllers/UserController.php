@@ -12,20 +12,29 @@ use Spatie\Permission\Models\Role;
 class UserController extends Controller
 {
     public function index()
-{
-    // Hide only Super Admin; keep other users visible even if role is null/trim issues.
-    $users = User::query()
-        ->where(function ($query) {
-            $query->whereNull('role')
-                ->orWhereRaw('LOWER(TRIM(role)) != ?', ['super admin']);
-        })
-        ->latest()
-        ->get();
+    {
+        $currentUser = auth()->user();
+        $isSuperAdmin = $currentUser && (strtolower(trim((string) ($currentUser->role ?? ''))) === 'super admin' || (method_exists($currentUser, 'isSuperAdmin') && $currentUser->isSuperAdmin()));
 
-    // Keep Admin role visible, only exclude Super Admin from selection.
-    $roles = Role::whereRaw('LOWER(name) != ?', ['super admin'])->get();
-    return view('admin.user.index', compact('users','roles'));
-}
+        if ($isSuperAdmin) {
+            $users = User::latest()->get();
+            $roles = Role::all();
+        } else {
+            // Hide only Super Admin; keep other users visible even if role is null/trim issues.
+            $users = User::query()
+                ->where(function ($query) {
+                    $query->whereNull('role')
+                        ->orWhereRaw('LOWER(TRIM(role)) != ?', ['super admin']);
+                })
+                ->latest()
+                ->get();
+
+            // Keep Admin role visible, only exclude Super Admin from selection.
+            $roles = Role::whereRaw('LOWER(name) != ?', ['super admin'])->get();
+        }
+
+        return view('admin.user.index', compact('users', 'roles', 'isSuperAdmin'));
+    }
 
   public function store(Request $request)
 {
@@ -92,10 +101,18 @@ public function changePassword(Request $request, $id)
         abort(403, 'You can only change your own password.');
     }
 
-    $request->validate([
-        'current_password' => ['required', 'current_password'],
-        'password' => ['required', 'string', 'min:8', 'confirmed', 'different:current_password'],
-    ]);
+    if ($isSuperAdmin && (int) auth()->id() !== (int) $user->id) {
+        // Super Admin resetting another user's password
+        $request->validate([
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+    } else {
+        // User (including Super Admin) changing their own password
+        $request->validate([
+            'current_password' => ['required', 'current_password'],
+            'password' => ['required', 'string', 'min:8', 'confirmed', 'different:current_password'],
+        ]);
+    }
 
     $user->password = Hash::make($request->password);
     $user->must_change_password = false;
@@ -107,11 +124,19 @@ public function changePassword(Request $request, $id)
 public function update(Request $request, $id)
 {
     $user = User::findOrFail($id);
+    $currentUser = auth()->user();
+    $isSuperAdmin = $currentUser && (strtolower(trim((string) ($currentUser->role ?? ''))) === 'super admin' || (method_exists($currentUser, 'isSuperAdmin') && $currentUser->isSuperAdmin()));
+    $targetIsSuperAdmin = (strtolower(trim((string) ($user->role ?? ''))) === 'super admin' || (method_exists($user, 'isSuperAdmin') && $user->isSuperAdmin()));
+
+    if ($targetIsSuperAdmin && !$isSuperAdmin) {
+        abort(403, 'You are not authorized to edit a Super Admin account.');
+    }
 
     $request->validate([
         'name' => 'required',
         'email' => 'required|email|unique:users,email,' . $id,
         'role' => 'required|string',
+        'password' => 'nullable|string|min:8',
     ]);
 
     $normalizedRole = trim((string) $request->role);
@@ -123,17 +148,56 @@ public function update(Request $request, $id)
     $user->role = $normalizedRole;
     $user->phone = $request->phone;
 
-    if ($request->password) {
-        $user->password = Hash::make($request->password); 
+    $passwordUpdated = false;
+    $newPassword = null;
+
+    if ($request->filled('password')) {
+        $newPassword = $request->password;
+        $user->password = Hash::make($newPassword);
+        $user->must_change_password = false;
+        $passwordUpdated = true;
     }
 
     $user->save();
+
+    if ($passwordUpdated && $request->boolean('send_password_email')) {
+        try {
+            Mail::raw(
+                "Hello {$user->name},\n\n" .
+                "Your password has been updated for PDMT Feedback System.\n" .
+                "Login Email: {$user->email}\n" .
+                "New Password: {$newPassword}\n\n" .
+                "Please login with your new password.",
+                function ($message) use ($user) {
+                    $message->to($user->email)
+                        ->subject('PDMT Account Password Updated');
+                }
+            );
+            return back()->with('success', 'User updated successfully and new password sent by email.');
+        } catch (\Throwable $e) {
+            Log::error('User updated but email send failed', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->with('warning', "User updated successfully. Email could not be sent. New password: {$newPassword}");
+        }
+    }
 
     return back()->with('success', 'User updated successfully');
 }
 public function destroy($id)
 {
     $user = User::findOrFail($id);
+    $currentUser = auth()->user();
+    $isSuperAdmin = $currentUser && (strtolower(trim((string) ($currentUser->role ?? ''))) === 'super admin' || (method_exists($currentUser, 'isSuperAdmin') && $currentUser->isSuperAdmin()));
+    $targetIsSuperAdmin = (strtolower(trim((string) ($user->role ?? ''))) === 'super admin' || (method_exists($user, 'isSuperAdmin') && $user->isSuperAdmin()));
+
+    if ($targetIsSuperAdmin && !$isSuperAdmin) {
+        abort(403, 'You are not authorized to delete a Super Admin account.');
+    }
+
     $user->delete();
 
     return back()->with('success', 'User deleted successfully');
