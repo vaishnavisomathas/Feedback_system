@@ -81,17 +81,7 @@
                             <input type="text" name="phone" id="phone" class="form-control" required>
                         </div>
 
-                        <div class="col-md-6 mb-3" id="passwordFieldContainer" style="display: none;">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" name="password" id="password" class="form-control" autocomplete="new-password">
-                            <small class="text-muted" id="passwordHelpText">Leave blank to keep existing password.</small>
-                        </div>
-
-                        <div class="col-md-12 mb-3" id="tempPasswordAlert">
-                            <div class="alert alert-info mb-0">
-                                Temporary password will be auto-generated and emailed to the user.
-                            </div>
-                        </div>
+                 
 
 
                     </div>

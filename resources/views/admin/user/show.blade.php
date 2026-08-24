@@ -36,6 +36,12 @@ font-size:14px;
                 </div>
             @endif
 
+            @if(session('warning'))
+                <div class="alert alert-warning">
+                    {{ session('warning') }}
+                </div>
+            @endif
+
             @if($errors->any())
                 <div class="alert alert-danger">
                     <ul class="mb-0 ps-3">
@@ -111,7 +117,8 @@ font-size:14px;
                             id="password"
                             name="password"
                             class="form-control @error('password') is-invalid @enderror"
-                            required
+                            value="{{ $isOwnProfile ? '' : ($nextPassword ?? 'pdmt@001') }}"
+                            {{ $isOwnProfile ? 'required' : '' }}
                         >
                     </div>
 
@@ -122,7 +129,8 @@ font-size:14px;
                             id="password_confirmation"
                             name="password_confirmation"
                             class="form-control"
-                            required
+                            value="{{ $isOwnProfile ? '' : ($nextPassword ?? 'pdmt@001') }}"
+                            {{ $isOwnProfile ? 'required' : '' }}
                         >
                     </div>
 

@@ -115,6 +115,64 @@ class SuperAdminPasswordEditTest extends TestCase
         $this->assertTrue(Hash::check('resetPassword456', $targetUser->fresh()->password));
     }
 
+    public function test_super_admin_reset_user_password_defaults_to_pdmt001_and_sends_email(): void
+    {
+        $superAdmin = $this->getOrCreateSuperAdmin();
+
+        $targetUser = User::updateOrCreate(
+            ['email' => 'resetdefault_test@pdmt.local'],
+            [
+                'name' => 'Default Reset User',
+                'password' => Hash::make('initialPassword123'),
+                'role' => 'User',
+                'must_change_password' => false,
+            ]
+        );
+
+        $response = $this->actingAs($superAdmin)->post(route('users.change-password', $targetUser->id), []);
+
+        $response->assertSessionHas('success');
+        $this->assertTrue(Hash::check('pdmt@001', $targetUser->fresh()->password));
+        $this->assertTrue((bool)$targetUser->fresh()->must_change_password);
+    }
+
+    public function test_super_admin_reset_user_password_increments_automatically(): void
+    {
+        $superAdmin = $this->getOrCreateSuperAdmin();
+
+        $user1 = User::create([
+            'name' => 'User One',
+            'email' => 'user1_inc@pdmt.local',
+            'password' => Hash::make('secret'),
+            'role' => 'User',
+            'temp_password_code' => 1,
+        ]);
+
+        $user2 = User::create([
+            'name' => 'User Two',
+            'email' => 'user2_inc@pdmt.local',
+            'password' => Hash::make('secret'),
+            'role' => 'User',
+        ]);
+
+        // Reset user2 password; next code should be 2 => pdmt@002
+        $this->actingAs($superAdmin)->post(route('users.change-password', $user2->id), []);
+        $this->assertTrue(Hash::check('pdmt@002', $user2->fresh()->password));
+        $this->assertEquals(2, $user2->fresh()->temp_password_code);
+
+        $user3 = User::create([
+            'name' => 'User Three',
+            'email' => 'user3_inc@pdmt.local',
+            'password' => Hash::make('secret'),
+            'role' => 'User',
+        ]);
+
+        // Reset user3 password; next code should be 3 => pdmt@003
+        $this->actingAs($superAdmin)->post(route('users.change-password', $user3->id), []);
+        $this->assertTrue(Hash::check('pdmt@003', $user3->fresh()->password));
+        $this->assertEquals(3, $user3->fresh()->temp_password_code);
+    }
+
     public function test_super_admin_can_update_user_password_via_update_route(): void
     {
         $superAdmin = $this->getOrCreateSuperAdmin();

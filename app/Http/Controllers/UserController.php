@@ -88,38 +88,83 @@ class UserController extends Controller
 public function show($id)
 {
     $user = User::findOrFail($id);
-    return view('admin.user.show', compact('user'));
+    $nextPasswordCode = (User::max('temp_password_code') ?? 0) + 1;
+    $nextPassword = 'pdmt@' . str_pad((string) $nextPasswordCode, 3, '0', STR_PAD_LEFT);
+    return view('admin.user.show', compact('user', 'nextPassword'));
 }
 
-public function changePassword(Request $request, $id)
-{
-    $user = User::findOrFail($id);
-    $currentUser = auth()->user();
-    $isSuperAdmin = $currentUser && (strtolower(trim((string) ($currentUser->role ?? ''))) === 'super admin' || (method_exists($currentUser, 'isSuperAdmin') && $currentUser->isSuperAdmin()));
+    public function changePassword(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        $currentUser = auth()->user();
+        $isSuperAdmin = $currentUser && (strtolower(trim((string) ($currentUser->role ?? ''))) === 'super admin' || (method_exists($currentUser, 'isSuperAdmin') && $currentUser->isSuperAdmin()));
 
-    if (!$isSuperAdmin && (int) auth()->id() !== (int) $user->id) {
-        abort(403, 'You can only change your own password.');
+        if (!$isSuperAdmin && (int) auth()->id() !== (int) $user->id) {
+            abort(403, 'You can only change your own password.');
+        }
+
+        if ($isSuperAdmin && (int) auth()->id() !== (int) $user->id) {
+            // Super Admin resetting another user's password
+            $request->validate([
+                'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            ]);
+
+            $nextPasswordCode = (User::max('temp_password_code') ?? 0) + 1;
+            $defaultPassword = 'pdmt@' . str_pad((string) $nextPasswordCode, 3, '0', STR_PAD_LEFT);
+
+            if ($request->filled('password')) {
+                $newPassword = $request->password;
+                if (preg_match('/^pdmt@(\d+)$/i', $newPassword, $matches)) {
+                    $user->temp_password_code = (int) $matches[1];
+                }
+            } else {
+                $newPassword = $defaultPassword;
+                $user->temp_password_code = $nextPasswordCode;
+            }
+        } else {
+            // User (including Super Admin) changing their own password
+            $request->validate([
+                'current_password' => ['required', 'current_password'],
+                'password' => ['required', 'string', 'min:8', 'confirmed', 'different:current_password'],
+            ]);
+            $newPassword = $request->password;
+        }
+
+        $user->password = Hash::make($newPassword);
+
+        if ($isSuperAdmin && (int) auth()->id() !== (int) $user->id) {
+            $user->must_change_password = true;
+            $user->save();
+
+            try {
+                Mail::raw(
+                    "Hello {$user->name},\n\n" .
+                    "Your account password has been reset by Super Admin for PDMT Feedback System.\n" .
+                    "Login Email: {$user->email}\n" .
+                    "New Password: {$newPassword}\n\n" .
+                    "Please login with your new password.",
+                    function ($message) use ($user) {
+                        $message->to($user->email)
+                            ->subject('PDMT Account Password Reset');
+                    }
+                );
+                return back()->with('success', "Password reset successfully to {$newPassword} and sent to user email.");
+            } catch (\Throwable $e) {
+                Log::error('Password reset but email send failed', [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                    'error' => $e->getMessage(),
+                ]);
+
+                return back()->with('warning', "Password reset successfully to {$newPassword}. Email could not be sent.");
+            }
+        }
+
+        $user->must_change_password = false;
+        $user->save();
+
+        return back()->with('success', 'Password changed successfully.');
     }
-
-    if ($isSuperAdmin && (int) auth()->id() !== (int) $user->id) {
-        // Super Admin resetting another user's password
-        $request->validate([
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);
-    } else {
-        // User (including Super Admin) changing their own password
-        $request->validate([
-            'current_password' => ['required', 'current_password'],
-            'password' => ['required', 'string', 'min:8', 'confirmed', 'different:current_password'],
-        ]);
-    }
-
-    $user->password = Hash::make($request->password);
-    $user->must_change_password = false;
-    $user->save();
-
-    return back()->with('success', 'Password changed successfully.');
-}
 
 public function update(Request $request, $id)
 {
