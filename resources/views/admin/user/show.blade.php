@@ -36,6 +36,12 @@ font-size:14px;
                 </div>
             @endif
 
+            @if(session('warning'))
+                <div class="alert alert-warning">
+                    {{ session('warning') }}
+                </div>
+            @endif
+
             @if($errors->any())
                 <div class="alert alert-danger">
                     <ul class="mb-0 ps-3">
@@ -78,22 +84,31 @@ font-size:14px;
                 </div>
             </div>
 
-            @if(auth()->id() === $user->id)
+            @php
+                $currentUser = auth()->user();
+                $isSuperAdmin = $currentUser && (strtolower(trim((string) ($currentUser->role ?? ''))) === 'super admin' || (method_exists($currentUser, 'isSuperAdmin') && $currentUser->isSuperAdmin()));
+                $isOwnProfile = (int) auth()->id() === (int) $user->id;
+                $canChangePassword = $isOwnProfile || $isSuperAdmin;
+            @endphp
+
+            @if($canChangePassword)
                 <hr>
-                <h5 class="mb-3">Change Password</h5>
+                <h5 class="mb-3">{{ $isOwnProfile ? 'Change Password' : 'Reset User Password' }}</h5>
 
                 <form method="POST" action="{{ route('users.change-password', $user->id) }}" class="row g-3 mb-3">
                     @csrf
-                    <div class="col-md-6">
-                        <label for="current_password" class="form-label">Current Password</label>
-                        <input
-                            type="password"
-                            id="current_password"
-                            name="current_password"
-                            class="form-control @error('current_password') is-invalid @enderror"
-                            required
-                        >
-                    </div>
+                    @if($isOwnProfile)
+                        <div class="col-md-6">
+                            <label for="current_password" class="form-label">Current Password</label>
+                            <input
+                                type="password"
+                                id="current_password"
+                                name="current_password"
+                                class="form-control @error('current_password') is-invalid @enderror"
+                                required
+                            >
+                        </div>
+                    @endif
 
                     <div class="col-md-6">
                         <label for="password" class="form-label">New Password</label>
@@ -102,7 +117,8 @@ font-size:14px;
                             id="password"
                             name="password"
                             class="form-control @error('password') is-invalid @enderror"
-                            required
+                            value="{{ $isOwnProfile ? '' : ($nextPassword ?? 'pdmt@001') }}"
+                            {{ $isOwnProfile ? 'required' : '' }}
                         >
                     </div>
 
@@ -113,12 +129,13 @@ font-size:14px;
                             id="password_confirmation"
                             name="password_confirmation"
                             class="form-control"
-                            required
+                            value="{{ $isOwnProfile ? '' : ($nextPassword ?? 'pdmt@001') }}"
+                            {{ $isOwnProfile ? 'required' : '' }}
                         >
                     </div>
 
                     <div class="col-12">
-                        <button type="submit" class="btn btn-primary">Update Password</button>
+                        <button type="submit" class="btn btn-primary">{{ $isOwnProfile ? 'Update Password' : 'Reset Password' }}</button>
                     </div>
                 </form>
             @endif

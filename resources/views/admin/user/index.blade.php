@@ -63,7 +63,7 @@
                             <select name="role" id="role" class="form-control" required>
                                 <option value="" disabled selected>Select a role</option>
                                 @foreach($roles as $r)
-                                @if(!in_array(strtolower($r->name), ['super admin']))
+                                @if(($isSuperAdmin ?? false) || !in_array(strtolower($r->name), ['super admin']))
                                 <option value="{{ $r->name }}">{{ ucfirst($r->name) }}</option>
                                 @endif
                                 @endforeach
@@ -80,11 +80,8 @@
                             <label>Phone</label>
                             <input type="text" name="phone" id="phone" class="form-control" required>
                         </div>
-                        <div class="col-md-12 mb-3">
-                            <div class="alert alert-info mb-0">
-                                Temporary password will be auto-generated as and emailed to the user.
-                            </div>
-                        </div>
+
+                 
 
 
                     </div>
@@ -157,7 +154,9 @@
                         <td>{{ $user->dob }}</td>
                         <td>{{ $user->nic_number }}</td>
                         <td>
-                            @if(strtolower($user->role) === 'admin')
+                            @if(strtolower($user->role) === 'super admin')
+                                <span class="badge bg-dark">{{ ucfirst($user->role) }}</span>
+                            @elseif(strtolower($user->role) === 'admin')
                                 <span class="badge bg-danger">{{ ucfirst($user->role) }}</span>
                             @elseif(strtolower($user->role) === 'commissioner')
                                 <span class="badge bg-warning text-dark">{{ ucfirst($user->role) }}</span>
@@ -215,6 +214,9 @@
         let deleteModal = new bootstrap.Modal(document.getElementById('deleteUserModal'));
         let form = document.getElementById('userForm');
         let deleteForm = document.getElementById('deleteUserForm');
+        let passwordContainer = document.getElementById('passwordFieldContainer');
+        let tempPasswordAlert = document.getElementById('tempPasswordAlert');
+        let passwordInput = document.getElementById('password');
 
         // Create
         document.getElementById('createUserBtn').addEventListener('click', function() {
@@ -222,6 +224,9 @@
             document.getElementById('methodField').value = 'POST';
             document.getElementById('modalTitle').innerText = 'Add User';
             form.reset();
+            if (passwordContainer) passwordContainer.style.display = 'none';
+            if (passwordInput) passwordInput.value = '';
+            if (tempPasswordAlert) tempPasswordAlert.style.display = 'block';
             modal.show();
         });
 
@@ -241,6 +246,10 @@
                 document.getElementById('role').value = btn.dataset.role;
                 document.getElementById('email').value = btn.dataset.email;
                 document.getElementById('phone').value = btn.dataset.phone;
+
+                if (passwordInput) passwordInput.value = '';
+                if (passwordContainer) passwordContainer.style.display = 'block';
+                if (tempPasswordAlert) tempPasswordAlert.style.display = 'none';
 
                 modal.show();
             });
