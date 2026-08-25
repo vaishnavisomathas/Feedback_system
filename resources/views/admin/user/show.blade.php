@@ -24,8 +24,11 @@ font-size:14px;
 <div class="container">
 
     <div class="card">
-        <div class="card-header">
-            <h4>User Details</h4>
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">User Details</h4>
+            <a href="{{ route('users.index') }}" class="btn btn-secondary">
+                Back
+            </a>
         </div>
 
         <div class="card-body">
@@ -93,7 +96,7 @@ font-size:14px;
 
             @if($canChangePassword)
                 <hr>
-                <h5 class="mb-3">{{ $isOwnProfile ? 'Change Password' : 'Reset User Password' }}</h5>
+                <h5 class="mb-3">{{ $isOwnProfile ? 'Change Password' : 'Reset Password' }}</h5>
 
                 <form method="POST" action="{{ route('users.change-password', $user->id) }}" class="row g-3 mb-3">
                     @csrf
@@ -108,41 +111,35 @@ font-size:14px;
                                 required
                             >
                         </div>
+
+                        <div class="col-md-6">
+                            <label for="password" class="form-label">New Password</label>
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                class="form-control @error('password') is-invalid @enderror"
+                                required
+                            >
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="password_confirmation" class="form-label">Confirm New Password</label>
+                            <input
+                                type="password"
+                                id="password_confirmation"
+                                name="password_confirmation"
+                                class="form-control"
+                                required
+                            >
+                        </div>
                     @endif
-
-                    <div class="col-md-6">
-                        <label for="password" class="form-label">New Password</label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            class="form-control @error('password') is-invalid @enderror"
-                            value="{{ $isOwnProfile ? '' : ($nextPassword ?? 'pdmt@001') }}"
-                            {{ $isOwnProfile ? 'required' : '' }}
-                        >
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="password_confirmation" class="form-label">Confirm New Password</label>
-                        <input
-                            type="password"
-                            id="password_confirmation"
-                            name="password_confirmation"
-                            class="form-control"
-                            value="{{ $isOwnProfile ? '' : ($nextPassword ?? 'pdmt@001') }}"
-                            {{ $isOwnProfile ? 'required' : '' }}
-                        >
-                    </div>
 
                     <div class="col-12">
                         <button type="submit" class="btn btn-primary">{{ $isOwnProfile ? 'Update Password' : 'Reset Password' }}</button>
                     </div>
                 </form>
             @endif
-
-            <a href="{{ route('users.index') }}" class="btn btn-secondary">
-                Back
-            </a>
 
         </div>
     </div>
