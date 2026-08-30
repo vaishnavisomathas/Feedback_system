@@ -129,10 +129,14 @@ class SuperAdminPasswordEditTest extends TestCase
             ]
         );
 
+        $maxCode = User::max('temp_password_code') ?? 0;
+        $expectedNextCode = $maxCode + 1;
+        $expectedPassword = 'pdmt@' . str_pad((string) $expectedNextCode, 3, '0', STR_PAD_LEFT);
+
         $response = $this->actingAs($superAdmin)->post(route('users.change-password', $targetUser->id), []);
 
         $response->assertSessionHas('success');
-        $this->assertTrue(Hash::check('pdmt@001', $targetUser->fresh()->password));
+        $this->assertTrue(Hash::check($expectedPassword, $targetUser->fresh()->password));
         $this->assertTrue((bool)$targetUser->fresh()->must_change_password);
     }
 
@@ -140,37 +144,42 @@ class SuperAdminPasswordEditTest extends TestCase
     {
         $superAdmin = $this->getOrCreateSuperAdmin();
 
+        $maxCode = User::max('temp_password_code') ?? 0;
+        $code1 = $maxCode + 1;
+        $code2 = $maxCode + 2;
+        $code3 = $maxCode + 3;
+
         $user1 = User::create([
             'name' => 'User One',
-            'email' => 'user1_inc@pdmt.local',
+            'email' => 'user1_inc_' . uniqid() . '@pdmt.local',
             'password' => Hash::make('secret'),
             'role' => 'User',
-            'temp_password_code' => 1,
+            'temp_password_code' => $code1,
         ]);
 
         $user2 = User::create([
             'name' => 'User Two',
-            'email' => 'user2_inc@pdmt.local',
+            'email' => 'user2_inc_' . uniqid() . '@pdmt.local',
             'password' => Hash::make('secret'),
             'role' => 'User',
         ]);
 
-        // Reset user2 password; next code should be 2 => pdmt@002
+        $expectedPassword2 = 'pdmt@' . str_pad((string) $code2, 3, '0', STR_PAD_LEFT);
         $this->actingAs($superAdmin)->post(route('users.change-password', $user2->id), []);
-        $this->assertTrue(Hash::check('pdmt@002', $user2->fresh()->password));
-        $this->assertEquals(2, $user2->fresh()->temp_password_code);
+        $this->assertTrue(Hash::check($expectedPassword2, $user2->fresh()->password));
+        $this->assertEquals($code2, $user2->fresh()->temp_password_code);
 
         $user3 = User::create([
             'name' => 'User Three',
-            'email' => 'user3_inc@pdmt.local',
+            'email' => 'user3_inc_' . uniqid() . '@pdmt.local',
             'password' => Hash::make('secret'),
             'role' => 'User',
         ]);
 
-        // Reset user3 password; next code should be 3 => pdmt@003
+        $expectedPassword3 = 'pdmt@' . str_pad((string) $code3, 3, '0', STR_PAD_LEFT);
         $this->actingAs($superAdmin)->post(route('users.change-password', $user3->id), []);
-        $this->assertTrue(Hash::check('pdmt@003', $user3->fresh()->password));
-        $this->assertEquals(3, $user3->fresh()->temp_password_code);
+        $this->assertTrue(Hash::check($expectedPassword3, $user3->fresh()->password));
+        $this->assertEquals($code3, $user3->fresh()->temp_password_code);
     }
 
     public function test_super_admin_can_update_user_password_via_update_route(): void
