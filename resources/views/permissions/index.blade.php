@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
+<div class="container-fluid px-0">
 
 @if(session('success'))
 <div class="alert alert-success">{{ session('success') }}</div>
@@ -48,7 +48,12 @@
     </div>
 </div>
 
-<button class="btn btn-primary mb-3" id="createBtn">Add Permission</button>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Permissions Management</h2>
+    <button class="btn btn-primary" id="createBtn">
+        <i class="bi bi-plus-lg me-1"></i> Add Permission
+    </button>
+</div>
 
 <div class="card">
 <div class="card-body">

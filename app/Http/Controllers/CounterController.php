@@ -30,57 +30,66 @@ class CounterController extends Controller
 public function store(Request $request)
 {
     $request->validate([
-        'district' => 'required',
-        'division_name' => 'required',
-        'counter_name' => 'required|alpha|size:1|uppercase'
+        'district' => 'required|string|max:100',
+        'division_name' => 'required|string|max:100',
+        'counter_name' => 'required|string|max:50'
     ]);
 
+    $counterName = strlen(trim($request->counter_name)) === 1
+        ? strtoupper(trim($request->counter_name))
+        : trim($request->counter_name);
+
     // Check duplicate
-    $exists = Counter::where('district',$request->district)
-        ->where('division_name',$request->division_name)
-        ->where('counter_name',strtoupper($request->counter_name))
+    $exists = Counter::where('district', $request->district)
+        ->where('division_name', $request->division_name)
+        ->where('counter_name', $counterName)
         ->exists();
 
-    if($exists){
-        return back()->with('error','This counter letter already exists for this DS division');
+    if ($exists) {
+        return back()->with('error', 'This counter name already exists for this DS division');
     }
 
     Counter::create([
-        'district'=>$request->district,
-        'division_name'=>$request->division_name,
-        'counter_name'=>strtoupper($request->counter_name)
+        'district' => $request->district,
+        'division_name' => $request->division_name,
+        'counter_name' => $counterName,
     ]);
 
-    return back()->with('success','Counter created successfully');
+    return back()->with('success', 'Counter created successfully');
 }
 
 
    public function update(Request $request, $id)
 {
     $request->validate([
-        'district' => 'required',
-        'division_name' => 'required',
+        'district' => 'required|string|max:100',
+        'division_name' => 'required|string|max:100',
+        'counter_name' => 'required|string|max:50',
     ]);
 
-    $exists = Counter::where('district',$request->district)
-        ->where('division_name',$request->division_name)
-        ->where('counter_name',strtoupper($request->counter_name))
-        ->where('id','!=',$id)
+    $counterName = strlen(trim($request->counter_name)) === 1
+        ? strtoupper(trim($request->counter_name))
+        : trim($request->counter_name);
+
+    $exists = Counter::where('district', $request->district)
+        ->where('division_name', $request->division_name)
+        ->where('counter_name', $counterName)
+        ->where('id', '!=', $id)
         ->exists();
 
-    if($exists){
-        return back()->with('error','This counter letter already exists for this DS division');
+    if ($exists) {
+        return back()->with('error', 'This counter name already exists for this DS division');
     }
 
     $counter = Counter::findOrFail($id);
 
     $counter->update([
-        'district'=>$request->district,
-        'division_name'=>$request->division_name,
-        'counter_name'=>strtoupper($request->counter_name)
+        'district' => $request->district,
+        'division_name' => $request->division_name,
+        'counter_name' => $counterName,
     ]);
 
-    return back()->with('success','Counter updated successfully');
+    return back()->with('success', 'Counter updated successfully');
 }
 
 

@@ -63,7 +63,7 @@ Counters Feedbacks - PDMT
 
 @section('content')
 
-<div class="container">
+<div class="container-fluid px-0">
 
     <h2 class="mb-1">Counters Feedbacks</h2>
 
@@ -225,9 +225,8 @@ Counters Feedbacks - PDMT
                                 </td>
 
                                 <td>
-
-                                    {{ $rating->created_at->format('d M Y, H:i') }}
-
+                                    <div>{{ $rating->created_at->format('d M Y') }}</div>
+                                    <small class="text-muted">{{ $rating->created_at->format('h:i A') }}</small>
                                 </td>
 
                             </tr>

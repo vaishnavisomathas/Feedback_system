@@ -5,7 +5,7 @@ Manual Complaints - PDMT
 @endsection
 
 @section('content')
-<div class="container">
+<div class="container-fluid px-0">
     @php
         $roleLower = strtolower(trim((string) auth()->user()->role));
         $isAdministrativeOfficer = in_array($roleLower, ['administrative officer', 'a/o', 'ao'], true);
@@ -14,7 +14,14 @@ Manual Complaints - PDMT
         $canAddManualComplaint = in_array($roleLower, ['super admin', 'admin', 'user'], true);
     @endphp
     <input type="hidden" id="manualComplaintHasErrors" value="{{ $errors->any() ? '1' : '0' }}">
-    <h2 class="mb-0">Manual Complaints</h2>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Manual Complaints</h2>
+        @if($canAddManualComplaint)
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#manualComplaintModal" id="addManualComplaintBtn">
+            <i class="bi bi-plus-lg me-1"></i> Add Manual Complaint
+        </button>
+        @endif
+    </div>
 
     <div class="card shadow border-0 mt-3">
         <div class="card-body">
@@ -22,14 +29,7 @@ Manual Complaints - PDMT
             <div class="alert alert-success">{{ session('success') }}</div>
             @endif
 
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                @if($canAddManualComplaint)
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#manualComplaintModal" id="addManualComplaintBtn">
-                    Add Manual Complaint
-                </button>
-                @else
-                <div></div>
-                @endif
+            <div class="d-flex justify-content-end align-items-center mb-3">
                 <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#filterBox">
                     <i class="bi bi-funnel"></i> Filters
                 </button>
@@ -122,7 +122,10 @@ Manual Complaints - PDMT
                             <td>{{ $item->sourceSetting->name ?? $item->source ?? '-' }}</td>
                             <td>{{ $item->phone ?? '-' }}</td>
                             <td>{{ $item->vehicle_number ?? '-' }}</td>
-                            <td>{{ optional($item->created_at)->format('d M Y, h:i A') }}</td>
+                            <td>
+                                <div>{{ optional($item->created_at)->format('d M Y') }}</div>
+                                <small class="text-muted">{{ optional($item->created_at)->format('h:i A') }}</small>
+                            </td>
                             <td>
                                 @if($item->status === 'pending')
                                 <span class="badge bg-warning text-dark">Pending</span>
@@ -173,9 +176,29 @@ Manual Complaints - PDMT
                 </table>
             </div>
 
-            <div class="d-flex justify-content-end align-items-center mt-3">
-                <div>
-                    {{ $manualComplaints->links('pagination::bootstrap-5') }}
+            <div class="d-flex justify-content-between align-items-center flex-wrap mt-3">
+                <form method="GET" class="d-flex align-items-center mb-2">
+                    @foreach(request()->except('per_page','page') as $key => $value)
+                        @if(is_array($value))
+                            @foreach($value as $v)
+                                <input type="hidden" name="{{ $key }}[]" value="{{ $v }}">
+                            @endforeach
+                        @else
+                            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                        @endif
+                    @endforeach
+
+                    <select name="per_page" class="form-control" onchange="this.form.submit()">
+                        @foreach([10,20,50,100] as $size)
+                            <option value="{{ $size }}" {{ request('per_page',10) == $size ? 'selected' : '' }}>
+                                Show {{ $size }}
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+
+                <div class="mb-2">
+                    {{ $manualComplaints->appends(request()->query())->links('pagination::bootstrap-5') }}
                 </div>
             </div>
         </div>

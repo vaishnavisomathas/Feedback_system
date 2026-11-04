@@ -61,7 +61,7 @@ Informed Complaints - PDMT
 </style>
 
 @section('content')
-<div class="container mt-4">
+<div class="container-fluid px-0">
 
     <h3>Informed Complaints</h3>
 
@@ -181,7 +181,10 @@ Informed Complaints - PDMT
                             <td>{{ $c->complaint_email ?? '-' }}</td>
                             <td>{{ $c->serviceQuality->name ?? '-' }}</td>
                             <td>{{ ['','Bad','Poor','Average','Good','Excellent'][$c->rating] ?? '' }}</td>
-                            <td>{{ $c->created_at->format('d M Y') }}</td>
+                            <td>
+                                <div>{{ $c->created_at->format('d M Y') }}</div>
+                                <small class="text-muted">{{ $c->created_at->format('h:i A') }}</small>
+                            </td>
                             <td>
                                 <span class="badge bg-danger"> Informed to Commissioner</span>
                             </td>

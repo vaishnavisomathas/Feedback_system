@@ -74,7 +74,7 @@
         </thead>
         <tbody>@forelse($complaints as $index => $item)<tr>
                 <td class="center">{{ $index + 1 }}</td>
-                <td>{{ $item->created_at?->format('d M Y') }}</td>
+                <td>{{ $item->created_at?->format('d M Y') }}<br><small style="color:#666; font-size:10px;">{{ $item->created_at?->format('h:i A') }}</small></td>
                 <td>{{ $item->counter->division_name ?? '-' }}<br>{{ $item->counter->counter_name ?? '-' }}</td>
   <td>{{ $item->phone ?? '-' }}</td>
                         <td>{{ $item->complaint_email ?? '-' }}</td>                

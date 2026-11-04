@@ -27,9 +27,14 @@ Complaint Types - PDMT
 
 @section('content')
 
-<div class="container">
+<div class="container-fluid px-0">
 
-    <h3 class="mb-0">Complaint Types Management</h3>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0">Complaint Types Management</h3>
+        <button class="btn btn-primary" id="addBtn">
+            <i class="bi bi-plus-lg me-1"></i> Add Complaint Type
+        </button>
+    </div>
 
     @if(session('success'))
     <div class="alert alert-success">
@@ -46,11 +51,6 @@ Complaint Types - PDMT
         </ul>
     </div>
     @endif
-
-
-    <button class="btn btn-primary mb-3" id="addBtn">
-        Add Complaint Type
-    </button>
 
 
     <!-- Modal -->
@@ -201,33 +201,30 @@ Complaint Types - PDMT
     </div>
 
 
-    <div class="d-flex justify-content-end align-items-center">
-
-        <div class="col-md-2 p-0">
-
-            <form method="GET">
-
-                <select name="per_page"
-                    class="form-control"
-                    onchange="this.form.submit()">
-
-                    @foreach([10,20,50,100] as $size)
-
-                    <option value="{{ $size }}"
-                        {{ request('per_page') == $size ? 'selected' : '' }}>
-
-                        Page {{ $size }}
-
-                    </option>
-
+    <div class="d-flex justify-content-between align-items-center flex-wrap mt-3">
+        <form method="GET" class="d-flex align-items-center mb-2">
+            @foreach(request()->except('per_page','page') as $key => $value)
+                @if(is_array($value))
+                    @foreach($value as $v)
+                        <input type="hidden" name="{{ $key }}[]" value="{{ $v }}">
                     @endforeach
+                @else
+                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                @endif
+            @endforeach
 
-                </select>
+            <select name="per_page" class="form-control" onchange="this.form.submit()">
+                @foreach([10,20,50,100] as $size)
+                    <option value="{{ $size }}" {{ request('per_page',10) == $size ? 'selected' : '' }}>
+                        Show {{ $size }}
+                    </option>
+                @endforeach
+            </select>
+        </form>
 
-            </form>
-
+        <div class="mb-2">
+            {{ $types->appends(request()->query())->links('pagination::bootstrap-5') }}
         </div>
-
     </div>
 
 

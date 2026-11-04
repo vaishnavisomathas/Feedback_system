@@ -5,8 +5,13 @@ Manual Complaint Sources - PDMT
 @endsection
 
 @section('content')
-<div class="container">
-    <h3 class="mb-0">Manual Complaint Sources</h3>
+<div class="container-fluid px-0">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0">Manual Complaint Sources</h3>
+        <button class="btn btn-primary" id="addSourceBtn">
+            <i class="bi bi-plus-lg me-1"></i> Add Source
+        </button>
+    </div>
 
     @if(session('success'))
     <div class="alert alert-success mt-2">{{ session('success') }}</div>
@@ -22,7 +27,7 @@ Manual Complaint Sources - PDMT
     </div>
     @endif
 
-    <button class="btn btn-primary mb-3 mt-3" id="addSourceBtn">Add Source</button>
+
 
     <div class="modal fade" id="sourceModal" tabindex="-1">
         <div class="modal-dialog">
@@ -110,8 +115,32 @@ Manual Complaint Sources - PDMT
         </div>
     </div>
 
-    <div class="d-flex justify-content-end mt-3">
-        {{ $sources->links() }}
+
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap mt-3">
+        <form method="GET" class="d-flex align-items-center mb-2">
+            @foreach(request()->except('per_page','page') as $key => $value)
+                @if(is_array($value))
+                    @foreach($value as $v)
+                        <input type="hidden" name="{{ $key }}[]" value="{{ $v }}">
+                    @endforeach
+                @else
+                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                @endif
+            @endforeach
+
+            <select name="per_page" class="form-control" onchange="this.form.submit()">
+                @foreach([10,20,50,100] as $size)
+                    <option value="{{ $size }}" {{ request('per_page',10) == $size ? 'selected' : '' }}>
+                        Show {{ $size }}
+                    </option>
+                @endforeach
+            </select>
+        </form>
+
+        <div class="mb-2">
+            {{ $sources->appends(request()->query())->links('pagination::bootstrap-5') }}
+        </div>
     </div>
 </div>
 

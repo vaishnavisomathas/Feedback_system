@@ -19,39 +19,77 @@ class FeedbackController extends Controller
                         ->header('Expires', 'Sat, 01 Jan 1990 00:00:00 GMT');
     });
 }
-   public function show($division, $counterName)
-{  
-    if (!session()->has('feedback_token')) {
-        $counter = Counter::where('division_name',$division)
-            ->where('counter_name',$counterName)
-            ->firstOrFail();
+    public function showCommon()
+    {
+        if (!session()->has('feedback_token')) {
+            session([
+                'rating_access' => true,
+                'feedback_token' => bin2hex(random_bytes(16)),
+                'rating_counter' => null,
+            ]);
+        }
 
-        session([
-            'rating_access' => true,
-            'feedback_token' => bin2hex(random_bytes(16)),
-            'rating_counter' => $counter->id,
+        if (!session('rating_access')) {
+            return redirect()->route('feedback.closed');
+        }
+
+        $counters = Counter::orderBy('district')
+            ->orderBy('division_name')
+            ->orderBy('counter_name')
+            ->get();
+
+        $qualities = ServiceQuality::select('id', 'name', 'type')
+            ->orderBy('name')
+            ->get();
+
+        return view('feedback', [
+            'counter' => null,
+            'counters' => $counters,
+            'qualities' => $qualities,
+            'selectedDivision' => null,
+            'counterName' => null,
+            'isCommon' => true,
+            'feedback_token' => session('feedback_token'),
         ]);
     }
-    if (!session('rating_access')) {
-        return redirect()->route('feedback.closed');
-    }
 
+    public function show($division, $counterName)
+    {  
+        $counter = Counter::where('division_name', $division)
+            ->where('counter_name', $counterName)
+            ->firstOrFail();
 
-    $counter = Counter::where('division_name',$division)
-        ->where('counter_name',$counterName)
-        ->firstOrFail();
+        if (!session()->has('feedback_token')) {
+            session([
+                'rating_access' => true,
+                'feedback_token' => bin2hex(random_bytes(16)),
+                'rating_counter' => $counter->id,
+            ]);
+        } else {
+            session(['rating_counter' => $counter->id]);
+        }
 
- 
-    $qualities = ServiceQuality::select('id', 'name', 'type')
-        ->orderBy('name')
-        ->get();
+        if (!session('rating_access')) {
+            return redirect()->route('feedback.closed');
+        }
+
+        $counters = Counter::orderBy('district')
+            ->orderBy('division_name')
+            ->orderBy('counter_name')
+            ->get();
+
+        $qualities = ServiceQuality::select('id', 'name', 'type')
+            ->orderBy('name')
+            ->get();
+
         return view('feedback', [
             'counter' => $counter,
-             'qualities' => $qualities,
+            'counters' => $counters,
+            'qualities' => $qualities,
             'selectedDivision' => $counter->division_name,
             'counterName' => $counter->counter_name,
-                        'feedback_token' => session('feedback_token'),
-
+            'isCommon' => false,
+            'feedback_token' => session('feedback_token'),
         ]);
     }
     public function store(Request $request)
@@ -77,15 +115,17 @@ if ($phone) {
 $request->merge(['phone' => $phone]);
 
         $request->validate([
-                  'counter_id'       => 'required|exists:counters,id',
+            'counter_id'       => 'required|exists:counters,id',
             'rating'           => 'required|integer|min:1|max:5',
 // 'service_quality_id'  => 'required|exists:service_qualities,id',
             'has_complaint'    => 'required|in:yes,no',
-'phone' => 'nullable|required_if:has_complaint,yes|regex:/^0[0-9]{9}$/',
-'complaint_email' => 'nullable|email|max:255',
-'vehicle_number' => 'nullable|string|max:12|required_if:has_complaint,yes',
-'note' => 'nullable|required_if:has_complaint,yes|max:500',
-              
+            'phone'            => 'nullable|required_if:has_complaint,yes|regex:/^0[0-9]{9}$/',
+            'complaint_email'  => 'nullable|email|max:255',
+            'vehicle_number'   => 'nullable|string|max:12|required_if:has_complaint,yes',
+            'note'             => 'nullable|required_if:has_complaint,yes|max:500',
+        ], [
+            'counter_id.required' => 'Please select a counter.',
+            'counter_id.exists'   => 'The selected counter is invalid.',
         ]);
 $ratingType = match ((int) $request->rating) {
     5, 4 => 'good',

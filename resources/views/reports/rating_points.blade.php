@@ -103,7 +103,7 @@ Rating Points Report - PDMT
     }
 </style>
 
-<div class="container">
+<div class="container-fluid px-0">
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
         <h2 class="mb-0">Rating Points Report</h2>
         <div class="d-flex gap-2">

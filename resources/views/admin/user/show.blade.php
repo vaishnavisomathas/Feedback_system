@@ -21,7 +21,7 @@ font-size:14px;
 }
 
 </style>
-<div class="container">
+<div class="container-fluid px-0">
 
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
