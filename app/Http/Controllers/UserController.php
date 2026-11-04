@@ -11,13 +11,14 @@ use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $currentUser = auth()->user();
         $isSuperAdmin = $currentUser && (strtolower(trim((string) ($currentUser->role ?? ''))) === 'super admin' || (method_exists($currentUser, 'isSuperAdmin') && $currentUser->isSuperAdmin()));
+        $perPage = $request->input('per_page', 10);
 
         if ($isSuperAdmin) {
-            $users = User::latest()->get();
+            $users = User::latest()->paginate($perPage);
             $roles = Role::all();
         } else {
             // Hide only Super Admin; keep other users visible even if role is null/trim issues.
@@ -27,7 +28,7 @@ class UserController extends Controller
                         ->orWhereRaw('LOWER(TRIM(role)) != ?', ['super admin']);
                 })
                 ->latest()
-                ->get();
+                ->paginate($perPage);
 
             // Keep Admin role visible, only exclude Super Admin from selection.
             $roles = Role::whereRaw('LOWER(name) != ?', ['super admin'])->get();

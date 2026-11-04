@@ -8,12 +8,243 @@
 
   <link rel="shortcut icon" href="{{ asset('assets/images/pdmt_logo.png') }}">
   <link href="{{ asset('assets/css/styles.min.css') }}" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('app_theme') || 'light';
+      document.documentElement.setAttribute('data-bs-theme', savedTheme);
+    })();
+  </script>
 
   <style>
     body {
       margin: 0;
       background: #f6f8fb;
       font-family: 'Segoe UI', sans-serif;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    /* =========================
+       DARK THEME STYLES
+    ========================= */
+    [data-bs-theme="dark"] body {
+      background: #0f172a !important;
+      color: #f1f5f9 !important;
+    }
+
+    [data-bs-theme="dark"] .left-sidebar {
+      background: #1e293b !important;
+      border-right: 1px solid #334155 !important;
+    }
+
+    [data-bs-theme="dark"] .sidebar-title {
+      color: #f1f5f9 !important;
+    }
+
+    [data-bs-theme="dark"] .nav-small-cap {
+      color: #94a3b8 !important;
+    }
+
+    [data-bs-theme="dark"] .sidebar-link {
+      color: #cbd5e1 !important;
+    }
+
+    [data-bs-theme="dark"] .sidebar-link i {
+      color: #94a3b8 !important;
+    }
+
+    [data-bs-theme="dark"] .sidebar-link:hover {
+      background: #334155 !important;
+      color: #ffffff !important;
+    }
+
+    [data-bs-theme="dark"] .sidebar-item.active .sidebar-link {
+      background: #2563eb !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35) !important;
+    }
+
+    [data-bs-theme="dark"] .app-headers {
+      background: #1e293b !important;
+      border-bottom: 1px solid #334155 !important;
+      color: #f1f5f9 !important;
+    }
+
+    [data-bs-theme="dark"] .card,
+    [data-bs-theme="dark"] .table-card {
+      background-color: #1e293b !important;
+      border: 1px solid #334155 !important;
+      color: #f1f5f9 !important;
+    }
+
+    [data-bs-theme="dark"] .card-header,
+    [data-bs-theme="dark"] .table-header {
+      background-color: #1e293b !important;
+      border-bottom: 1px solid #334155 !important;
+      color: #f1f5f9 !important;
+    }
+
+    [data-bs-theme="dark"] .table {
+      color: #e2e8f0 !important;
+      border-color: #334155 !important;
+    }
+
+    [data-bs-theme="dark"] .table th,
+    [data-bs-theme="dark"] .table td {
+      border-color: #334155 !important;
+      color: #cbd5e1 !important;
+    }
+
+    [data-bs-theme="dark"] .table-hover tbody tr:hover {
+      background-color: #27354a !important;
+    }
+
+    [data-bs-theme="dark"] .dashboard-table {
+      background-color: #1e293b !important;
+    }
+
+    [data-bs-theme="dark"] .dashboard-table tbody tr {
+      border-bottom: 1px solid #334155 !important;
+    }
+
+    [data-bs-theme="dark"] .dashboard-table tbody tr:hover {
+      background: #27354a !important;
+    }
+
+    [data-bs-theme="dark"] .dashboard-table thead {
+      background: #1e3a8a !important;
+      color: #ffffff !important;
+    }
+
+    [data-bs-theme="dark"] .form-control,
+    [data-bs-theme="dark"] .form-select {
+      background-color: #1e293b !important;
+      border-color: #475569 !important;
+      color: #f1f5f9 !important;
+    }
+
+    [data-bs-theme="dark"] .form-control:focus,
+    [data-bs-theme="dark"] .form-select:focus {
+      border-color: #3b82f6 !important;
+      box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25) !important;
+    }
+
+    [data-bs-theme="dark"] .dropdown-menu {
+      background-color: #1e293b !important;
+      border: 1px solid #334155 !important;
+      color: #f1f5f9 !important;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+    }
+
+    [data-bs-theme="dark"] .dropdown-item {
+      color: #cbd5e1 !important;
+    }
+
+    [data-bs-theme="dark"] .dropdown-item:hover {
+      background-color: #334155 !important;
+      color: #ffffff !important;
+    }
+
+    [data-bs-theme="dark"] .notif-header {
+      background: #243044 !important;
+      border-bottom: 1px solid #334155 !important;
+      color: #f1f5f9 !important;
+    }
+
+    [data-bs-theme="dark"] .notif-item {
+      border-bottom: 1px solid #334155 !important;
+    }
+
+    [data-bs-theme="dark"] .notif-item:hover {
+      background: #27354a !important;
+    }
+
+    [data-bs-theme="dark"] .notif-footer {
+      background: #243044 !important;
+      border-top: 1px solid #334155 !important;
+    }
+
+    [data-bs-theme="dark"] .modal-content {
+      background-color: #1e293b !important;
+      border: 1px solid #334155 !important;
+      color: #f1f5f9 !important;
+    }
+
+    [data-bs-theme="dark"] .modal-header,
+    [data-bs-theme="dark"] .modal-footer {
+      border-color: #334155 !important;
+    }
+
+    [data-bs-theme="dark"] .select2-container .select2-selection--single {
+      background-color: #1e293b !important;
+      border-color: #475569 !important;
+    }
+
+    [data-bs-theme="dark"] .select2-container--default .select2-selection--single .select2-selection__rendered {
+      color: #f1f5f9 !important;
+    }
+
+    [data-bs-theme="dark"] .select2-dropdown {
+      background-color: #1e293b !important;
+      border-color: #475569 !important;
+      color: #f1f5f9 !important;
+    }
+
+    [data-bs-theme="dark"] .select2-search--dropdown .select2-search__field {
+      background-color: #0f172a !important;
+      border-color: #475569 !important;
+      color: #f1f5f9 !important;
+    }
+
+    [data-bs-theme="dark"] .select2-results__option {
+      color: #cbd5e1 !important;
+    }
+
+    [data-bs-theme="dark"] .select2-container--default .select2-results__option--highlighted[aria-selected] {
+      background-color: #2563eb !important;
+      color: #ffffff !important;
+    }
+
+    [data-bs-theme="dark"] .text-dark {
+      color: #f1f5f9 !important;
+    }
+
+    [data-bs-theme="dark"] .text-muted {
+      color: #94a3b8 !important;
+    }
+
+    [data-bs-theme="dark"] .bg-white {
+      background-color: #1e293b !important;
+    }
+
+    [data-bs-theme="dark"] .bg-light {
+      background-color: #243044 !important;
+    }
+
+    [data-bs-theme="dark"] .border {
+      border-color: #334155 !important;
+    }
+
+    [data-bs-theme="dark"] .common-qr-row {
+      background: #1e3050 !important;
+      border-left-color: #3b82f6 !important;
+    }
+
+    [data-bs-theme="dark"] .common-qr-row:hover {
+      background: #253d66 !important;
+    }
+
+    .theme-toggle-btn {
+      width: 40px;
+      height: 40px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .theme-toggle-btn:hover {
+      transform: scale(1.08);
     }
 
     /* =========================
@@ -131,10 +362,75 @@
     .body-wrapper {
       margin-left: 270px;
       padding-top: 60px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
     .container-fluids {
-      padding: 50px 15px;
+      padding: 18px 24px 35px 24px !important;
+      width: 100%;
+    }
+
+    @media (max-width: 768px) {
+      .container-fluids {
+        padding: 14px 12px 25px 12px !important;
+      }
+    }
+
+    /* Expand all containers inside body-wrapper to full width and remove template's 180px padding-top */
+    .body-wrapper .container,
+    .body-wrapper .container-fluid {
+      max-width: 100% !important;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+      margin: 0 !important;
+    }
+
+    /* Clean, compact per_page selector matching screenshot */
+    select[name="per_page"] {
+      width: auto !important;
+      display: inline-block !important;
+      min-width: 110px;
+      font-size: 13px !important;
+      padding: 6px 12px !important;
+      border-radius: 6px !important;
+      cursor: pointer;
+    }
+
+    /* Modern pagination links styling */
+    .pagination {
+      margin-bottom: 0 !important;
+      gap: 3px;
+    }
+
+    .page-item .page-link {
+      border-radius: 6px !important;
+      font-size: 13px;
+      padding: 6px 12px;
+      color: #334155;
+      border-color: #e2e8f0;
+    }
+
+    [data-bs-theme="dark"] .page-item .page-link {
+      background-color: #1e293b;
+      border-color: #334155;
+      color: #cbd5e1;
+    }
+
+    .page-item.active .page-link {
+      background-color: #2563eb !important;
+      border-color: #2563eb !important;
+      color: #ffffff !important;
+      font-weight: 600;
+    }
+
+    [data-bs-theme="dark"] .page-item.active .page-link {
+      background-color: #2563eb !important;
+      border-color: #2563eb !important;
+      color: #ffffff !important;
     }
 
     /* Badge */
@@ -564,6 +860,12 @@ MOBILE
       <!-- RIGHT -->
       <div class="d-flex align-items-center gap-3">
         <span>{{ auth()->user()->name }} Dashboard</span>
+
+        <!-- 🌓 THEME TOGGLE -->
+        <button id="themeToggleBtn" type="button" class="btn btn-sm btn-light border rounded-circle d-flex align-items-center justify-content-center shadow-sm theme-toggle-btn" style="width: 38px; height: 38px;" title="Switch Theme (Dark / Light)">
+          <i id="themeIcon" class="bi bi-moon-stars-fill text-primary"></i>
+        </button>
+
         <!-- 🔔 NOTIFICATION -->
         <div class="dropdown">
           <a class="nav-link position-relative" href="#" data-bs-toggle="dropdown">
@@ -666,8 +968,13 @@ MOBILE
 
         @yield('content')
 
-        <div class="text-center mt-4">
-          © {{ date('Y') }} Northern Provincial Department of Motor Traffic
+        <div class="text-center mt-5 pt-3 pb-2 text-muted small border-top" style="border-color: rgba(148, 163, 184, 0.25) !important;">
+          <div class="fw-semibold">
+            Provincial Department of Motor Traffic (PDMT) • Northern Provincial Council, Sri Lanka
+          </div>
+          <div class="mt-1" style="font-size: 11.5px; opacity: 0.85;">
+            Official Citizen Feedback, Service Quality Monitoring & Complaint Redressal System • © {{ date('Y') }} All Rights Reserved
+          </div>
         </div>
 
       </div>
@@ -678,11 +985,47 @@ MOBILE
   <!-- JS -->
   <script src="{{ asset('assets/libs/jquery/dist/jquery.min.js') }}"></script>
   <script src="{{ asset('assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
   <script>
     document.getElementById('menuBtn').addEventListener('click', function() {
       document.getElementById('main-wrapper').classList.toggle('show-sidebar');
     });
+
+    // Theme Toggle Handler
+    (function() {
+      const toggleBtn = document.getElementById('themeToggleBtn');
+      const icon = document.getElementById('themeIcon');
+
+      function updateThemeUI(theme) {
+        document.documentElement.setAttribute('data-bs-theme', theme);
+        localStorage.setItem('app_theme', theme);
+        if (theme === 'dark') {
+          if (icon) icon.className = 'bi bi-sun-fill text-warning';
+          if (toggleBtn) {
+            toggleBtn.classList.remove('btn-light');
+            toggleBtn.classList.add('btn-dark');
+          }
+        } else {
+          if (icon) icon.className = 'bi bi-moon-stars-fill text-primary';
+          if (toggleBtn) {
+            toggleBtn.classList.remove('btn-dark');
+            toggleBtn.classList.add('btn-light');
+          }
+        }
+      }
+
+      const activeTheme = localStorage.getItem('app_theme') || 'light';
+      updateThemeUI(activeTheme);
+
+      if (toggleBtn) {
+        toggleBtn.addEventListener('click', function() {
+          const current = document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'dark' : 'light';
+          const target = current === 'dark' ? 'light' : 'dark';
+          updateThemeUI(target);
+        });
+      }
+    })();
   </script>
 
   @yield('script')

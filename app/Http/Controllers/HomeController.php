@@ -67,7 +67,26 @@ class HomeController extends Controller
         ->with('counter')
         ->orderByDesc('total')
         ->first();
+
+    // ================= YEAR =================
+    $highestYear = Feedback::select(
+            'counter_id',
+            DB::raw('COUNT(*) as total'),
+            DB::raw('AVG(rating) as avg_rating')
+        )
+        ->whereYear('created_at', now()->year)
+        ->groupBy('counter_id')
+        ->with('counter')
+        ->orderByDesc('total')
+        ->first();
+
    $latestComplaints = Feedback::with('counter')
+        ->where(function ($q) {
+            $q->where('has_complaint', 'yes')
+              ->orWhere(function ($sub) {
+                  $sub->whereNotNull('note')->where('note', '!=', '');
+              });
+        })
         ->latest()
         ->limit(5)
         ->get();
@@ -117,6 +136,7 @@ $topDivisions = $query
             'highestToday',
             'highestMonth',
             'highestWeek',
+            'highestYear',
             'latestComplaints',
             'topDivisions',
             'pending','ao','commissioner'

@@ -7,6 +7,7 @@
 
   <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/pdmt_logo.png') }}" />
   <link rel="stylesheet" href="/assets/css/styles.min.css" />
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
   <style>
     body {
@@ -143,6 +144,85 @@
       box-shadow: 0 0 0 0.16rem rgba(57, 112, 220, 0.18);
     }
 
+    .select2-container {
+      width: 100% !important;
+    }
+
+    .select2-container--default .select2-selection--single {
+      min-height: 44px !important;
+      border: 1px solid #cfd7e4 !important;
+      border-radius: 10px !important;
+      display: flex !important;
+      align-items: center !important;
+      padding: 0 8px !important;
+      background: #ffffff !important;
+      box-shadow: none !important;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+      color: #1f2a3a !important;
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      line-height: normal !important;
+      padding-left: 4px !important;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+      height: 42px !important;
+      right: 10px !important;
+    }
+
+    .select2-container--default.select2-container--focus .select2-selection--single,
+    .select2-container--default.select2-container--open .select2-selection--single {
+      border-color: #3970dc !important;
+      box-shadow: 0 0 0 0.16rem rgba(57, 112, 220, 0.18) !important;
+    }
+
+    .select2-dropdown {
+      border: 1px solid #cfd7e4 !important;
+      border-radius: 10px !important;
+      box-shadow: 0 8px 24px rgba(17, 24, 39, 0.12) !important;
+      overflow: hidden !important;
+      z-index: 1055 !important;
+    }
+
+    .select2-search--dropdown {
+      padding: 8px 10px !important;
+    }
+
+    .select2-search--dropdown .select2-search__field {
+      border: 1px solid #cfd7e4 !important;
+      border-radius: 8px !important;
+      padding: 8px 12px !important;
+      outline: none !important;
+      font-size: 14px !important;
+      width: 100% !important;
+    }
+
+    .select2-search--dropdown .select2-search__field:focus {
+      border-color: #3970dc !important;
+    }
+
+    .select2-results__option {
+      padding: 9px 14px !important;
+      font-size: 14px !important;
+    }
+
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+      background-color: #2d66d4 !important;
+      color: #ffffff !important;
+    }
+
+    .select2-container--default .select2-results__group {
+      background-color: #f4f7fb !important;
+      color: #1e293b !important;
+      font-weight: 700 !important;
+      font-size: 12px !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.5px !important;
+      padding: 6px 14px !important;
+    }
+
     .complaint-toggle {
       display: flex;
       align-items: center;
@@ -272,22 +352,54 @@
 
 </div>
 
-        {{-- COUNTER --}}
-        <div class="text-center mb-3">
-          <div class="counter-pill">
-            <strong>Counter:</strong>
-            <span class="counter-name">
-              {{ $counter->division_name }} – {{ $counter->counter_name }}
-            </span>
-          </div>
-        </div>
-
-        <form method="POST" action="{{ route('feedback.store') }}">
+        <form method="POST" action="{{ route('feedback.store') }}" id="feedbackForm">
           @csrf
 
-          <input type="hidden" name="counter_id" value="{{ $counter->id }}">
           <input type="hidden" name="feedback_token" value="{{ $feedback_token }}">
           <input type="hidden" name="has_complaint" id="hasComplaintValue" value="no">
+
+          {{-- COUNTER --}}
+          @if(isset($counter) && $counter)
+            {{-- Specific Counter QR scanned --}}
+            <input type="hidden" name="counter_id" value="{{ $counter->id }}">
+            <div class="text-center mb-3">
+              <div class="counter-pill">
+                <strong>Counter:</strong>
+                <span class="counter-name">
+                  {{ $counter->division_name }} – {{ $counter->counter_name }}
+                </span>
+              </div>
+            </div>
+          @else
+            {{-- Common QR scanned: Searchable Counter dropdown --}}
+            <div class="mb-3">
+              <label class="section-label" for="counter_id">Counter <span class="text-danger">*</span></label>
+              <select class="form-select select2" name="counter_id" id="counter_id">
+                <option value="">-- Search & Select Counter --</option>
+                @php
+                  $groupedCounters = isset($counters) ? $counters->groupBy('district') : collect();
+                @endphp
+                @foreach($groupedCounters as $districtName => $divisionCounters)
+                  @php
+                    $isProvinceWide = in_array(strtolower($districtName), ['northern province', 'province', 'online', 'online services', 'head office', 'pdmt']) || str_ends_with(strtolower($districtName), 'district') || str_ends_with(strtolower($districtName), 'province');
+                    $groupLabel = $isProvinceWide ? $districtName : $districtName . ' District';
+                  @endphp
+                  <optgroup label="{{ $groupLabel }}">
+                    @foreach($divisionCounters as $cntr)
+                      @php
+                        $isOnlineOrNamed = stripos($cntr->counter_name, 'online') !== false || strlen($cntr->counter_name) > 2;
+                        $displayCounterLabel = $isOnlineOrNamed ? $cntr->counter_name : 'Counter ' . $cntr->counter_name;
+                      @endphp
+                      <option value="{{ $cntr->id }}" {{ (old('counter_id') == $cntr->id || (request('counter_id') == $cntr->id)) ? 'selected' : '' }}>
+                        {{ $cntr->division_name }} – {{ $displayCounterLabel }}
+                      </option>
+                    @endforeach
+                  </optgroup>
+                @endforeach
+              </select>
+              @error('counter_id') <small class="text-danger d-block mt-1">{{ $message }}</small> @enderror
+            </div>
+          @endif
 
           {{-- RATING --}}
           <div class="mb-3">
@@ -379,11 +491,31 @@
 
 <script src="/assets/libs/jquery/dist/jquery.min.js"></script>
 <script src="/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
 @if(!session('rating_access'))
     window.location.href = "{{ route('feedback.closed') }}";
 @endif
+
+$(document).ready(function() {
+    if ($('#counter_id').length) {
+        $('#counter_id').select2({
+            placeholder: '-- Search & Select Counter --',
+            allowClear: true,
+            width: '100%'
+        });
+    }
+
+    $('#feedbackForm').on('submit', function(e) {
+        if ($('#counter_id').length && !$('#counter_id').val()) {
+            e.preventDefault();
+            alert('Please select a counter before submitting your feedback.');
+            $('#counter_id').select2('open');
+            return false;
+        }
+    });
+});
 
 // PHONE FORMAT
 const qualities = @json($qualities);

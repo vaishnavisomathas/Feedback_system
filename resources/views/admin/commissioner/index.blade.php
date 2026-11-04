@@ -62,7 +62,7 @@ Commissioner Complaints - PDMT
 </style>
 @section('content')
 
-<div class="container mt-4">
+<div class="container-fluid px-0">
 
     <h3>Commissioner Complaints</h3>
 
@@ -254,7 +254,10 @@ Commissioner Complaints - PDMT
 
                                 </td>
 
-                                <td>{{ $c->created_at->format('d M Y') }}</td>
+                                <td>
+                                    <div>{{ $c->created_at->format('d M Y') }}</div>
+                                    <small class="text-muted">{{ $c->created_at->format('h:i A') }}</small>
+                                </td>
 
 
                                 <td>

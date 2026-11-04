@@ -47,13 +47,18 @@ class DsDivisionController extends Controller
         ->paginate($request->input('per_page', 10))
         ->withQueryString();
 
+    $commonQrUrl = route('feedback.common');
+    $commonQrSvg = (string) QrCode::size(130)->generate($commonQrUrl);
+
     return view('admin.ds_division.index', compact(
         'counters',
         'search',
         'selectedCounter',
         'district',
         'districts',
-        'counterOptions'
+        'counterOptions',
+        'commonQrUrl',
+        'commonQrSvg'
     ));
 }
 
@@ -106,6 +111,10 @@ class DsDivisionController extends Controller
 
         $counter = Counter::findOrFail($request->counter_id);
 
+        if (stripos($counter->counter_name, 'online') !== false || stripos($counter->division_name, 'online') !== false) {
+            return back()->with('error', 'Online Tax counter does not require a physical QR code.');
+        }
+
     $url = route('feedback.show', [
         'division' => $counter->division_name,
         'counter'  => $counter->counter_name,
@@ -150,6 +159,24 @@ class DsDivisionController extends Controller
         ]);
 
         return $pdf->download('qr_' . $counter->division_name . '_' . $counter->counter_name . '.pdf');
+    }
+
+    /**
+     * Download Common QR as PDF
+     */
+    public function downloadCommonQrPdf()
+    {
+        $url = route('feedback.common');
+        $qrSvg = base64_encode(
+            QrCode::format('svg')->size(300)->generate($url)
+        );
+
+        $pdf = Pdf::loadView('admin.ds_division.common_pdf', [
+            'qrSvg' => $qrSvg,
+            'url'   => $url,
+        ]);
+
+        return $pdf->download('common_feedback_qr.pdf');
     }
 
 }

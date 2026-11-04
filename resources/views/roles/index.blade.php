@@ -2,7 +2,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
+<div class="container-fluid px-0">
 
 @if(session('success'))
 <div class="alert alert-success">{{ session('success') }}</div>
@@ -70,7 +70,12 @@ id="perm_{{ $permission->id }}">
 </div>
 </div>
 
-<button class="btn btn-primary mb-3" id="createRoleBtn">Add Role</button>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Roles Management</h2>
+    <button class="btn btn-primary" id="createRoleBtn">
+        <i class="bi bi-plus-lg me-1"></i> Add Role
+    </button>
+</div>
 
 <div class="card">
 <div class="card-body">

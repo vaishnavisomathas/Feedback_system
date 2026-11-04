@@ -7,9 +7,9 @@ use Illuminate\Http\Request;
 
 class ComplainTypeController extends Controller
 {
-  public function index()
+  public function index(Request $request)
     {
-        $types = ComplainType::latest()->paginate(10);
+        $types = ComplainType::latest()->paginate($request->input('per_page', 10));
         return view('admin.complain_type.index', compact('types'));
     }
 

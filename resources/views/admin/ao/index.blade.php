@@ -61,7 +61,7 @@ Administrative Officer Complaints- PDMT
     }
 </style>
 @section('content')
-<div class="container">
+<div class="container-fluid px-0">
 
     <h2 class="mb-0">Administrative Officer Complaints</h2>
 <div class="card shadow border-0">
@@ -215,7 +215,10 @@ Administrative Officer Complaints- PDMT
                         <td>{{ $rating->complaint_email ?? '-' }}</td>
                         <td>{{ $rating->serviceQuality->name ?? '-' }}</td>
                         <td>{{ ['','Bad','Poor','Average','Good','Excellent'][$rating->rating] ?? 'N/A' }}</td>
-                        <td>{{ $rating->created_at->format('d M Y') }}</td>
+                        <td>
+                            <div>{{ $rating->created_at->format('d M Y') }}</div>
+                            <small class="text-muted">{{ $rating->created_at->format('h:i A') }}</small>
+                        </td>
 
                         <td>
                             <span class="badge bg-info">At Administrative Officer</span>
@@ -300,7 +303,10 @@ Administrative Officer Complaints- PDMT
                         <td>{{ $c->complaint_email ?? '-' }}</td>
                         <td>{{ $c->serviceQuality->name ?? '-' }}</td>
                         <td>{{ ['','Bad','Poor','Average','Good','Excellent'][$c->rating] ?? 'N/A' }}</td>
-                        <td>{{ $c->updated_at->format('d M Y') }}</td>
+                        <td>
+                            <div>{{ $c->updated_at->format('d M Y') }}</div>
+                            <small class="text-muted">{{ $c->updated_at->format('h:i A') }}</small>
+                        </td>
 
                         <td>
                          @if($c->status == 'pending' || is_null($c->status))

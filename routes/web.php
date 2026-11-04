@@ -36,6 +36,8 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
+Route::get('/feedback', [FeedbackController::class, 'showCommon'])
+    ->name('feedback.common');
 Route::get('/feedback/{division}/{counter}', [FeedbackController::class, 'show'])
     ->name('feedback.show');
 Route::post('feedback/store', [FeedbackController::class, 'store'])->name('feedback.store');
@@ -78,6 +80,8 @@ Route::middleware(['auth', 'force.password.change'])->group(function () {
     Route::get('/admin/feedbacks/pdf', [CounterController::class, 'downloadPdf'])
         ->name('admin.feedback.downloadPdf');
     Route::get('ds-divisions', [DsDivisionController::class, 'index'])->name('ds-divisions.index');
+    Route::get('/ds-divisions/common-qr-pdf', [DsDivisionController::class, 'downloadCommonQrPdf'])
+        ->name('ds-divisions.commonQrPdf');
     // Show QR page
     Route::get('/{counterId}/qr', [DsDivisionController::class, 'showQr'])->name('showQr');
 

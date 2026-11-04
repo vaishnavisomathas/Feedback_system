@@ -65,7 +65,7 @@ Complaints - PDMT
     }
 </style>
 @section('content')
-<div class="container">
+<div class="container-fluid px-0">
 
     <h2 class="mb-0">Complaint Management</h2>
 <div class="card shadow border-0">
@@ -253,7 +253,8 @@ Complaints - PDMT
                             {{ ['','Bad','Poor','Average','Good','Excellent'][$rating->rating] ?? 'N/A' }}
                         </td>
                         <td>
-                            {{ $rating->created_at->format('d M Y') }}
+                            <div>{{ $rating->created_at->format('d M Y') }}</div>
+                            <small class="text-muted">{{ $rating->created_at->format('h:i A') }}</small>
                         </td>
                         <td>
                             @if($rating->status == 'pending' || $rating->status == null)
@@ -363,7 +364,8 @@ Complaints - PDMT
                         </td>
 
                         <td>
-                            {{ $rating->created_at->format('d M Y') }}
+                            <div>{{ $rating->created_at->format('d M Y') }}</div>
+                            <small class="text-muted">{{ $rating->created_at->format('h:i A') }}</small>
                         </td>
                         <td>
                             @switch($rating->status)

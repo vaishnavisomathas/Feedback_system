@@ -4,7 +4,7 @@
 
 @section('content')
 @include('reports.partials.report_table_styles')
-<div class="container">
+<div class="container-fluid px-0">
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
         <h2 class="mb-0">Manual Complaint Report</h2>
         <a href="{{ route('reports.manual-complaints.pdf', request()->query()) }}" class="btn btn-danger btn-sm">

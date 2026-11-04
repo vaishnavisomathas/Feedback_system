@@ -4,7 +4,7 @@
 
 @section('content')
 @include('reports.partials.report_table_styles')
-<div class="container">
+<div class="container-fluid px-0">
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
         <h2 class="mb-0">QR Complaint Report</h2>
         <a href="{{ route('reports.qr-complaints.pdf', request()->except('page', 'per_page')) }}" class="btn btn-danger btn-sm">
@@ -67,7 +67,10 @@
                 </thead>
                 <tbody>@forelse($complaints as $index => $item)<tr>
                         <td>{{ $complaints->firstItem() + $index }}</td>
-                        <td>{{ $item->created_at?->format('d M Y') }}</td>
+                        <td>
+                            <div>{{ $item->created_at?->format('d M Y') }}</div>
+                            <small class="text-muted">{{ $item->created_at?->format('h:i A') }}</small>
+                        </td>
                         <td>{{ $item->counter->division_name ?? '-' }}<br>{{ $item->counter->counter_name ?? '-' }}</td>
                         <td>{{ $item->phone ?? '-' }}</td>
                         <td>{{ $item->complaint_email ?? '-' }}</td>
