@@ -371,28 +371,68 @@ Administrative Officer Complaints- PDMT
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div class="row g-3">
-                    <div class="col-md-6"><strong>Vehicle:</strong> <span id="pendingAoVehicle">-</span></div>
-                    <div class="col-md-6"><strong>Phone:</strong> <span id="pendingAoPhone">-</span></div>
-                    <div class="col-md-6"><strong>Email:</strong> <span id="pendingAoEmail">-</span></div>
-                    <div class="col-md-6"><strong>DS Division - Counter:</strong> <span id="pendingAoDivisionCounter">-</span></div>
-                    <div class="col-md-6"><strong>Service Quality:</strong> <span id="pendingAoServiceQuality">-</span></div>
-                    <div class="col-md-6"><strong>Rating:</strong> <span id="pendingAoRating">-</span></div>
-                    <div class="col-md-6"><strong>Complaint Type:</strong> <span id="pendingAoType">-</span></div>
-                    <div class="col-md-6"><strong>User Remarks:</strong> <span id="pendingAoUserRemarks">-</span></div>
-                    <div class="col-12">
-                        <strong>Complaint:</strong>
-                        <div class="p-2 bg-light rounded border" id="pendingAoComplaint">-</div>
+                <div class="row g-2 mb-3">
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Vehicle</span>
+                            <div id="pendingAoVehicle" class="modal-info-value">-</div>
+                        </div>
                     </div>
-                    <div class="col-12">
-                        <form method="POST" id="pendingAoActionForm">
-                            @csrf
-                            <label><strong>AO Final Remarks</strong></label>
-                            <textarea name="ao_remarks" class="form-control mb-2"></textarea>
-                            <button class="btn btn-success btn-sm" name="action" value="verify">Verified</button>
-                            <button class="btn btn-warning btn-sm text-dark" name="action" value="inform_commissioner">Inform By Commissioner</button>
-                        </form>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Phone</span>
+                            <div id="pendingAoPhone" class="modal-info-value">-</div>
+                        </div>
                     </div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Email</span>
+                            <div id="pendingAoEmail" class="modal-info-value">-</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">DS Division - Counter</span>
+                            <div id="pendingAoDivisionCounter" class="modal-info-value">-</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Service Quality</span>
+                            <div id="pendingAoServiceQuality" class="modal-info-value">-</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Rating</span>
+                            <div id="pendingAoRating" class="modal-info-value">-</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Complaint Type</span>
+                            <div id="pendingAoType" class="modal-info-value">-</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">User Remarks</span>
+                            <div id="pendingAoUserRemarks" class="modal-info-value">-</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted mb-1"><strong>Complaint:</strong></label>
+                    <div class="modal-text-box" id="pendingAoComplaint">-</div>
+                </div>
+                <div class="modal-form-box">
+                    <form method="POST" id="pendingAoActionForm">
+                        @csrf
+                        <label><strong>AO Final Remarks</strong></label>
+                        <textarea name="ao_remarks" class="form-control mb-3" rows="3"></textarea>
+                        <button class="btn btn-success btn-sm" name="action" value="verify">Verified</button>
+                        <button class="btn btn-warning btn-sm text-dark" name="action" value="inform_commissioner">Inform By Commissioner</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -407,25 +447,71 @@ Administrative Officer Complaints- PDMT
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div class="row g-3">
-                    <div class="col-md-6"><strong>Vehicle:</strong> <span id="closedAoVehicle">-</span></div>
-                    <div class="col-md-6"><strong>Phone:</strong> <span id="closedAoPhone">-</span></div>
-                    <div class="col-md-6"><strong>Email:</strong> <span id="closedAoEmail">-</span></div>
-                    <div class="col-md-6"><strong>DS Division - Counter:</strong> <span id="closedAoDivisionCounter">-</span></div>
-                    <div class="col-md-6"><strong>Service Quality:</strong> <span id="closedAoServiceQuality">-</span></div>
-                    <div class="col-md-6"><strong>Rating:</strong> <span id="closedAoRating">-</span></div>
-                    <div class="col-md-6"><strong>Complaint Type:</strong> <span id="closedAoType">-</span></div>
-                    <div class="col-md-6"><strong>User Remarks:</strong> <span id="closedAoUserRemarks">-</span></div>
-                    <div class="col-md-6"><strong>AO Remarks:</strong> <span id="closedAoAoRemarks">-</span></div>
-                    <div class="col-12">
-                        <strong>Complaint:</strong>
-                        <div class="p-2 bg-light rounded border" id="closedAoComplaint">-</div>
+                <div class="row g-2 mb-3">
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Vehicle</span>
+                            <div id="closedAoVehicle" class="modal-info-value">-</div>
+                        </div>
                     </div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Phone</span>
+                            <div id="closedAoPhone" class="modal-info-value">-</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Email</span>
+                            <div id="closedAoEmail" class="modal-info-value">-</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">DS Division - Counter</span>
+                            <div id="closedAoDivisionCounter" class="modal-info-value">-</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Service Quality</span>
+                            <div id="closedAoServiceQuality" class="modal-info-value">-</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Rating</span>
+                            <div id="closedAoRating" class="modal-info-value">-</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Complaint Type</span>
+                            <div id="closedAoType" class="modal-info-value">-</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">User Remarks</span>
+                            <div id="closedAoUserRemarks" class="modal-info-value">-</div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">AO Remarks</span>
+                            <div id="closedAoAoRemarks" class="modal-info-value">-</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label text-muted mb-1"><strong>Complaint:</strong></label>
+                    <div class="modal-text-box" id="closedAoComplaint">-</div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 @endsection
 
 @section('script')

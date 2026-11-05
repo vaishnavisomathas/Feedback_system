@@ -266,59 +266,77 @@ Manual Complaints - PDMT
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div class="row g-3">
+                <div class="row g-2 mb-3">
                     <div class="col-md-6">
-                        <label class="form-label text-muted mb-1">Name</label>
-                        <div id="detailsComplainantName" class="fw-semibold">-</div>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label text-muted mb-1">Source</label>
-                        <div id="detailsSource" class="fw-semibold">-</div>
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Name</span>
+                            <div id="detailsComplainantName" class="modal-info-value">-</div>
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label text-muted mb-1">Phone</label>
-                        <div id="detailsPhone" class="fw-semibold">-</div>
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Source</span>
+                            <div id="detailsSource" class="modal-info-value">-</div>
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label text-muted mb-1">Email</label>
-                        <div id="detailsComplaintEmail" class="fw-semibold">-</div>
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Phone</span>
+                            <div id="detailsPhone" class="modal-info-value">-</div>
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label text-muted mb-1">Vehicle Number</label>
-                        <div id="detailsVehicleNumber" class="fw-semibold">-</div>
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Email</span>
+                            <div id="detailsComplaintEmail" class="modal-info-value">-</div>
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label text-muted mb-1">Complaint Type</label>
-                        <div id="detailsComplaintType" class="fw-semibold">-</div>
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Vehicle Number</span>
+                            <div id="detailsVehicleNumber" class="modal-info-value">-</div>
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label text-muted mb-1">Entered By</label>
-                        <div id="detailsEnteredBy" class="fw-semibold">-</div>
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Complaint Type</span>
+                            <div id="detailsComplaintType" class="modal-info-value">-</div>
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label text-muted mb-1">Date</label>
-                        <div id="detailsReceivedDate" class="fw-semibold">-</div>
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Entered By</span>
+                            <div id="detailsEnteredBy" class="modal-info-value">-</div>
+                        </div>
                     </div>
-
-                    <div class="col-12">
-                        <label class="form-label text-muted mb-1">Complaint</label>
-                        <div id="detailsComplaintText" class="p-3 bg-light rounded border">-</div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Date</span>
+                            <div id="detailsReceivedDate" class="modal-info-value">-</div>
+                        </div>
                     </div>
-                       <div class="col-md-12">
-                        <label class="form-label text-muted mb-1">Action Note</label>
-                        <div id="detailsActionNoteView" class="p-3 bg-light rounded border">-</div>
-                    </div>
-                    @if($isAdministrativeOfficer)
-                    <div class="col-12">
-                        <form method="POST" id="aoVerifyForwardForm">
-                            @csrf
-                            <div class="d-flex justify-content-end mt-2">
-                                <button type="submit" name="action" value="verify" class="btn btn-outline-secondary btn-sm">Verified</button>
-                            </div>
-                        </form>
-                    </div>
-                    @endif
                 </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-muted mb-1">Complaint</label>
+                    <div id="detailsComplaintText" class="modal-text-box">-</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-muted mb-1">Action Note</label>
+                    <div id="detailsActionNoteView" class="modal-text-box">-</div>
+                </div>
+
+                @if($isAdministrativeOfficer)
+                <div class="modal-form-box">
+                    <form method="POST" id="aoVerifyForwardForm">
+                        @csrf
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" name="action" value="verify" class="btn btn-outline-secondary btn-sm">Verified</button>
+                        </div>
+                    </form>
+                </div>
+                @endif
             </div>
         </div>
     </div>

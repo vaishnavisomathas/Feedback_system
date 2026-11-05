@@ -37,7 +37,7 @@ Manual Complaint Sources - PDMT
 
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 id="sourceModalTitle">Add Source</h5>
+                        <h5 class="modal-title" id="sourceModalTitle">Add Source</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">

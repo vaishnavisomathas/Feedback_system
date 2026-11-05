@@ -66,7 +66,7 @@ Complaint Types - PDMT
                 <div class="modal-content">
 
                     <div class="modal-header">
-                        <h5 id="modalTitle">Add Complaint Type</h5>
+                        <h5 class="modal-title" id="modalTitle">Add Complaint Type</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
 

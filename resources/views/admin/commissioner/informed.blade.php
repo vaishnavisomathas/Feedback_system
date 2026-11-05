@@ -192,90 +192,90 @@ Informed Complaints - PDMT
 
                         {{-- MODAL --}}
                         <div class="modal fade" id="informedModal{{ $c->id }}">
-<div class="modal-dialog modal-lg modal-dialog-centered informed-modal-dialog">
-                                    <div class="modal-content rounded-0">
-
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Complaint Details</h5>
-                                        <button type="button"
-                                                class="btn-close"
-                                                data-bs-dismiss="modal"></button>
-                                    </div>
-
-                                    <div class="modal-body">
-
-                                        <div class="alert alert-danger py-2 mb-3">
-                                            <strong> Informed to Commissioner</strong>
-                                        </div>
-
-                                        <div class="row">
-
-                                            <div class="col-md-6 mb-2">
-                                                <strong>Vehicle:-</strong>
-                                                {{ $c->vehicle_number ?? '-' }}
-                                            </div>
-
-                                            <div class="col-md-6 mb-2">
-                                                <strong>Phone:-</strong>
-                                                {{ $c->phone ?? '-' }}
-                                            </div>
-
-                                            <div class="col-md-6 mb-2">
-                                                <strong>Email:-</strong>
-                                                {{ $c->complaint_email ?? '-' }}
-                                            </div>
-   <div class="col-md-6 mb-2">
-                                                <strong>Division:-</strong>
-                                                {{ $c->counter->division_name ?? '-' }}
-                                            </div>
-                                            <div class="col-md-6 mb-2">
-                                                <strong>Complaint Type:-</strong>
-                                                <span class="badge bg-warning text-dark">
-                                                    {{ $c->complainType->name ?? 'N/A' }}
-                                                </span>
-                                            </div>
-
-                                         
-
-                                            <div class="col-md-6 mb-2">
-                                                <strong>Counter:-</strong>
-                                                {{ $c->counter->counter_name ?? '-' }}
-                                            </div>
-
-                                            <div class="col-md-6 mb-2">
-                                                <strong>Service Quality:-</strong>
-                                                {{ $c->serviceQuality->name ?? '-' }}
-                                            </div>
-
-                                            <div class="col-md-6 mb-2">
-                                                <strong>Rating:-</strong>
-                                                {{ ['','Bad','Poor','Average','Good','Excellent'][$c->rating] ?? '-' }}
-                                            </div>
-
-                                            <div class="col-md-12 mb-2">
-                                                <strong>Complaint:-</strong>
-                                                <div class="p-2 bg-light rounded border mt-1">
-                                                    {{ $c->note ?? '-' }}
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-6 mb-2">
-                                                <strong>User Remarks:-</strong>
-                                                {{ $c->user_remarks ?? '-' }}
-                                            </div>
-
-                                            <div class="col-md-6 mb-2">
-                                                <strong>AO Remarks:-</strong>
-                                                {{ $c->ao_remarks ?? '-' }}
-                                            </div>
-
-                                        </div>
-                                    </div>
-
-                                </div>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Complaint Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger py-2 mb-3">
+                    <strong> Informed to Commissioner</strong>
+                </div>
+                <div class="row g-2 mb-3">
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Vehicle:-</span>
+                            <div class="modal-info-value">{{ $c->vehicle_number ?? '-' }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Phone:-</span>
+                            <div class="modal-info-value">{{ $c->phone ?? '-' }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Email:-</span>
+                            <div class="modal-info-value">{{ $c->complaint_email ?? '-' }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Division:-</span>
+                            <div class="modal-info-value">{{ $c->counter->division_name ?? '-' }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Complaint Type:-</span>
+                            <div class="modal-info-value">
+                                <span class="badge bg-warning text-dark">{{ $c->complainType->name ?? 'N/A' }}</span>
                             </div>
                         </div>
-                    @empty
+                    </div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Counter:-</span>
+                            <div class="modal-info-value">{{ $c->counter->counter_name ?? '-' }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Service Quality:-</span>
+                            <div class="modal-info-value">{{ $c->serviceQuality->name ?? '-' }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Rating:-</span>
+                            <div class="modal-info-value">{{ ['','Bad','Poor','Average','Good','Excellent'][$c->rating] ?? '-' }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">User Remarks:-</span>
+                            <div class="modal-info-value">{{ $c->user_remarks ?? '-' }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">AO Remarks:-</span>
+                            <div class="modal-info-value">{{ $c->ao_remarks ?? '-' }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label text-muted mb-1"><strong>Complaint:-</strong></label>
+                    <div class="modal-text-box">{{ $c->note ?? '-' }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@empty
                         <tr>
                             <td colspan="10" class="text-center">No informed complaints found</td>
                         </tr>

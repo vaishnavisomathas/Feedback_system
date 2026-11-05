@@ -282,94 +282,68 @@ Commissioner Complaints - PDMT
                             {{-- PENDING MODAL --}}
 
                             <div class="modal fade" id="pendingModal{{ $c->id }}">
-
-                                <div class="modal-dialog modal-lg modal-dialog-centered">
-
-                                    <div class="modal-content rounded-0">
-                                        <div class="modal-header">
-
-                                            <h5 class="modal-title">
-                                                Complaint Details
-                                            </h5>
-
-                                            <button type="button"
-                                                class="btn-close"
-                                                data-bs-dismiss="modal"></button>
-
-                                        </div>
-                                        <div class="modal-body">
-
-                                            @if($c->status === 'commissioner')
-                                            <div class="alert alert-danger py-2 mb-3" role="alert">
-                                                <strong>Important:</strong>  Informed to Commissioner.
-                                            </div>
-                                            @endif
-
-                                            <div class="row">
-
-                                                <div class="col-md-6 mb-2">
-
-                                                    <strong>Vehicle:-</strong>
-
-                                                    {{ $c->vehicle_number }}
-
-                                                </div>
-
-                                                <div class="col-md-6 mb-2">
-
-                                                    <strong>Phone:-</strong>
-                                                    {{ $c->phone }}
-
-                                                </div>
-                                                <div class="col-md-6 mb-2">
-
-                                                    <strong>Email:-</strong>
-                                                    {{ $c->complaint_email ?? '-' }}
-
-                                                </div>
-                                                <div class="col-md-6 mb-2">
-
-                                                    <strong>Complaint:</strong> {{ $c->note }}
-
-
-                                                </div>
-                                                <div class="col-md-6 mb-2">
-
-                                                    <strong>Complaint Type</strong>
-
-                                                    <span class="badge bg-warning text-dark">
-                                                        {{ $c->complainType->name ?? 'N/A' }}
-                                                    </span>
-                                                </div>
-
-
-
-                                                <div class="col-md-6 mb-2">
-
-                                                    <strong>User Remarks:-</strong>
-                                                    {{ $c->user_remarks ?? '-' }}
-
-                                                </div>
-
-                                                <div class="col-md-6 mb-2">
-
-                                                    <strong>AO Remarks:-</strong>
-                                                    {{ $c->ao_remarks ?? '-' }}
-
-                                                </div>
-
-                                            </div>
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Complaint Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                @if($c->status === 'commissioner')
+                <div class="alert alert-danger py-2 mb-3" role="alert">
+                    <strong>Important:</strong> Informed to Commissioner.
+                </div>
+                @endif
+                <div class="row g-2 mb-3">
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Vehicle:-</span>
+                            <div class="modal-info-value">{{ $c->vehicle_number }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Phone:-</span>
+                            <div class="modal-info-value">{{ $c->phone }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Email:-</span>
+                            <div class="modal-info-value">{{ $c->complaint_email ?? '-' }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Complaint Type</span>
+                            <div class="modal-info-value">
+                                <span class="badge bg-warning text-dark">{{ $c->complainType->name ?? 'N/A' }}</span>
                             </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">User Remarks:-</span>
+                            <div class="modal-info-value">{{ $c->user_remarks ?? '-' }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">AO Remarks:-</span>
+                            <div class="modal-info-value">{{ $c->ao_remarks ?? '-' }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label text-muted mb-1"><strong>Complaint:</strong></label>
+                    <div class="modal-text-box">{{ $c->note ?? '-' }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-
-                            @empty
+@empty
 
                             <tr>
 

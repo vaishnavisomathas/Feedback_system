@@ -247,6 +247,147 @@
       transform: scale(1.08);
     }
 
+    /* =====================================
+       PROFESSIONAL MODAL DESIGN SYSTEM
+    ===================================== */
+    .modal-content {
+      border-radius: 16px !important;
+      border: 1px solid rgba(15, 23, 42, 0.08) !important;
+      box-shadow: 0 20px 45px rgba(15, 23, 42, 0.16) !important;
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    .modal-header {
+      background-color: #f8fafc;
+      border-bottom: 1px solid #e2e8f0 !important;
+      padding: 16px 22px !important;
+    }
+
+    .modal-title {
+      font-size: 16.5px !important;
+      font-weight: 700 !important;
+      color: #0f172a;
+      letter-spacing: -0.2px;
+      margin: 0;
+    }
+
+    .modal-body {
+      padding: 22px !important;
+    }
+
+    .modal-footer {
+      background-color: #f8fafc;
+      border-top: 1px solid #e2e8f0 !important;
+      padding: 14px 22px !important;
+    }
+
+    /* Modal Info Tiles (Label + Value pairs) */
+    .modal-info-tile {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      height: 100%;
+      transition: all 0.2s ease;
+    }
+
+    .modal-info-tile:hover {
+      border-color: #cbd5e1;
+      background: #f1f5f9;
+    }
+
+    .modal-info-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #64748b;
+      font-weight: 700;
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .modal-info-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: #0f172a;
+      word-break: break-word;
+    }
+
+    /* Text display boxes (for Complaint, Action Note, Remarks) */
+    .modal-text-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-left: 3.5px solid #3b82f6;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 13.5px;
+      color: #1e293b;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    /* Form container inside Modal */
+    .modal-form-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 16px;
+      margin-top: 10px;
+    }
+
+    /* Dark Mode Overrides for Modals */
+    [data-bs-theme="dark"] .modal-content {
+      background-color: #1e293b !important;
+      border-color: #334155 !important;
+      color: #f1f5f9 !important;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5) !important;
+    }
+
+    [data-bs-theme="dark"] .modal-header,
+    [data-bs-theme="dark"] .modal-footer {
+      background-color: #182234 !important;
+      border-color: #334155 !important;
+    }
+
+    [data-bs-theme="dark"] .modal-title {
+      color: #f8fafc !important;
+    }
+
+    [data-bs-theme="dark"] .modal-header .btn-close {
+      filter: invert(1) grayscale(100%) brightness(200%);
+    }
+
+    [data-bs-theme="dark"] .modal-info-tile {
+      background: #182234 !important;
+      border-color: #334155 !important;
+    }
+
+    [data-bs-theme="dark"] .modal-info-tile:hover {
+      background: #1e293b !important;
+      border-color: #475569 !important;
+    }
+
+    [data-bs-theme="dark"] .modal-info-label {
+      color: #94a3b8 !important;
+    }
+
+    [data-bs-theme="dark"] .modal-info-value {
+      color: #f1f5f9 !important;
+    }
+
+    [data-bs-theme="dark"] .modal-text-box {
+      background: #182234 !important;
+      border-color: #334155 !important;
+      border-left-color: #3b82f6 !important;
+      color: #f1f5f9 !important;
+    }
+
+    [data-bs-theme="dark"] .modal-form-box {
+      background: #182234 !important;
+      border-color: #334155 !important;
+    }
+
     /* =========================
    SIDEBAR (CLEAN WHITE)
 ========================= */

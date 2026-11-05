@@ -438,54 +438,68 @@ Complaints - PDMT
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div class="row g-3">
+                <div class="row g-2 mb-3">
                     <div class="col-md-6">
-                        <label class="form-label text-muted mb-1">Vehicle</label>
-                        <div id="pendingDetailsVehicle" class="fw-semibold">-</div>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label text-muted mb-1">Phone</label>
-                        <div id="pendingDetailsPhone" class="fw-semibold">-</div>
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Vehicle</span>
+                            <div id="pendingDetailsVehicle" class="modal-info-value">-</div>
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label text-muted mb-1">Email</label>
-                        <div id="pendingDetailsEmail" class="fw-semibold">-</div>
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Phone</span>
+                            <div id="pendingDetailsPhone" class="modal-info-value">-</div>
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label text-muted mb-1">DS Division - Counter</label>
-                        <div id="pendingDetailsDivisionCounter" class="fw-semibold">-</div>
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Email</span>
+                            <div id="pendingDetailsEmail" class="modal-info-value">-</div>
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label text-muted mb-1">Service Quality</label>
-                        <div id="pendingDetailsServiceQuality" class="fw-semibold">-</div>
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">DS Division - Counter</span>
+                            <div id="pendingDetailsDivisionCounter" class="modal-info-value">-</div>
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label text-muted mb-1">Rating</label>
-                        <div id="pendingDetailsRating" class="fw-semibold">-</div>
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Service Quality</span>
+                            <div id="pendingDetailsServiceQuality" class="modal-info-value">-</div>
+                        </div>
                     </div>
-                    <div class="col-12">
-                        <label class="form-label text-muted mb-1">Complaint</label>
-                        <div id="pendingDetailsComplaint" class="p-3 bg-light rounded border">-</div>
+                    <div class="col-md-6">
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Rating</span>
+                            <div id="pendingDetailsRating" class="modal-info-value">-</div>
+                        </div>
                     </div>
-                    <div class="col-12">
-                        <form method="POST" id="pendingComplaintForm">
-                            @csrf
-                            <div class="mb-3">
-                                <label><strong>Complaint Type:</strong></label>
-                                <select name="complain_type_id" id="pendingComplaintType" class="form-control">
-                                    <option value="">-- Select Type --</option>
-                                    @foreach($types as $type)
-                                    <option value="{{ $type->id }}">{{ $type->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label><strong>Remarks:</strong></label>
-                                <textarea name="user_remarks" id="pendingComplaintRemarks" class="form-control" rows="3"></textarea>
-                            </div>
-                            <button class="btn btn-danger btn-sm">Forward to Administrative Officer</button>
-                        </form>
-                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-muted mb-1">Complaint</label>
+                    <div id="pendingDetailsComplaint" class="modal-text-box">-</div>
+                </div>
+
+                <div class="modal-form-box">
+                    <form method="POST" id="pendingComplaintForm">
+                        @csrf
+                        <div class="mb-3">
+                            <label><strong>Complaint Type:</strong></label>
+                            <select name="complain_type_id" id="pendingComplaintType" class="form-control">
+                                <option value="">-- Select Type --</option>
+                                @foreach($types as $type)
+                                <option value="{{ $type->id }}">{{ $type->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label><strong>Remarks:</strong></label>
+                            <textarea name="user_remarks" id="pendingComplaintRemarks" class="form-control" rows="3"></textarea>
+                        </div>
+                        <button class="btn btn-danger btn-sm">Forward to Administrative Officer</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -500,56 +514,77 @@ Complaints - PDMT
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div class="row g-3">
+                <div class="row g-2 mb-3">
                     <div class="col-md-6">
-                        <label class="form-label text-muted mb-1">Vehicle</label>
-                        <div id="closedDetailsVehicle" class="fw-semibold">-</div>
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Vehicle</span>
+                            <div id="closedDetailsVehicle" class="modal-info-value">-</div>
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label text-muted mb-1">Phone</label>
-                        <div id="closedDetailsPhone" class="fw-semibold">-</div>
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Phone</span>
+                            <div id="closedDetailsPhone" class="modal-info-value">-</div>
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label text-muted mb-1">Email</label>
-                        <div id="closedDetailsEmail" class="fw-semibold">-</div>
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Email</span>
+                            <div id="closedDetailsEmail" class="modal-info-value">-</div>
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label text-muted mb-1">Complaint Type</label>
-                        <div id="closedDetailsType" class="fw-semibold">-</div>
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Complaint Type</span>
+                            <div id="closedDetailsType" class="modal-info-value">-</div>
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label text-muted mb-1">DS Division - Counter</label>
-                        <div id="closedDetailsDivisionCounter" class="fw-semibold">-</div>
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">DS Division - Counter</span>
+                            <div id="closedDetailsDivisionCounter" class="modal-info-value">-</div>
+                        </div>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label text-muted mb-1">Service Quality</label>
-                        <div id="closedDetailsServiceQuality" class="fw-semibold">-</div>
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Service Quality</span>
+                            <div id="closedDetailsServiceQuality" class="modal-info-value">-</div>
+                        </div>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label text-muted mb-1">Rating</label>
-                        <div id="closedDetailsRating" class="fw-semibold">-</div>
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Rating</span>
+                            <div id="closedDetailsRating" class="modal-info-value">-</div>
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label text-muted mb-1">User Remarks</label>
-                        <div id="closedDetailsUserRemarks" class="p-2 bg-light rounded border">-</div>
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">User Remarks</span>
+                            <div id="closedDetailsUserRemarks" class="mt-1" style="font-size: 13.5px; line-height: 1.4;">-</div>
+                        </div>
                     </div>
                     <div class="col-md-6" id="closedDetailsAoWrap">
-                        <label class="form-label text-muted mb-1">AO Remarks</label>
-                        <div id="closedDetailsAoRemarks" class="p-2 bg-light rounded border">-</div>
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">AO Remarks</span>
+                            <div id="closedDetailsAoRemarks" class="mt-1" style="font-size: 13.5px; line-height: 1.4;">-</div>
+                        </div>
                     </div>
                     <div class="col-md-6" id="closedDetailsCommissionerWrap">
-                        <label class="form-label text-muted mb-1">Final Commissioner Decision</label>
-                        <div id="closedDetailsCommissionerRemarks" class="p-2 bg-light rounded border">-</div>
+                        <div class="modal-info-tile">
+                            <span class="modal-info-label">Final Commissioner Decision</span>
+                            <div id="closedDetailsCommissionerRemarks" class="mt-1" style="font-size: 13.5px; line-height: 1.4;">-</div>
+                        </div>
                     </div>
-                    <div class="col-12">
-                        <label class="form-label text-muted mb-1">Complaint</label>
-                        <div id="closedDetailsComplaint" class="p-3 bg-light rounded border">-</div>
-                    </div>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label text-muted mb-1">Complaint</label>
+                    <div id="closedDetailsComplaint" class="modal-text-box">-</div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 @endsection
 @section('script')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
