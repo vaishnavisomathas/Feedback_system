@@ -127,6 +127,39 @@ $topDivisions = $query
 ->with('counter')
 ->take(5)
 ->get();
+
+        // Rating Distribution (5 to 1 stars)
+        $ratingDistribution = [
+            5 => Feedback::where('rating', 5)->count(),
+            4 => Feedback::where('rating', 4)->count(),
+            3 => Feedback::where('rating', 3)->count(),
+            2 => Feedback::where('rating', 2)->count(),
+            1 => Feedback::where('rating', 1)->count(),
+        ];
+
+        // Overall Average Rating & Satisfaction Rate
+        $overallAvgRating = round(Feedback::avg('rating') ?? 0, 1);
+        $positiveRatingsCount = Feedback::whereIn('rating', [4, 5])->count();
+        $satisfactionPercentage = $totalRatings > 0 ? round(($positiveRatingsCount / $totalRatings) * 100) : 0;
+
+        // 6-Month Trend for Visual Analytics
+        $trendLabels = [];
+        $trendRatings = [];
+        $trendComplaints = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $monthStart = Carbon::now()->subMonths($i)->startOfMonth();
+            $monthEnd = Carbon::now()->subMonths($i)->endOfMonth();
+            $trendLabels[] = $monthStart->format('M Y');
+            $trendRatings[] = Feedback::whereBetween('created_at', [$monthStart, $monthEnd])->count();
+            $trendComplaints[] = Feedback::whereBetween('created_at', [$monthStart, $monthEnd])
+                ->where(function ($q) {
+                    $q->where('has_complaint', 'yes')
+                      ->orWhere(function ($sub) {
+                          $sub->whereNotNull('note')->where('note', '!=', '');
+                      });
+                })->count();
+        }
+
         return view('welcome', compact(
             'totalRatings',
             'totalComplaints',
@@ -139,7 +172,13 @@ $topDivisions = $query
             'highestYear',
             'latestComplaints',
             'topDivisions',
-            'pending','ao','commissioner'
+            'pending','ao','commissioner',
+            'ratingDistribution',
+            'overallAvgRating',
+            'satisfactionPercentage',
+            'trendLabels',
+            'trendRatings',
+            'trendComplaints'
         ));
     }
 

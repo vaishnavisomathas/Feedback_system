@@ -16,4 +16,17 @@ class ExampleTest extends TestCase
 
         $response->assertStatus(200);
     }
+
+    public function test_dashboard_can_be_rendered_for_authenticated_user(): void
+    {
+        $user = \App\Models\User::first();
+        if (!$user) {
+            $user = \App\Models\User::factory()->create();
+        }
+
+        $response = $this->actingAs($user)->get(route('dashboard'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Provincial Department of Motor Traffic');
+    }
 }
